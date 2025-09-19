@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Analytics Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --primary-light: #8377f1;
+            --primary-dark: #5649d3;
+            --secondary: #fd79a8;
+            --accent: #00cec9;
+            --dark: #2d3436;
+            --light: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.92);
+            --sidebar-bg: rgba(45, 52, 54, 0.95);
+            --text-dark: #2d3436;
+            --text-light: #dfe6e9;
+            --success: #00b894;
+            --warning: #fdcb6e;
+            --danger: #d63031;
+            --transition: all 0.3s ease;
+            --border-radius: 16px;
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+            --gradient: linear-gradient(135deg, var(--primary), var(--accent));
+        }
+
+        .dark-theme {
+            --primary: #8377f1;
+            --primary-light: #6c5ce7;
+            --primary-dark: #5649d3;
+            --card-bg: rgba(45, 52, 54, 0.92);
+            --sidebar-bg: rgba(25, 30, 32, 0.97);
+            --text-dark: #dfe6e9;
+            --text-light: #dfe6e9;
+            --light: #2d3436;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #6c5ce7 0%, #2d3436 100%);
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Layout */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            color: var(--text-light);
+            padding: 2rem 1.5rem;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+            box-shadow: 5px 0 25px rgba(0, 0, 0, 0.15);
+            z-index: 10;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .auth-logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .auth-logo i {
+            font-size: 2.5rem;
+            color: var(--primary-light);
+            margin-right: 12px;
+        }
+
+        .logo h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.6rem;
+            background: linear-gradient(to right, var(--primary-light), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .menu-title {
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            color: var(--primary-light);
+            margin: 1.5rem 0 1rem;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.2rem;
+            margin-bottom: 0.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: var(--gradient);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .menu-item:hover {
+            background: rgba(166, 155, 254, 0.1);
+            transform: translateX(5px);
+        }
+
+        .menu-item.active {
+            background: rgba(166, 155, 254, 0.15);
+        }
+
+        .menu-item.active::before {
+            opacity: 1;
+        }
+
+        .menu-item i {
+            margin-right: 12px;
+            font-size: 1.2rem;
+            color: var(--primary-light);
+            width: 24px;
+            text-align: center;
+        }
+
+        .menu-item span {
+            font-weight: 500;
+        }
+
+        .menu-badge {
+            margin-left: auto;
+            background: var(--primary);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 2.5rem;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            padding: 1.5rem;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            backdrop-filter: blur(10px);
+        }
+
+        .header h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            background: var(--light);
+            border-radius: 30px;
+            padding: 0.3rem;
+            cursor: pointer;
+        }
+
+        .theme-toggle-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.6rem;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            transition: var(--transition);
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            padding: 0.8rem 1.2rem 0.8rem 3rem;
+            border: none;
+            background: var(--light);
+            border-radius: 30px;
+            width: 250px;
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-dark);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+            box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3);
+        }
+
+        .user-info h4 {
+            font-weight: 600;
+        }
+
+        .user-info p {
+            font-size: 0.85rem;
+            color: var(--primary);
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.8rem;
+            margin-bottom: 2.5rem;
+        }
+
+        /* Stats Cards */
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 1.8rem;
+            box-shadow: var(--card-shadow);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-icon {
+            width: 65px;
+            height: 65px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1.5rem;
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        .stat-icon.blue {
+            background: var(--gradient);
+        }
+
+        .stat-icon.green {
+            background: linear-gradient(135deg, var(--success), #00a382);
+        }
+
+        .stat-icon.pink {
+            background: linear-gradient(135deg, var(--secondary), #e84393);
+        }
+
+        .stat-icon.teal {
+            background: linear-gradient(135deg, var(--accent), #00a8ff);
+        }
+        .stat-icon.purple {
+            background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+        }
+        .stat-icon.orange {
+            background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+        }
+
+        .stat-info h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-info p {
+            color: var(--text-dark);
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Main Content Area */
+        .content-area {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        /* Student Table */
+        .table-container {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--card-shadow);
+            backdrop-filter: blur(10px);
+            margin-bottom: 2rem;
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .table-header h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 1.4rem;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.9rem 1.6rem;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(108, 92, 231, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            box-shadow: none;
+        }
+
+        .btn-outline:hover {
+            background: var(--gradient);
+            color: white;
+            border-color: transparent;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th, td {
+            padding: 1.2rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        th {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        tbody tr {
+            transition: var(--transition);
+        }
+
+        tbody tr:hover {
+            background: rgba(108, 92, 231, 0.05);
+        }
+
+        .status {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status.active {
+            background: rgba(0, 184, 148, 0.2);
+            color: var(--success);
+        }
+
+        .status.inactive {
+            background: rgba(214, 48, 49, 0.2);
+            color: var(--danger);
+        }
+
+        .level {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .level.beginner {
+            background: rgba(253, 203, 110, 0.2);
+            color: var(--warning);
+        }
+
+        .level.intermediate {
+            background: rgba(0, 206, 201, 0.2);
+            color: var(--accent);
+        }
+
+        .level.advanced {
+            background: rgba(108, 92, 231, 0.2);
+            color: var(--primary);
+        }
+
+        .action-cell {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .action-btn.edit {
+            background: rgba(108, 92, 231, 0.1);
+            color: var(--primary);
+        }
+
+        .action-btn.edit:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .action-btn.delete {
+            background: rgba(214, 48, 49, 0.1);
+            color: var(--danger);
+        }
+
+        .action-btn.delete:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Charts Container */
+        .charts-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 1.8rem;
+            box-shadow: var(--card-shadow);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-header h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 250px;
+            width: 100%;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 700px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-header {
+            padding: 1.5rem 2rem;
+            background: var(--gradient);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.6rem;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: var(--light);
+            color: var(--text-dark);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+        }
+
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            background: rgba(0, 0, 0, 0.03);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: auto;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .content-area {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                width: 90px;
+                padding: 2rem 1rem;
+            }
+            .logo h1, .menu-title, .menu-item span, .menu-badge {
+                display: none;
+            }
+            .logo {
+                justify-content: center;
+            }
+            .menu-item {
+                justify-content: center;
+                padding: 1rem 0.5rem;
+            }
+            .menu-item i {
+                margin-right: 0;
+                font-size: 1.4rem;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .dashboard-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                padding: 1.5rem;
+                display: flex;
+                flex-direction: column;
+            }
+            .logo {
+                justify-content: flex-start;
+                margin-bottom: 1rem;
+            }
+            
+            .logo h1, .menu-item span {
+                display: inline-block;
+            }
+            .menu-title {
+                display: block;
+            }
+            .menu-item {
+                justify-content: flex-start;
+            }
+
+            .main-content {
+                padding: 1.5rem;
+            }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1.5rem;
+            }
+            .header-actions {
+                width: 100%;
+                flex-wrap: wrap;
+                justify-content: space-between;
+            }
+            .search-box input {
+                width: 100%;
+            }
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            .table-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+         @media (max-width: 480px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+         }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-card, .table-container, .chart-card {
+            animation: fadeIn 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .stat-card:nth-child(2) { animation-delay: 0.1s; }
+        .stat-card:nth-child(3) { animation-delay: 0.2s; }
+        .stat-card:nth-child(4) { animation-delay: 0.3s; }
+        .stat-card:nth-child(5) { animation-delay: 0.4s; }
+        .stat-card:nth-child(6) { animation-delay: 0.5s; }
+
+
+        #full-logo{
+    display: flex;
+}
+#full-logo .auth-logo-icon{
+            font-size:2.5rem;
+            margin-right: 15px;
+            color: var(--secondary);
+            filter: drop-shadow(0 0 10px var(--secondary));
+            animation: float 5s infinite ease-in-out;
+        
+}      
+.auth-logo .fas{
+    font-size:2.5rem;
+            margin-right: 15px;
+            color: var(--secondary);
+            filter: drop-shadow(0 0 10px var(--secondary));
+            animation: float 5s infinite ease-in-out;
+        
+}
+   @keyframes float {
+  0% { transform: translateY(-12px) translateX(0px) rotate(0deg) scale(1); }
+     33% { transform: translateY(-30px) translateX(40px) rotate(120deg) scale(1.1); }
+     66% { transform: translateY(30px) translateX(30px) rotate(240deg) scale(1.2); }
+     100% { transform: translateY(-12px) translateX(12px) rotate(360deg) scale(1.4); }
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    
+    <div class="app-container">
+        <div class="sidebar">
+             <div class="auth-logo">
+                    <i class="fas fa-graduation-cap auth-logo-icon"></i>
+                    <h1>Hack<span>NRun</span></h1>
+                </div>
+
+            <div class="menu-title">Main</div>
+            <div class="menu-item active">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </div>
+            <div class="menu-item">
+                <i class="fas fa-user-graduate"></i>
+                <a style="color: white; text-decoration: none;" href="leaderboard.html"><span>Dashboard</span></a>
+                <span class="menu-badge">142</span>
+            </div>
+            <div class="menu-item">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Faculty</span>
+            </div>
+            
+            <div class="menu-title">Analytics</div>
+            <div class="menu-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Performance</span>
+            </div>
+            <div class="menu-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Test Results</span>
+            </div>
+            <div class="menu-item">
+                <i class="fas fa-certificate"></i>
+                <span>Level Analysis</span>
+            </div>
+            
+            <div class="menu-title">Administration</div>
+            <div class="menu-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </div>
+            <div class="menu-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <h2>Student Analytics Dashboard</h2>
+                <div class="header-actions">
+                    <div class="theme-toggle">
+                        <div class="theme-toggle-btn">
+                            <i class="fas fa-moon"></i>
+                        </div>
+                    </div>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search students...">
+                    </div>
+                    <div class="user-profile">
+                        <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&q=80" alt="User" class="user-avatar">
+                        <div class="user-info">
+                            <h4>Dr. Williams</h4>
+                            <p>Academic Director</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>542</h3>
+                        <p>Total Students</p>
+                    </div>
+                </div>
+                
+               
+                <div class="stat-card">
+                    <div class="stat-icon pink">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>84%</h3>
+                        <p>Average Performance</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon teal">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>32</h3>
+                        <p>Total Tests</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon purple">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>1,248</h3>
+                        <p>Total Submissions</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>2,156</h3>
+                        <p>Classes Attended</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>Student Records</h3>
+                        <div class="table-actions">
+                            <button class="btn" id="addStudentBtn"><i class="fas fa-plus"></i> Add Student</button>
+                            <button class="btn btn-outline"><i class="fas fa-filter"></i> Filter</button>
+                        </div>
+                    </div>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Classes</th>
+                                <th>Tests</th>
+                                <th>Submissions</th>
+                                <th>Level</th>
+                                <th>Score</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>STU-001</td>
+                                <td>Emma Johnson</td>
+                                <td>32</td>
+                                <td>15</td>
+                                <td>14</td>
+                                <td><span class="level advanced">Advanced</span></td>
+                                <td>92%</td>
+                                <td><span class="status active">Active</span></td>
+                                <td class="action-cell">
+                                    <div class="action-btn edit"><i class="fas fa-edit"></i></div>
+                                    <div class="action-btn delete"><i class="fas fa-trash"></i></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>STU-002</td>
+                                <td>Michael Chen</td>
+                                <td>28</td>
+                                <td>12</td>
+                                <td>11</td>
+                                <td><span class="level intermediate">Intermediate</span></td>
+                                <td>85%</td>
+                                <td><span class="status active">Active</span></td>
+                                <td class="action-cell">
+                                    <div class="action-btn edit"><i class="fas fa-edit"></i></div>
+                                    <div class="action-btn delete"><i class="fas fa-trash"></i></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>STU-003</td>
+                                <td>Sarah Williams</td>
+                                <td>30</td>
+                                <td>10</td>
+                                <td>10</td>
+                                <td><span class="level advanced">Advanced</span></td>
+                                <td>95%</td>
+                                <td><span class="status active">Active</span></td>
+                                <td class="action-cell">
+                                    <div class="action-btn edit"><i class="fas fa-edit"></i></div>
+                                    <div class="action-btn delete"><i class="fas fa-trash"></i></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>STU-004</td>
+                                <td>James Wilson</td>
+                                <td>18</td>
+                                <td>8</td>
+                                <td>5</td>
+                                <td><span class="level beginner">Beginner</span></td>
+                                <td>72%</td>
+                                <td><span class="status inactive">Inactive</span></td>
+                                <td class="action-cell">
+                                    <div class="action-btn edit"><i class="fas fa-edit"></i></div>
+                                    <div class="action-btn delete"><i class="fas fa-trash"></i></div>
+                                </td>
+                            </tr>
+                             <tr>
+                                <td>STU-002</td>
+                                <td>Michael Chen</td>
+                                <td>28</td>
+                                <td>12</td>
+                                <td>11</td>
+                                <td><span class="level intermediate">Intermediate</span></td>
+                                <td>85%</td>
+                                <td><span class="status active">Active</span></td>
+                                <td class="action-cell">
+                                    <div class="action-btn edit"><i class="fas fa-edit"></i></div>
+                                    <div class="action-btn delete"><i class="fas fa-trash"></i></div>
+                                </td>
+                            </tr>
+                             <tr>
+                                <td>STU-002</td>
+                                <td>Michael Chen</td>
+                                <td>28</td>
+                                <td>12</td>
+                                <td>11</td>
+                                <td><span class="level intermediate">Intermediate</span></td>
+                                <td>85%</td>
+                                <td><span class="status active">Active</span></td>
+                                <td class="action-cell">
+                                    <div class="action-btn edit"><i class="fas fa-edit"></i></div>
+                                    <div class="action-btn delete"><i class="fas fa-trash"></i></div>
+                                </td>
+                            </tr>
+                             <tr>
+                                <td>STU-002</td>
+                                <td>Michael Chen</td>
+                                <td>28</td>
+                                <td>12</td>
+                                <td>11</td>
+                                <td><span class="level intermediate">Intermediate</span></td>
+                                <td>85%</td>
+                                <td><span class="status active">Active</span></td>
+                                <td class="action-cell">
+                                    <div class="action-btn edit"><i class="fas fa-edit"></i></div>
+                                    <div class="action-btn delete"><i class="fas fa-trash"></i></div>
+                                </td>
+                            </tr>
+                             <tr>
+                                <td>STU-002</td>
+                                <td>Michael Chen</td>
+                                <td>28</td>
+                                <td>12</td>
+                                <td>11</td>
+                                <td><span class="level intermediate">Intermediate</span></td>
+                                <td>85%</td>
+                                <td><span class="status active">Active</span></td>
+                                <td class="action-cell">
+                                    <div class="action-btn edit"><i class="fas fa-edit"></i></div>
+                                    <div class="action-btn delete"><i class="fas fa-trash"></i></div>
+                                </td>
+                            </tr>
+                             <tr>
+                                <td>STU-002</td>
+                                <td>Michael Chen</td>
+                                <td>28</td>
+                                <td>12</td>
+                                <td>11</td>
+                                <td><span class="level intermediate">Intermediate</span></td>
+                                <td>85%</td>
+                                <td><span class="status active">Active</span></td>
+                                <td class="action-cell">
+                                    <div class="action-btn edit"><i class="fas fa-edit"></i></div>
+                                    <div class="action-btn delete"><i class="fas fa-trash"></i></div>
+                                </td>
+                            </tr>
+                             <tr>
+                                <td>STU-002</td>
+                                <td>Michael Chen</td>
+                                <td>28</td>
+                                <td>12</td>
+                                <td>11</td>
+                                <td><span class="level intermediate">Intermediate</span></td>
+                                <td>85%</td>
+                                <td><span class="status active">Active</span></td>
+                                <td class="action-cell">
+                                    <div class="action-btn edit"><i class="fas fa-edit"></i></div>
+                                    <div class="action-btn delete"><i class="fas fa-trash"></i></div>
+                                </td>
+                            </tr>
+                             <tr>
+                                <td>STU-002</td>
+                                <td>Michael Chen</td>
+                                <td>28</td>
+                                <td>12</td>
+                                <td>11</td>
+                                <td><span class="level intermediate">Intermediate</span></td>
+                                <td>85%</td>
+                                <td><span class="status active">Active</span></td>
+                                <td class="action-cell">
+                                    <div class="action-btn edit"><i class="fas fa-edit"></i></div>
+                                    <div class="action-btn delete"><i class="fas fa-trash"></i></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>STU-005</td>
+                                <td>Olivia Martinez</td>
+                                <td>35</td>
+                                <td>14</td>
+                                <td>13</td>
+                                <td><span class="level advanced">Advanced</span></td>
+                                <td>89%</td>
+                                <td><span class="status active">Active</span></td>
+                                <td class="action-cell">
+                                    <div class="action-btn edit"><i class="fas fa-edit"></i></div>
+                                    <div class="action-btn delete"><i class="fas fa-trash"></i></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Test Performance by Class</h3>
+                            <i class="fas fa-chart-bar" style="color: var(--primary);"></i>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="performanceChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Level Distribution</h3>
+                            <i class="fas fa-certificate" style="color: var(--accent);"></i>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="levelChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Submission Rate</h3>
+                            <i class="fas fa-file-upload" style="color: var(--secondary);"></i>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="submissionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="addStudentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Student</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input type="text" id="firstName" class="form-control" placeholder="Enter first name">
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input type="text" id="lastName" class="form-control" placeholder="Enter last name">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" class="form-control" placeholder="Enter email address">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" class="form-control" placeholder="Enter phone number">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="testClass">Test Class</label>
+                        <select id="testClass" class="form-control">
+                            <option value="">Select a test class</option>
+                            <option value="math">Mathematics</option>
+                            <option value="science">Science</option>
+                            <option value="literature">Literature</option>
+                            <option value="history">History</option>
+                            <option value="cs">Computer Science</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="level">Level</label>
+                        <select id="level" class="form-control">
+                            <option value="">Select level</option>
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <textarea id="address" class="form-control" rows="3" placeholder="Enter full address"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline close-modal">Cancel</button>
+                <button class="btn">Add Student</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize particles.js
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: "#ffffff" },
+                shape: { type: "circle" },
+                opacity: { value: 0.5, random: true },
+                size: { value: 3, random: true },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: "#ffffff",
+                    opacity: 0.4,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: "none",
+                    random: true,
+                    straight: false,
+                    out_mode: "out",
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" },
+                    onclick: { enable: true, mode: "push" },
+                    resize: true
+                }
+            },
+            retina_detect: true
+        });
+
+        // Toggle functionality
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Dark mode toggle
+        const themeToggle = document.querySelector('.theme-toggle');
+        themeToggle.addEventListener('click', function() {
+            document.body.classList.toggle('dark-theme');
+            
+            const icon = themeToggle.querySelector('i');
+            if (document.body.classList.contains('dark-theme')) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+            // Note: For charts to update colors on theme change, you would need to destroy and re-render them with new color options.
+        });
+
+        // Modal functionality
+        const modal = document.getElementById('addStudentModal');
+        const addStudentBtn = document.getElementById('addStudentBtn');
+        const closeModalBtns = document.querySelectorAll('.close-modal');
+        
+        addStudentBtn.addEventListener('click', function() {
+            modal.style.display = 'flex';
+        });
+        
+        closeModalBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+        });
+        
+        window.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Initialize Charts
+        document.addEventListener('DOMContentLoaded', function() {
+            const gridColor = 'rgba(0, 0, 0, 0.08)';
+            const labelColor = '#666';
+
+            // Performance Chart (Horizontal Bar)
+            const perfCtx = document.getElementById('performanceChart').getContext('2d');
+            new Chart(perfCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Mathematics', 'Science', 'Literature', 'History', 'CompSci'],
+                    datasets: [{
+                        label: 'Average Score %',
+                        data: [92, 85, 95, 72, 89],
+                        backgroundColor: [
+                            'rgba(108, 92, 231, 0.7)',
+                            'rgba(0, 206, 201, 0.7)',
+                            'rgba(253, 121, 168, 0.7)',
+                            'rgba(253, 203, 110, 0.7)',
+                             'rgba(99, 110, 255, 0.7)'
+                        ],
+                        borderColor: [
+                            '#6c5ce7',
+                            '#00cec9',
+                            '#fd79a8',
+                            '#fdcb6e',
+                             '#636efa'
+                        ],
+                        borderWidth: 1,
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            grid: { color: gridColor },
+                             ticks: { color: labelColor }
+                        },
+                        y: {
+                           grid: { display: false },
+                           ticks: { color: labelColor }
+                        }
+                    }
+                }
+            });
+
+            // Level Distribution Chart (Doughnut)
+            const levelCtx = document.getElementById('levelChart').getContext('2d');
+            new Chart(levelCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Beginner', 'Intermediate', 'Advanced'],
+                    datasets: [{
+                        label: 'Student Levels',
+                        data: [12, 35, 53],
+                        backgroundColor: [
+                            'rgba(253, 203, 110, 0.8)',
+                            'rgba(0, 206, 201, 0.8)',
+                            'rgba(108, 92, 231, 0.8)',
+                        ],
+                        borderColor: ['#ffffff'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: labelColor
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Submission Rate Chart (Line)
+            const submissionCtx = document.getElementById('submissionChart').getContext('2d');
+            const gradient = submissionCtx.createLinearGradient(0, 0, 0, 250);
+            gradient.addColorStop(0, 'rgba(253, 121, 168, 0.5)');
+            gradient.addColorStop(1, 'rgba(253, 121, 168, 0)');
+            
+            new Chart(submissionCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Submissions per Month',
+                        data: [180, 210, 200, 240, 280, 260],
+                        backgroundColor: gradient,
+                        borderColor: '#fd79a8',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#fd79a8',
+                        pointBorderColor: '#fff',
+                        pointHoverRadius: 7,
+                        pointRadius: 5,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: gridColor },
+                            ticks: { color: labelColor }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: labelColor }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

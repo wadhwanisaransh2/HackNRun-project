@@ -1,0 +1,2001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gravity Quest - Interactive Physics Learning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --neon-blue: #00bfff;
+    --electric-purple: #9d4edd;
+    --rocket-orange: #ff8500;
+    --success-green: #00ff7f;
+    --danger-red: #ff073a;
+    --space-black: #0d1421;
+    --card-bg: rgba(13, 20, 33, 0.95);
+    --glow: 0 0 15px;
+    --soft-white: #f0f0f0;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Comfortaa', cursive;
+    background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+    color: var(--soft-white);
+    overflow: hidden;
+    height: 100vh;
+}
+
+.game-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Enhanced Mission Control Panel */
+.mission-control {
+    width: 350px;
+    background: var(--card-bg);
+    border-right: 3px solid var(--neon-blue);
+    box-shadow: var(--glow) var(--neon-blue);
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.mission-title {
+    text-align: center;
+    color: var(--neon-blue);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-shadow: var(--glow) var(--neon-blue);
+}
+
+.tutorial-section {
+    background: rgba(0, 191, 255, 0.1);
+    border: 2px solid var(--neon-blue);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-left: 5px solid var(--neon-blue);
+}
+
+.tutorial-title {
+    color: var(--neon-blue);
+    font-weight: 700;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.tutorial-step {
+    margin: 8px 0;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    border-left: 3px solid var(--success-green);
+}
+
+.tutorial-step .key {
+    background: var(--electric-purple);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 0.8rem;
+}
+
+.stats-panel {
+    background: rgba(0, 255, 127, 0.1);
+    border: 2px solid var(--success-green);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.stat-value {
+    color: var(--rocket-orange);
+    font-weight: 700;
+}
+
+.mission-objective {
+    background: rgba(157, 78, 221, 0.1);
+    border: 2px solid var(--electric-purple);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.objective-title {
+    color: var(--electric-purple);
+    font-weight: 700;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.objective-text {
+    font-size: 0.95rem;
+    line-height: 1.4;
+    margin-bottom: 10px;
+}
+
+.progress-indicator {
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 8px;
+    padding: 8px;
+    margin-top: 10px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    margin: 8px 0;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--success-green), var(--neon-blue));
+    transition: width 0.3s ease;
+    border-radius: 6px;
+}
+
+.power-ups {
+    background: rgba(255, 133, 0, 0.1);
+    border: 2px solid var(--rocket-orange);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.power-up-btn {
+    width: 100%;
+    background: linear-gradient(45deg, var(--electric-purple), var(--rocket-orange));
+    border: none;
+    color: white;
+    padding: 12px;
+    border-radius: 25px;
+    font-family: 'Comfortaa', cursive;
+    font-weight: 600;
+    margin: 6px 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    position: relative;
+}
+
+.power-up-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--glow) var(--rocket-orange);
+}
+
+.power-up-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.power-up-btn .cost {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+/* Main Game Area */
+.game-arena {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+#gameCanvas {
+    display: block;
+    cursor: crosshair;
+    border: 2px solid var(--neon-blue);
+}
+
+/* Enhanced HUD */
+.hud {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: var(--card-bg);
+    border: 2px solid var(--success-green);
+    border-radius: 15px;
+    padding: 20px;
+    min-width: 220px;
+    box-shadow: var(--glow) var(--success-green);
+}
+
+.hud-title {
+    color: var(--success-green);
+    font-weight: 700;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+.hud-item {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+    font-weight: 600;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hud-value {
+    color: var(--rocket-orange);
+    font-weight: 700;
+}
+
+/* Enhanced Instructions Panel */
+.instructions {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: var(--card-bg);
+    border: 2px solid var(--electric-purple);
+    border-radius: 15px;
+    padding: 20px;
+    max-width: 400px;
+    box-shadow: var(--glow) var(--electric-purple);
+}
+
+.instructions h3 {
+    color: var(--electric-purple);
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.control-group {
+    margin: 12px 0;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    border-left: 3px solid var(--electric-purple);
+}
+
+.control-title {
+    font-weight: 700;
+    color: var(--rocket-orange);
+    margin-bottom: 5px;
+}
+
+.control-desc {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    line-height: 1.3;
+}
+
+/* Speed Indicator */
+.speed-indicator {
+    position: absolute;
+    bottom: 150px;
+    right: 20px;
+    background: var(--card-bg);
+    border: 2px solid var(--rocket-orange);
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: var(--glow) var(--rocket-orange);
+    min-width: 150px;
+}
+
+.speed-title {
+    color: var(--rocket-orange);
+    font-weight: 700;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.speed-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    margin: 8px 0;
+    overflow: hidden;
+}
+
+.speed-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--success-green), var(--danger-red));
+    transition: width 0.2s ease;
+    border-radius: 4px;
+}
+
+/* Modal Improvements */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: var(--card-bg);
+    border: 3px solid var(--neon-blue);
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 600px;
+    width: 90%;
+    text-align: center;
+    box-shadow: var(--glow) var(--neon-blue);
+    animation: modalPop 0.5s ease;
+}
+
+@keyframes modalPop {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.modal h2 {
+    color: var(--neon-blue);
+    font-size: 2.2rem;
+    margin-bottom: 20px;
+    text-shadow: var(--glow) var(--neon-blue);
+}
+
+.modal-text {
+    font-size: 1.1rem;
+    line-height: 1.5;
+    margin: 15px 0;
+    opacity: 0.95;
+}
+
+.modal-btn {
+    background: linear-gradient(45deg, var(--neon-blue), var(--electric-purple));
+    border: none;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 25px;
+    font-family: 'Comfortaa', cursive;
+    font-weight: 700;
+    cursor: pointer;
+    margin: 10px;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.modal-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--glow) var(--neon-blue);
+}
+
+/* Achievement notification */
+.achievement {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(45deg, var(--success-green), var(--neon-blue));
+    color: white;
+    padding: 20px 30px;
+    border-radius: 15px;
+    font-weight: 700;
+    font-size: 1.3rem;
+    box-shadow: var(--glow) var(--success-green);
+    animation: achievementSlide 4s ease forwards;
+    z-index: 999;
+    pointer-events: none;
+    border: 2px solid white;
+}
+
+@keyframes achievementSlide {
+    0% { opacity: 0; transform: translateX(-50%) translateY(-30px); }
+    15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-30px); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .game-container { flex-direction: column; }
+    .mission-control { width: 100%; height: 250px; border-right: none; border-bottom: 3px solid var(--neon-blue); }
+    .hud, .instructions, .speed-indicator { position: relative; margin: 10px; }
+}
+</style>
+</head>
+<body>
+
+<div class="game-container">
+    <!-- Enhanced Mission Control Panel -->
+    <div class="mission-control">
+        <h2 class="mission-title">🚀 MISSION CONTROL</h2>
+        
+        <!-- Tutorial Section -->
+        <div class="tutorial-section">
+            <div class="tutorial-title">📚 HOW TO PLAY</div>
+            <div class="tutorial-step">
+                <span class="key">WASD</span> Move your spacecraft slowly and carefully
+            </div>
+            <div class="tutorial-step">
+                <span class="key">SPACE</span> Fire thrusters for extra speed (uses energy)
+            </div>
+            <div class="tutorial-step">
+                <span class="key">CLICK</span> Place gravity wells to help navigate
+            </div>
+            <div class="tutorial-step">
+                <span class="key">DRAG</span> Move gravity wells around
+            </div>
+            <div class="tutorial-step">
+                <span class="key">RIGHT CLICK</span> Remove gravity wells
+            </div>
+            <div class="tutorial-step">
+                <span class="key">SCROLL</span> Adjust gravity well strength
+            </div>
+        </div>
+        
+        <div class="stats-panel">
+            <div class="stat-row">
+                <span>📊 Score:</span>
+                <span class="stat-value" id="player-score">0</span>
+            </div>
+            <div class="stat-row">
+                <span>🌟 Level:</span>
+                <span class="stat-value" id="current-level">1</span>
+            </div>
+            <div class="stat-row">
+                <span>❤️ Lives:</span>
+                <span class="stat-value" id="player-lives">3</span>
+            </div>
+            <div class="stat-row">
+                <span>⚡ Energy:</span>
+                <span class="stat-value" id="player-energy">100</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="energy-bar" style="width: 100%"></div>
+            </div>
+        </div>
+        
+        <div class="mission-objective">
+            <div class="objective-title">🎯 CURRENT MISSION</div>
+            <div class="objective-text" id="mission-text">
+                Navigate your spacecraft to collect all energy cores! Use gravity wells strategically to reach them safely.
+            </div>
+            <div class="progress-indicator">
+                <strong>Progress:</strong> <span id="objective-progress">0/5</span> Energy Cores
+                <div class="progress-bar">
+                    <div class="progress-fill" id="objective-bar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="power-ups">
+            <div class="objective-title" style="color: var(--rocket-orange);">⚡ POWER-UPS</div>
+            <button class="power-up-btn" id="shield-btn" onclick="activateShield()">
+                🛡️ PROTECTIVE SHIELD
+                <span class="cost">-20⚡</span>
+            </button>
+            <button class="power-up-btn" id="boost-btn" onclick="activateBoost()">
+                🚀 SPEED BOOST
+                <span class="cost">-15⚡</span>
+            </button>
+            <button class="power-up-btn" id="gravity-btn" onclick="activateAntiGravity()">
+                🌌 ANTI-GRAVITY FIELD
+                <span class="cost">-30⚡</span>
+            </button>
+            <button class="power-up-btn" id="slowmo-btn" onclick="activateSlowMotion()">
+                ⏱️ SLOW MOTION MODE
+                <span class="cost">-25⚡</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Main Game Arena -->
+    <div class="game-arena">
+        <canvas id="gameCanvas"></canvas>
+        
+        <!-- Enhanced HUD -->
+        <div class="hud">
+            <div class="hud-title">📊 FLIGHT DATA</div>
+            <div class="hud-item">
+                <span>Combo Multiplier:</span>
+                <span class="hud-value" id="combo-counter">x1</span>
+            </div>
+            <div class="hud-item">
+                <span>Mission Timer:</span>
+                <span class="hud-value" id="level-timer" style="color: var(--danger-red);">90s</span>
+            </div>
+            <div class="hud-item">
+                <span>Gravity Mode:</span>
+                <span class="hud-value" id="physics-mode">Earth</span>
+            </div>
+            <div class="hud-item">
+                <span>Wells Placed:</span>
+                <span class="hud-value" id="wells-count">0</span>
+            </div>
+        </div>
+        
+        <!-- Speed Indicator -->
+        <div class="speed-indicator">
+            <div class="speed-title">🚀 SPEED</div>
+            <div class="speed-bar">
+                <div class="speed-fill" id="speed-bar" style="width: 0%"></div>
+            </div>
+            <div style="text-align: center; margin-top: 8px; font-size: 0.9rem;">
+                <span id="speed-value">0</span> m/s
+            </div>
+        </div>
+        
+        <!-- Enhanced Instructions Panel -->
+        <div class="instructions">
+            <h3>🎮 GAME CONTROLS</h3>
+            
+            <div class="control-group">
+                <div class="control-title">🚀 Spacecraft Movement</div>
+                <div class="control-desc">Use WASD keys to move slowly and precisely. Hold SPACE for extra thrust (costs energy).</div>
+            </div>
+            
+            <div class="control-group">
+                <div class="control-title">🌌 Gravity Wells</div>
+                <div class="control-desc">Click to place, drag to move, scroll to adjust strength, right-click to remove.</div>
+            </div>
+            
+            <div class="control-group">
+                <div class="control-title">💡 Strategy Tip</div>
+                <div class="control-desc">Use gravity wells to "slingshot" around obstacles and reach energy cores efficiently!</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Welcome Tutorial Modal -->
+<div id="welcome-modal" class="modal" style="display: flex;">
+    <div class="modal-content">
+        <h2>🚀 Welcome to Gravity Quest!</h2>
+        <div class="modal-text">
+            <p><strong>Your Mission:</strong> Pilot a spacecraft through space and collect energy cores using the power of gravity!</p>
+            <br>
+            <p><strong>🎯 How to Win:</strong> Collect all energy cores before time runs out</p>
+            <p><strong>🌌 Physics Tip:</strong> Gravity wells pull your spacecraft - use them to navigate!</p>
+            <p><strong>⚡ Energy Management:</strong> Thrusters use energy, but collecting cores restores it</p>
+            <br>
+            <p style="color: var(--success-green); font-weight: 700;">Ready to explore the physics of space? Let's begin!</p>
+        </div>
+        <button class="modal-btn" onclick="startGame()">🚀 START MISSION</button>
+        <button class="modal-btn" onclick="showDetailedTutorial()">📚 DETAILED TUTORIAL</button>
+    </div>
+</div>
+
+<!-- Detailed Tutorial Modal -->
+<div id="tutorial-modal" class="modal">
+    <div class="modal-content">
+        <h2>📚 Detailed Tutorial</h2>
+        <div class="modal-text" style="text-align: left;">
+            <h3 style="color: var(--neon-blue);">🚀 Spacecraft Controls:</h3>
+            <p>• <strong>W/A/S/D or Arrow Keys:</strong> Move spacecraft (slow, precise control)</p>
+            <p>• <strong>SPACE:</strong> Fire thrusters for extra speed (costs 0.5 energy per second)</p>
+            <br>
+            <h3 style="color: var(--electric-purple);">🌌 Gravity Wells:</h3>
+            <p>• <strong>Left Click:</strong> Place a new gravity well (costs 10 energy)</p>
+            <p>• <strong>Drag:</strong> Move existing gravity wells around</p>
+            <p>• <strong>Mouse Wheel:</strong> Increase/decrease gravity well strength</p>
+            <p>• <strong>Right Click:</strong> Remove a gravity well</p>
+            <br>
+            <h3 style="color: var(--rocket-orange);">💡 Strategy Tips:</h3>
+            <p>• Use gravity wells to "slingshot" around obstacles</p>
+            <p>• Stronger gravity wells pull from farther away</p>
+            <p>• Collect energy cores to restore energy and increase score</p>
+            <p>• Use power-ups wisely - they can save your mission!</p>
+        </div>
+        <button class="modal-btn" onclick="closeTutorial()">Got It! Let's Play! 🎮</button>
+    </div>
+</div>
+
+<!-- Level Complete Modal -->
+<div id="level-complete-modal" class="modal">
+    <div class="modal-content">
+        <h2>🎊 MISSION ACCOMPLISHED!</h2>
+        <div class="modal-text">
+            <p id="level-complete-text">Outstanding piloting, Commander!</p>
+            <div style="margin: 20px 0; padding: 15px; background: rgba(0, 255, 127, 0.1); border-radius: 10px;">
+                <div><strong>Mission Score:</strong> <span style="color: var(--rocket-orange);" id="level-score">0</span></div>
+                <div><strong>Time Bonus:</strong> <span style="color: var(--success-green);" id="time-bonus">0</span></div>
+                <div><strong>Efficiency Bonus:</strong> <span style="color: var(--neon-blue);" id="efficiency-bonus">0</span></div>
+            </div>
+            <p style="color: var(--electric-purple); font-weight: 700;">🧠 Physics Lesson Unlocked!</p>
+        </div>
+        <button class="modal-btn" onclick="nextLevel()">NEXT MISSION 🚀</button>
+        <button class="modal-btn" onclick="showPhysicsLesson()">LEARN PHYSICS 🧠</button>
+    </div>
+</div>
+
+<!-- Game Over Modal -->
+<div id="game-over-modal" class="modal">
+    <div class="modal-content">
+        <h2>💥 MISSION INCOMPLETE</h2>
+        <div class="modal-text">
+            <p>Your spacecraft encountered difficulties during the mission.</p>
+            <p><strong>Final Score:</strong> <span style="color: var(--rocket-orange);" id="final-score-text">0</span></p>
+            <br>
+            <div style="background: rgba(0, 191, 255, 0.1); padding: 15px; border-radius: 10px; border-left: 4px solid var(--neon-blue);">
+                <p><strong>🧠 Physics Reminder:</strong> Gravity follows the inverse square law - objects twice as far away have 1/4 the gravitational pull!</p>
+            </div>
+            <br>
+            <p style="color: var(--success-green);">Don't give up! Every great pilot learns through practice!</p>
+        </div>
+        <button class="modal-btn" onclick="restartGame()">TRY AGAIN 🔄</button>
+        <button class="modal-btn" onclick="showDetailedTutorial()">REVIEW TUTORIAL 📚</button>
+    </div>
+</div>
+
+<!-- Physics Lesson Modal -->
+<div id="physics-lesson-modal" class="modal">
+    <div class="modal-content">
+        <h2>🧠 PHYSICS DISCOVERY</h2>
+        <div id="physics-lesson-content" class="modal-text" style="text-align: left;">
+            <h3 style="color: var(--neon-blue);">Newton's Law of Universal Gravitation</h3>
+            <p>You just experienced the fundamental force that governs the universe!</p>
+            <div style="background: rgba(0, 243, 255, 0.1); padding: 20px; border-radius: 12px; margin: 20px 0; border: 2px solid var(--neon-blue);">
+                <p style="text-align: center; font-size: 1.3rem; font-weight: 700; color: var(--neon-blue);">F = G(m₁m₂)/r²</p>
+                <br>
+                <p><strong>Where:</strong></p>
+                <p>• <strong>F</strong> = gravitational force between objects</p>
+                <p>• <strong>G</strong> = gravitational constant (6.67 × 10⁻¹¹)</p>
+                <p>• <strong>m₁, m₂</strong> = masses of the two objects</p>
+                <p>• <strong>r</strong> = distance between object centers</p>
+            </div>
+            <p><strong>🌍 Real World Applications:</strong></p>
+            <p>• Keeps the Moon orbiting Earth (27.3 days per orbit)</p>
+            <p>• Controls planetary motion around the Sun</p>
+            <p>• Enables satellite navigation (GPS systems)</p>
+            <p>• Governs tidal forces in our oceans</p>
+        </div>
+        <button class="modal-btn" onclick="closePhysicsLesson()">CONTINUE EXPLORING! 🚀</button>
+    </div>
+</div>
+
+<script>
+// Enhanced Game State with Better Controls [web:55][web:59][web:64]
+const GameState = {
+    canvas: null,
+    ctx: null,
+    width: 0,
+    height: 0,
+    
+    // Player stats
+    score: 0,
+    level: 1,
+    lives: 3,
+    energy: 100,
+    maxEnergy: 100,
+    
+    // Game mechanics
+    isPlaying: false,
+    isPaused: false,
+    levelTimer: 90,
+    combo: 1,
+    
+    // Collections
+    player: null,
+    gravityWells: [],
+    energyCores: [],
+    particles: [],
+    
+    // Input
+    keys: {},
+    mouse: { x: 0, y: 0, isDown: false, rightDown: false },
+    
+    // Power-up states
+    shieldActive: false,
+    boostActive: false,
+    antiGravityActive: false,
+    slowMotionActive: false,
+    
+    // Level objectives
+    coresCollected: 0,
+    coresRequired: 5,
+    
+    // Enhanced physics settings for better control [web:64][web:66]
+    gravity: 0.3,           // Reduced from 0.5
+    physicsMode: 'earth',
+    timeScale: 1.0,
+    
+    // Statistics
+    wellsPlaced: 0,
+    totalDistance: 0
+};
+
+// Enhanced Spacecraft Class with Slower, More Controlled Movement [web:58][web:64]
+class Spacecraft {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.vx = 0;
+        this.vy = 0;
+        this.angle = 0;
+        this.radius = 15;
+        
+        // Significantly reduced movement values for better control
+        this.thrust = 0.12;        // Reduced from 0.3
+        this.maxSpeed = 4;         // Reduced from 8
+        this.friction = 0.96;      // More friction for better control
+        this.rotationSpeed = 0.1;
+        
+        this.health = 100;
+        this.trail = [];
+        this.thrusterParticles = [];
+        this.lastX = x;
+        this.lastY = y;
+    }
+    
+    update() {
+        // Handle input for smoother movement [web:59][web:67]
+        let thrustX = 0, thrustY = 0;
+        let thrustActive = false;
+        
+        // Smooth, gradual movement
+        if (GameState.keys['w'] || GameState.keys['ArrowUp']) {
+            thrustY = -this.thrust;
+            thrustActive = true;
+        }
+        if (GameState.keys['s'] || GameState.keys['ArrowDown']) {
+            thrustY = this.thrust;
+            thrustActive = true;
+        }
+        if (GameState.keys['a'] || GameState.keys['ArrowLeft']) {
+            thrustX = -this.thrust;
+            thrustActive = true;
+        }
+        if (GameState.keys['d'] || GameState.keys['ArrowRight']) {
+            thrustX = this.thrust;
+            thrustActive = true;
+        }
+        
+        // Space bar for extra thrust (more controlled)
+        if (GameState.keys[' '] && GameState.energy > 0) {
+            thrustX *= 1.8;  // Reduced from 2
+            thrustY *= 1.8;
+            GameState.energy = Math.max(0, GameState.energy - 0.3); // Reduced energy cost
+            thrustActive = true;
+            
+            // Create thruster particles
+            for (let i = 0; i < 2; i++) {
+                this.thrusterParticles.push({
+                    x: this.x - thrustX * 15 + (Math.random() - 0.5) * 8,
+                    y: this.y - thrustY * 15 + (Math.random() - 0.5) * 8,
+                    vx: -thrustX * 1.5 + (Math.random() - 0.5) * 1.5,
+                    vy: -thrustY * 1.5 + (Math.random() - 0.5) * 1.5,
+                    life: 25,
+                    maxLife: 25
+                });
+            }
+        }
+        
+        // Apply thrust
+        if (thrustActive) {
+            this.vx += thrustX;
+            this.vy += thrustY;
+        }
+        
+        // Apply gravity from wells (reduced effect for better control)
+        GameState.gravityWells.forEach(well => {
+            const dx = well.x - this.x;
+            const dy = well.y - this.y;
+            const distSq = dx * dx + dy * dy;
+            const dist = Math.sqrt(distSq);
+            
+            if (dist > 0 && dist < well.influence) {
+                const force = (well.mass * GameState.gravity * 0.6) / distSq; // Reduced gravity effect
+                const forceX = (dx / dist) * force;
+                const forceY = (dy / dist) * force;
+                
+                if (!GameState.antiGravityActive) {
+                    this.vx += forceX;
+                    this.vy += forceY;
+                } else {
+                    this.vx -= forceX * 0.4;
+                    this.vy -= forceY * 0.4;
+                }
+            }
+        });
+        
+        // Apply power-up effects
+        if (GameState.boostActive) {
+            this.maxSpeed = 6; // Increased but still controlled
+        } else {
+            this.maxSpeed = 4;
+        }
+        
+        // Enhanced speed limiting with smoother control
+        const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+        if (speed > this.maxSpeed) {
+            this.vx = (this.vx / speed) * this.maxSpeed;
+            this.vy = (this.vy / speed) * this.maxSpeed;
+        }
+        
+        // Apply friction for better control
+        this.vx *= this.friction;
+        this.vy *= this.friction;
+        
+        // Update position
+        this.x += this.vx * GameState.timeScale;
+        this.y += this.vy * GameState.timeScale;
+        
+        // Track distance for statistics
+        const distance = Math.sqrt((this.x - this.lastX) ** 2 + (this.y - this.lastY) ** 2);
+        GameState.totalDistance += distance;
+        this.lastX = this.x;
+        this.lastY = this.y;
+        
+        // Boundary collision with gentler bounce
+        const margin = this.radius;
+        if (this.x < margin || this.x > GameState.width - margin) {
+            this.vx *= -0.4; // Gentler bounce
+            this.x = Math.max(margin, Math.min(GameState.width - margin, this.x));
+            this.takeDamage(3); // Reduced damage
+        }
+        if (this.y < margin || this.y > GameState.height - margin) {
+            this.vy *= -0.4;
+            this.y = Math.max(margin, Math.min(GameState.height - margin, this.y));
+            this.takeDamage(3);
+        }
+        
+        // Update angle for visual rotation (smoother)
+        if (Math.abs(this.vx) > 0.05 || Math.abs(this.vy) > 0.05) {
+            const targetAngle = Math.atan2(this.vy, this.vx);
+            const angleDiff = targetAngle - this.angle;
+            this.angle += angleDiff * this.rotationSpeed;
+        }
+        
+        // Add to trail with better spacing
+        if (speed > 0.5) {
+            this.trail.push({ x: this.x, y: this.y, alpha: 1 });
+            if (this.trail.length > 15) this.trail.shift();
+        }
+        
+        // Update trail alpha
+        this.trail.forEach((point, index) => {
+            point.alpha = (index / this.trail.length) * 0.8;
+        });
+        
+        // Update thruster particles
+        this.thrusterParticles = this.thrusterParticles.filter(particle => {
+            particle.x += particle.vx;
+            particle.y += particle.vy;
+            particle.vx *= 0.95;
+            particle.vy *= 0.95;
+            particle.life--;
+            return particle.life > 0;
+        });
+        
+        // Update speed indicator
+        updateSpeedIndicator(speed);
+    }
+    
+    takeDamage(amount) {
+        if (!GameState.shieldActive) {
+            this.health -= amount;
+            GameState.energy = Math.max(0, GameState.energy - amount);
+            
+            // Gentler screen shake
+            GameState.canvas.style.transform = `translate(${(Math.random() - 0.5) * 6}px, ${(Math.random() - 0.5) * 6}px)`;
+            setTimeout(() => {
+                GameState.canvas.style.transform = 'translate(0, 0)';
+            }, 80);
+            
+            if (this.health <= 0) {
+                this.destroy();
+            }
+        }
+    }
+    
+    destroy() {
+        // Create explosion effect
+        for (let i = 0; i < 15; i++) {
+            GameState.particles.push(new ExplosionParticle(this.x, this.y));
+        }
+        
+        GameState.lives--;
+        if (GameState.lives <= 0) {
+            gameOver();
+        } else {
+            // Respawn with better starting conditions
+            this.x = 100;
+            this.y = GameState.height / 2;
+            this.vx = 0;
+            this.vy = 0;
+            this.health = 100;
+            GameState.energy = Math.min(GameState.maxEnergy, GameState.energy + 50);
+            showAchievement('🔄 SPACECRAFT RESPAWNED');
+        }
+    }
+    
+    draw() {
+        const ctx = GameState.ctx;
+        
+        // Draw enhanced trail
+        if (this.trail.length > 1) {
+            ctx.strokeStyle = '#00bfff';
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+            
+            for (let i = 0; i < this.trail.length - 1; i++) {
+                ctx.globalAlpha = this.trail[i].alpha;
+                ctx.lineWidth = 4 * this.trail[i].alpha;
+                ctx.beginPath();
+                ctx.moveTo(this.trail[i].x, this.trail[i].y);
+                ctx.lineTo(this.trail[i + 1].x, this.trail[i + 1].y);
+                ctx.stroke();
+            }
+            ctx.globalAlpha = 1;
+        }
+        
+        // Draw thruster particles
+        this.thrusterParticles.forEach(particle => {
+            ctx.globalAlpha = particle.life / particle.maxLife;
+            ctx.fillStyle = '#ff8500';
+            ctx.beginPath();
+            ctx.arc(particle.x, particle.y, 3, 0, Math.PI * 2);
+            ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+        
+        // Draw shield with better visuals
+        if (GameState.shieldActive) {
+            const shieldGradient = ctx.createRadialGradient(this.x, this.y, this.radius, this.x, this.y, this.radius * 2.2);
+            shieldGradient.addColorStop(0, 'rgba(0, 255, 127, 0.4)');
+            shieldGradient.addColorStop(0.7, 'rgba(0, 255, 127, 0.2)');
+            shieldGradient.addColorStop(1, 'rgba(0, 255, 127, 0)');
+            
+            ctx.fillStyle = shieldGradient;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius * 2.2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.strokeStyle = '#00ff7f';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([8, 4]);
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius * 2, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+        
+        // Draw spacecraft with enhanced visuals
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+        
+        // Main body with gradient
+        const bodyGradient = ctx.createLinearGradient(-15, -10, 15, 10);
+        bodyGradient.addColorStop(0, '#00bfff');
+        bodyGradient.addColorStop(0.5, '#9d4edd');
+        bodyGradient.addColorStop(1, '#ff8500');
+        
+        ctx.fillStyle = bodyGradient;
+        ctx.beginPath();
+        ctx.moveTo(15, 0);
+        ctx.lineTo(-12, -10);
+        ctx.lineTo(-8, 0);
+        ctx.lineTo(-12, 10);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Enhanced outline
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        // Cockpit with glow
+        const cockpitGradient = ctx.createRadialGradient(5, 0, 0, 5, 0, 4);
+        cockpitGradient.addColorStop(0, '#ffffff');
+        cockpitGradient.addColorStop(1, '#00bfff');
+        
+        ctx.fillStyle = cockpitGradient;
+        ctx.beginPath();
+        ctx.arc(5, 0, 4, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Wing details
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(-5, -6);
+        ctx.lineTo(8, -3);
+        ctx.moveTo(-5, 6);
+        ctx.lineTo(8, 3);
+        ctx.stroke();
+        
+        ctx.restore();
+    }
+}
+
+// Enhanced Interactive Gravity Well [web:55][web:56]
+class InteractiveGravityWell {
+    constructor(x, y, mass = 1000) {
+        this.x = x;
+        this.y = y;
+        this.mass = mass;
+        this.maxMass = 2500; // Reduced maximum for better control
+        this.minMass = 400;  // Reduced minimum
+        this.radius = Math.sqrt(this.mass / 8);
+        this.influence = this.mass / 4; // Reduced influence range
+        this.dragging = false;
+        this.pulsing = 0;
+        this.particles = [];
+        this.strengthIndicator = 0;
+    }
+    
+    update() {
+        this.pulsing += 0.08;
+        this.radius = Math.sqrt(this.mass / 8);
+        this.influence = this.mass / 4;
+        
+        // Strength indicator animation
+        if (this.strengthIndicator > 0) {
+            this.strengthIndicator--;
+        }
+        
+        // Create ambient particles with better control
+        if (Math.random() < 0.2) {
+            const angle = Math.random() * Math.PI * 2;
+            const distance = this.radius + Math.random() * 15;
+            this.particles.push({
+                x: this.x + Math.cos(angle) * distance,
+                y: this.y + Math.sin(angle) * distance,
+                angle: angle + Math.PI,
+                speed: 0.8 + Math.random() * 0.4,
+                life: 40,
+                maxLife: 40,
+                size: 1 + Math.random() * 2
+            });
+        }
+        
+        // Update particles
+        this.particles = this.particles.filter(particle => {
+            particle.angle += 0.03;
+            particle.x += Math.cos(particle.angle) * particle.speed;
+            particle.y += Math.sin(particle.angle) * particle.speed;
+            particle.life--;
+            particle.size *= 0.99;
+            return particle.life > 0;
+        });
+    }
+    
+    adjustMass(delta) {
+        const oldMass = this.mass;
+        this.mass = Math.max(this.minMass, Math.min(this.maxMass, this.mass + delta));
+        
+        if (this.mass !== oldMass) {
+            this.strengthIndicator = 30; // Show strength change indicator
+        }
+    }
+    
+    contains(x, y) {
+        const dx = x - this.x;
+        const dy = y - this.y;
+        return Math.sqrt(dx * dx + dy * dy) < this.radius + 15;
+    }
+    
+    draw() {
+        const ctx = GameState.ctx;
+        
+        // Draw particles
+        this.particles.forEach(particle => {
+            ctx.globalAlpha = (particle.life / particle.maxLife) * 0.8;
+            ctx.fillStyle = '#9d4edd';
+            ctx.beginPath();
+            ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+            ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+        
+        // Draw influence field with better visualization
+        const pulse = Math.sin(this.pulsing) * 0.15 + 0.85;
+        const gradient = ctx.createRadialGradient(
+            this.x, this.y, this.radius,
+            this.x, this.y, this.influence
+        );
+        gradient.addColorStop(0, `rgba(157, 78, 221, ${0.3 * pulse})`);
+        gradient.addColorStop(0.4, `rgba(157, 78, 221, ${0.15 * pulse})`);
+        gradient.addColorStop(1, 'rgba(157, 78, 221, 0)');
+        
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.influence, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Draw core with enhanced visuals
+        const coreGradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
+        coreGradient.addColorStop(0, '#ffffff');
+        coreGradient.addColorStop(0.3, '#9d4edd');
+        coreGradient.addColorStop(0.7, '#6a4c93');
+        coreGradient.addColorStop(1, '#3a2a5c');
+        
+        ctx.fillStyle = coreGradient;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Enhanced outline
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        // Mass indicator with better formatting
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 11px Comfortaa';
+        ctx.textAlign = 'center';
+        const massDisplay = Math.floor(this.mass / 100);
+        ctx.fillText(massDisplay, this.x, this.y + 3);
+        
+        // Strength change indicator
+        if (this.strengthIndicator > 0) {
+            ctx.globalAlpha = this.strengthIndicator / 30;
+            ctx.fillStyle = '#00ff7f';
+            ctx.font = 'bold 10px Comfortaa';
+            ctx.fillText(`Mass: ${massDisplay}`, this.x, this.y - this.radius - 15);
+            ctx.globalAlpha = 1;
+        }
+        
+        // Enhanced dragging indicator
+        if (this.dragging) {
+            ctx.strokeStyle = '#00ff7f';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([6, 6]);
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius + 12, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // Show influence range when dragging
+            ctx.strokeStyle = 'rgba(0, 255, 127, 0.3)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.influence, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+    }
+}
+
+// Enhanced Energy Core with Better Visuals [web:56][web:60]
+class EnergyCore {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.radius = 14;
+        this.collected = false;
+        this.rotation = 0;
+        this.pulse = 0;
+        this.floatOffset = Math.random() * Math.PI * 2;
+        this.particles = [];
+        this.glowIntensity = 0.8;
+        this.originalY = y;
+    }
+    
+    update() {
+        if (this.collected) return;
+        
+        this.rotation += 0.08;
+        this.pulse += 0.12;
+        
+        // Floating animation
+        this.y = this.originalY + Math.sin(this.pulse + this.floatOffset) * 3;
+        
+        // Enhanced sparkle particles
+        if (Math.random() < 0.25) {
+            this.particles.push({
+                x: this.x + (Math.random() - 0.5) * 35,
+                y: this.y + (Math.random() - 0.5) * 35,
+                vx: (Math.random() - 0.5) * 1.5,
+                vy: (Math.random() - 0.5) * 1.5,
+                life: 35,
+                maxLife: 35,
+                size: 1 + Math.random() * 2
+            });
+        }
+        
+        // Update particles
+        this.particles = this.particles.filter(particle => {
+            particle.x += particle.vx;
+            particle.y += particle.vy;
+            particle.vx *= 0.98;
+            particle.vy *= 0.98;
+            particle.life--;
+            particle.size *= 0.98;
+            return particle.life > 0;
+        });
+        
+        // Check collision with player
+        if (GameState.player) {
+            const dx = GameState.player.x - this.x;
+            const dy = GameState.player.y - this.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < this.radius + GameState.player.radius) {
+                this.collect();
+            }
+        }
+    }
+    
+    collect() {
+        this.collected = true;
+        GameState.coresCollected++;
+        
+        // Enhanced scoring system
+        const baseScore = 100;
+        const comboBonus = (GameState.combo - 1) * 50;
+        const totalScore = baseScore + comboBonus;
+        
+        GameState.score += totalScore;
+        GameState.combo++;
+        GameState.energy = Math.min(GameState.maxEnergy, GameState.energy + 20);
+        
+        // Create enhanced collection effect
+        for (let i = 0; i < 20; i++) {
+            GameState.particles.push(new CollectionParticle(this.x, this.y));
+        }
+        
+        // Check level completion
+        if (GameState.coresCollected >= GameState.coresRequired) {
+            showAchievement('🎯 MISSION COMPLETE!');
+            setTimeout(() => levelComplete(), 1000);
+        } else {
+            showAchievement(`⚡ ENERGY CORE! +${totalScore} (${GameState.combo}x Combo)`);
+        }
+        
+        updateUI();
+    }
+    
+    draw() {
+        if (this.collected) return;
+        
+        const ctx = GameState.ctx;
+        
+        // Draw enhanced particles
+        this.particles.forEach(particle => {
+            ctx.globalAlpha = (particle.life / particle.maxLife) * 0.9;
+            ctx.fillStyle = '#00ff7f';
+            ctx.beginPath();
+            ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+            ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+        
+        // Draw enhanced glow effect
+        const glowSize = this.radius + Math.sin(this.pulse) * 6;
+        const glowGradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, glowSize * 1.5);
+        glowGradient.addColorStop(0, 'rgba(0, 255, 127, 0.9)');
+        glowGradient.addColorStop(0.5, 'rgba(0, 255, 127, 0.4)');
+        glowGradient.addColorStop(1, 'rgba(0, 255, 127, 0)');
+        
+        ctx.fillStyle = glowGradient;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, glowSize * 1.5, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Draw core with rotation and enhanced details
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation);
+        
+        // Core body
+        const coreGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, this.radius);
+        coreGradient.addColorStop(0, '#ffffff');
+        coreGradient.addColorStop(0.3, '#00ff7f');
+        coreGradient.addColorStop(0.7, '#00cc66');
+        coreGradient.addColorStop(1, '#009944');
+        
+        ctx.fillStyle = coreGradient;
+        ctx.beginPath();
+        ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Enhanced inner details
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        for (let i = 0; i < 8; i++) {
+            const angle = (i / 8) * Math.PI * 2;
+            const innerRadius = 4;
+            const outerRadius = 9;
+            const x1 = Math.cos(angle) * innerRadius;
+            const y1 = Math.sin(angle) * innerRadius;
+            const x2 = Math.cos(angle) * outerRadius;
+            const y2 = Math.sin(angle) * outerRadius;
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+        }
+        ctx.stroke();
+        
+        // Central energy symbol
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 12px Comfortaa';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('⚡', 0, 0);
+        
+        ctx.restore();
+        
+        // Draw collection hint
+        if (GameState.player) {
+            const dx = GameState.player.x - this.x;
+            const dy = GameState.player.y - this.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < 80) {
+                ctx.globalAlpha = 0.8;
+                ctx.fillStyle = '#00ff7f';
+                ctx.font = 'bold 10px Comfortaa';
+                ctx.textAlign = 'center';
+                ctx.fillText('ENERGY CORE', this.x, this.y - this.radius - 20);
+                ctx.globalAlpha = 1;
+            }
+        }
+    }
+}
+
+// Enhanced Particle Classes [web:55]
+class ExplosionParticle {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.vx = (Math.random() - 0.5) * 8;
+        this.vy = (Math.random() - 0.5) * 8;
+        this.life = 50;
+        this.maxLife = 50;
+        this.color = ['#ff073a', '#ff8500', '#ffff00'][Math.floor(Math.random() * 3)];
+        this.size = Math.random() * 5 + 2;
+    }
+    
+    update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vx *= 0.97;
+        this.vy *= 0.97;
+        this.life--;
+        this.size *= 0.97;
+    }
+    
+    draw() {
+        const ctx = GameState.ctx;
+        ctx.globalAlpha = this.life / this.maxLife;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+    }
+}
+
+class CollectionParticle {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.vx = (Math.random() - 0.5) * 5;
+        this.vy = (Math.random() - 0.5) * 5;
+        this.life = 35;
+        this.maxLife = 35;
+        this.size = Math.random() * 3 + 1;
+        this.rotation = 0;
+        this.rotationSpeed = (Math.random() - 0.5) * 0.3;
+    }
+    
+    update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.08; // gentle gravity
+        this.rotation += this.rotationSpeed;
+        this.life--;
+        this.size *= 0.98;
+    }
+    
+    draw() {
+        const ctx = GameState.ctx;
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation);
+        ctx.globalAlpha = this.life / this.maxLife;
+        ctx.fillStyle = '#00ff7f';
+        ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
+        ctx.globalAlpha = 1;
+        ctx.restore();
+    }
+}
+
+// Enhanced Game Functions [web:55][web:59]
+function initGame() {
+    GameState.canvas = document.getElementById('gameCanvas');
+    GameState.ctx = GameState.canvas.getContext('2d');
+    
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    
+    setupEventListeners();
+    
+    // Don't auto-start - wait for player to click start
+}
+
+function startGame() {
+    document.getElementById('welcome-modal').style.display = 'none';
+    generateLevel(GameState.level);
+    GameState.isPlaying = true;
+    gameLoop();
+}
+
+function showDetailedTutorial() {
+    document.getElementById('welcome-modal').style.display = 'none';
+    document.getElementById('tutorial-modal').style.display = 'flex';
+}
+
+function closeTutorial() {
+    document.getElementById('tutorial-modal').style.display = 'none';
+    startGame();
+}
+
+function resizeCanvas() {
+    const arena = document.querySelector('.game-arena');
+    GameState.width = arena.clientWidth - 4; // Account for border
+    GameState.height = arena.clientHeight - 4;
+    GameState.canvas.width = GameState.width;
+    GameState.canvas.height = GameState.height;
+}
+
+function setupEventListeners() {
+    // Enhanced keyboard controls [web:67]
+    window.addEventListener('keydown', (e) => {
+        GameState.keys[e.key.toLowerCase()] = true;
+        if (e.code === 'Space') {
+            e.preventDefault();
+            GameState.keys[' '] = true;
+        }
+    });
+    
+    window.addEventListener('keyup', (e) => {
+        GameState.keys[e.key.toLowerCase()] = false;
+        if (e.code === 'Space') {
+            GameState.keys[' '] = false;
+        }
+    });
+    
+    // Enhanced mouse controls [web:59]
+    GameState.canvas.addEventListener('mousedown', (e) => {
+        const rect = GameState.canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        GameState.mouse.x = x;
+        GameState.mouse.y = y;
+        
+        if (e.button === 0) { // Left click
+            GameState.mouse.isDown = true;
+            
+            // Check if clicking existing well
+            let wellClicked = false;
+            GameState.gravityWells.forEach(well => {
+                if (well.contains(x, y)) {
+                    well.dragging = true;
+                    wellClicked = true;
+                }
+            });
+            
+            // Create new well if not clicking existing one and have enough energy
+            if (!wellClicked && GameState.energy >= 10) {
+                const well = new InteractiveGravityWell(x, y, 800);
+                GameState.gravityWells.push(well);
+                GameState.energy -= 10;
+                GameState.wellsPlaced++;
+                showAchievement('🌌 Gravity Well Placed!');
+                updateUI();
+            } else if (!wellClicked && GameState.energy < 10) {
+                showAchievement('❌ Not Enough Energy!');
+            }
+        } else if (e.button === 2) { // Right click
+            GameState.mouse.rightDown = true;
+        }
+    });
+    
+    GameState.canvas.addEventListener('mousemove', (e) => {
+        const rect = GameState.canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        GameState.mouse.x = x;
+        GameState.mouse.y = y;
+        
+        if (GameState.mouse.isDown) {
+            GameState.gravityWells.forEach(well => {
+                if (well.dragging) {
+                    well.x = x;
+                    well.y = y;
+                }
+            });
+        }
+    });
+    
+    GameState.canvas.addEventListener('mouseup', (e) => {
+        if (e.button === 0) {
+            GameState.mouse.isDown = false;
+            GameState.gravityWells.forEach(well => {
+                well.dragging = false;
+            });
+        } else if (e.button === 2) {
+            // Remove gravity well on right click
+            const x = GameState.mouse.x;
+            const y = GameState.mouse.y;
+            
+            const initialLength = GameState.gravityWells.length;
+            GameState.gravityWells = GameState.gravityWells.filter(well => {
+                return !well.contains(x, y);
+            });
+            
+            if (GameState.gravityWells.length < initialLength) {
+                showAchievement('🗑️ Gravity Well Removed!');
+            }
+            
+            GameState.mouse.rightDown = false;
+        }
+    });
+    
+    // Prevent context menu
+    GameState.canvas.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+    });
+    
+    // Enhanced mouse wheel for mass adjustment [web:64]
+    GameState.canvas.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const x = GameState.mouse.x;
+        const y = GameState.mouse.y;
+        
+        GameState.gravityWells.forEach(well => {
+            if (well.contains(x, y)) {
+                const delta = e.deltaY > 0 ? -80 : 80; // Smaller adjustments for better control
+                well.adjustMass(delta);
+            }
+        });
+    });
+}
+
+function generateLevel(levelNum) {
+    // Reset level state
+    GameState.gravityWells = [];
+    GameState.energyCores = [];
+    GameState.particles = [];
+    GameState.coresCollected = 0;
+    GameState.coresRequired = Math.min(3 + Math.floor(levelNum / 2), 7);
+    GameState.levelTimer = 120 - (levelNum - 1) * 8; // More time for learning
+    GameState.combo = 1;
+    GameState.wellsPlaced = 0;
+    GameState.totalDistance = 0;
+    
+    // Create player with better starting position
+    GameState.player = new Spacecraft(80, GameState.height / 2);
+    
+    // Generate energy cores in strategic positions
+    const positions = [
+        { x: GameState.width * 0.7, y: GameState.height * 0.2 },
+        { x: GameState.width * 0.8, y: GameState.height * 0.8 },
+        { x: GameState.width * 0.5, y: GameState.height * 0.1 },
+        { x: GameState.width * 0.9, y: GameState.height * 0.5 },
+        { x: GameState.width * 0.6, y: GameState.height * 0.9 },
+        { x: GameState.width * 0.3, y: GameState.height * 0.3 },
+        { x: GameState.width * 0.4, y: GameState.height * 0.7 }
+    ];
+    
+    for (let i = 0; i < GameState.coresRequired; i++) {
+        const pos = positions[i] || {
+            x: 300 + Math.random() * (GameState.width - 500),
+            y: 100 + Math.random() * (GameState.height - 200)
+        };
+        GameState.energyCores.push(new EnergyCore(pos.x, pos.y));
+    }
+    
+    // Generate helpful initial gravity wells based on level
+    if (levelNum === 1) {
+        // Tutorial level - one helpful well
+        GameState.gravityWells.push(new InteractiveGravityWell(GameState.width * 0.4, GameState.height * 0.6, 1200));
+    } else {
+        // More complex levels
+        const initialWells = Math.min(1 + Math.floor(levelNum / 3), 3);
+        for (let i = 0; i < initialWells; i++) {
+            const x = 250 + Math.random() * (GameState.width - 500);
+            const y = 150 + Math.random() * (GameState.height - 300);
+            const mass = 600 + Math.random() * 800;
+            
+            GameState.gravityWells.push(new InteractiveGravityWell(x, y, mass));
+        }
+    }
+    
+    // Update physics mode based on level
+    const physicsModes = ['Earth', 'Moon', 'Mars', 'Jupiter', 'Space Station'];
+    const gravityValues = [0.3, 0.05, 0.11, 0.76, 0.02];
+    const modeIndex = Math.min(levelNum - 1, physicsModes.length - 1);
+    
+    GameState.physicsMode = physicsModes[modeIndex];
+    GameState.gravity = gravityValues[modeIndex];
+    
+    updateUI();
+}
+
+function gameLoop() {
+    if (!GameState.isPlaying) {
+        requestAnimationFrame(gameLoop);
+        return;
+    }
+    
+    // Clear canvas with enhanced space effect
+    const ctx = GameState.ctx;
+    ctx.fillStyle = 'rgba(13, 20, 33, 0.15)';
+    ctx.fillRect(0, 0, GameState.width, GameState.height);
+    
+    // Draw enhanced starfield
+    drawStarfield();
+    
+    // Update game objects
+    if (GameState.player) {
+        GameState.player.update();
+    }
+    
+    GameState.gravityWells.forEach(well => well.update());
+    GameState.energyCores.forEach(core => core.update());
+    
+    // Update particles
+    GameState.particles = GameState.particles.filter(particle => {
+        particle.update();
+        return particle.life > 0;
+    });
+    
+    // Update level timer
+    GameState.levelTimer -= 1/60;
+    if (GameState.levelTimer <= 0) {
+        gameOver();
+        return;
+    }
+    
+    // Update power-up timers
+    updatePowerUps();
+    
+    // Draw everything
+    drawGravityLines();
+    GameState.gravityWells.forEach(well => well.draw());
+    GameState.energyCores.forEach(core => core.draw());
+    GameState.particles.forEach(particle => particle.draw());
+    
+    if (GameState.player) {
+        GameState.player.draw();
+    }
+    
+    // Draw helpful UI overlays
+    drawHelpfulOverlays();
+    
+    updateUI();
+    requestAnimationFrame(gameLoop);
+}
+
+function drawStarfield() {
+    const ctx = GameState.ctx;
+    ctx.fillStyle = '#ffffff';
+    
+    // Enhanced starfield with twinkling
+    for (let i = 0; i < 80; i++) {
+        const x = (i * 123 + GameState.levelTimer * 3) % GameState.width;
+        const y = (i * 456 + GameState.levelTimer * 2) % GameState.height;
+        const size = (i % 3) + 1;
+        const twinkle = Math.sin(GameState.levelTimer * 0.1 + i) * 0.3 + 0.7;
+        
+        ctx.globalAlpha = (0.2 + (i % 3) * 0.15) * twinkle;
+        ctx.beginPath();
+        ctx.arc(x, y, size * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+}
+
+function drawGravityLines() {
+    if (!GameState.player) return;
+    
+    const ctx = GameState.ctx;
+    
+    GameState.gravityWells.forEach(well => {
+        const dx = well.x - GameState.player.x;
+        const dy = well.y - GameState.player.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < well.influence) {
+            const alpha = Math.max(0.1, 1 - distance / well.influence);
+            ctx.strokeStyle = `rgba(157, 78, 221, ${alpha * 0.4})`;
+            ctx.lineWidth = 2;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(GameState.player.x, GameState.player.y);
+            ctx.lineTo(well.x, well.y);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+    });
+}
+
+function drawHelpfulOverlays() {
+    const ctx = GameState.ctx;
+    
+    // Draw nearest energy core indicator
+    if (GameState.player && GameState.energyCores.length > 0) {
+        let nearestCore = null;
+        let nearestDistance = Infinity;
+        
+        GameState.energyCores.forEach(core => {
+            if (!core.collected) {
+                const dx = core.x - GameState.player.x;
+                const dy = core.y - GameState.player.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < nearestDistance) {
+                    nearestDistance = distance;
+                    nearestCore = core;
+                }
+            }
+        });
+        
+        if (nearestCore && nearestDistance > 50) {
+            const dx = nearestCore.x - GameState.player.x;
+            const dy = nearestCore.y - GameState.player.y;
+            const angle = Math.atan2(dy, dx);
+            
+            // Draw directional arrow
+            ctx.save();
+            ctx.translate(GameState.player.x + Math.cos(angle) * 30, GameState.player.y + Math.sin(angle) * 30);
+            ctx.rotate(angle);
+            
+            ctx.fillStyle = '#00ff7f';
+            ctx.globalAlpha = 0.7;
+            ctx.beginPath();
+            ctx.moveTo(10, 0);
+            ctx.lineTo(-5, -5);
+            ctx.lineTo(-5, 5);
+            ctx.closePath();
+            ctx.fill();
+            ctx.globalAlpha = 1;
+            
+            ctx.restore();
+        }
+    }
+}
+
+function updateSpeedIndicator(speed) {
+    const maxDisplaySpeed = 6;
+    const speedPercent = Math.min(speed / maxDisplaySpeed, 1) * 100;
+    document.getElementById('speed-bar').style.width = speedPercent + '%';
+    document.getElementById('speed-value').textContent = speed.toFixed(1);
+}
+
+// Enhanced Power-up Functions [web:55]
+function activateShield() {
+    if (GameState.energy >= 20) {
+        GameState.energy -= 20;
+        GameState.shieldActive = true;
+        
+        setTimeout(() => {
+            GameState.shieldActive = false;
+            showAchievement('🛡️ Shield Deactivated');
+        }, 6000);
+        
+        showAchievement('🛡️ PROTECTIVE SHIELD ACTIVE!');
+        updateUI();
+    }
+}
+
+function activateBoost() {
+    if (GameState.energy >= 15) {
+        GameState.energy -= 15;
+        GameState.boostActive = true;
+        
+        setTimeout(() => {
+            GameState.boostActive = false;
+            showAchievement('🚀 Boost Ended');
+        }, 4000);
+        
+        showAchievement('🚀 SPEED BOOST ENGAGED!');
+        updateUI();
+    }
+}
+
+function activateAntiGravity() {
+    if (GameState.energy >= 30) {
+        GameState.energy -= 30;
+        GameState.antiGravityActive = true;
+        
+        setTimeout(() => {
+            GameState.antiGravityActive = false;
+            showAchievement('🌌 Anti-Gravity Ended');
+        }, 5000);
+        
+        showAchievement('🌌 ANTI-GRAVITY FIELD ACTIVE!');
+        updateUI();
+    }
+}
+
+function activateSlowMotion() {
+    if (GameState.energy >= 25) {
+        GameState.energy -= 25;
+        GameState.slowMotionActive = true;
+        GameState.timeScale = 0.6;
+        
+        setTimeout(() => {
+            GameState.slowMotionActive = false;
+            GameState.timeScale = 1.0;
+            showAchievement('⏱️ Time Normal');
+        }, 7000);
+        
+        showAchievement('⏱️ TIME DILATION ACTIVE!');
+        updateUI();
+    }
+}
+
+function updatePowerUps() {
+    // Update power-up button states
+    document.getElementById('shield-btn').disabled = GameState.energy < 20;
+    document.getElementById('boost-btn').disabled = GameState.energy < 15;
+    document.getElementById('gravity-btn').disabled = GameState.energy < 30;
+    document.getElementById('slowmo-btn').disabled = GameState.energy < 25;
+}
+
+// Enhanced UI Updates [web:55][web:56]
+function updateUI() {
+    document.getElementById('player-score').textContent = GameState.score.toLocaleString();
+    document.getElementById('current-level').textContent = GameState.level;
+    document.getElementById('player-lives').textContent = GameState.lives;
+    document.getElementById('player-energy').textContent = Math.floor(GameState.energy);
+    document.getElementById('combo-counter').textContent = `x${GameState.combo}`;
+    document.getElementById('level-timer').textContent = `${Math.ceil(GameState.levelTimer)}s`;
+    document.getElementById('physics-mode').textContent = GameState.physicsMode;
+    document.getElementById('wells-count').textContent = GameState.wellsPlaced;
+    document.getElementById('objective-progress').textContent = `${GameState.coresCollected}/${GameState.coresRequired}`;
+    
+    // Update progress bars
+    const energyPercent = (GameState.energy / GameState.maxEnergy) * 100;
+    document.getElementById('energy-bar').style.width = energyPercent + '%';
+    
+    const objectivePercent = (GameState.coresCollected / GameState.coresRequired) * 100;
+    document.getElementById('objective-bar').style.width = objectivePercent + '%';
+    
+    // Update mission text based on progress
+    const remaining = GameState.coresRequired - GameState.coresCollected;
+    if (remaining > 0) {
+        document.getElementById('mission-text').textContent = 
+            `Navigate through gravity fields and collect ${remaining} more energy core${remaining > 1 ? 's' : ''}! Use gravity wells strategically to reach them safely.`;
+    } else {
+        document.getElementById('mission-text').textContent = 
+            'Excellent work! All energy cores collected. Mission accomplished!';
+    }
+}
+
+function levelComplete() {
+    GameState.isPlaying = false;
+    
+    const timeBonus = Math.floor(GameState.levelTimer * 15);
+    const efficiencyBonus = Math.max(0, (5 - GameState.wellsPlaced) * 50);
+    
+    GameState.score += timeBonus + efficiencyBonus;
+    
+    document.getElementById('level-score').textContent = GameState.score.toLocaleString();
+    document.getElementById('time-bonus').textContent = timeBonus.toLocaleString();
+    document.getElementById('efficiency-bonus').textContent = efficiencyBonus.toLocaleString();
+    document.getElementById('level-complete-modal').style.display = 'flex';
+}
+
+function nextLevel() {
+    document.getElementById('level-complete-modal').style.display = 'none';
+    GameState.level++;
+    GameState.energy = GameState.maxEnergy;
+    generateLevel(GameState.level);
+    GameState.isPlaying = true;
+}
+
+function gameOver() {
+    GameState.isPlaying = false;
+    document.getElementById('final-score-text').textContent = GameState.score.toLocaleString();
+    document.getElementById('game-over-modal').style.display = 'flex';
+}
+
+function restartGame() {
+    document.getElementById('game-over-modal').style.display = 'none';
+    GameState.level = 1;
+    GameState.score = 0;
+    GameState.lives = 3;
+    GameState.energy = GameState.maxEnergy;
+    GameState.combo = 1;
+    generateLevel(GameState.level);
+    GameState.isPlaying = true;
+}
+
+function showPhysicsLesson() {
+    document.getElementById('level-complete-modal').style.display = 'none';
+    
+    const lessons = {
+        1: {
+            title: 'Newton\'s Law of Universal Gravitation',
+            content: `
+                <h3 style="color: var(--neon-blue);">Newton's Law of Universal Gravitation</h3>
+                <p>You just experienced the fundamental force that governs the universe!</p>
+                <div style="background: rgba(0, 243, 255, 0.1); padding: 20px; border-radius: 12px; margin: 20px 0; border: 2px solid var(--neon-blue);">
+                    <p style="text-align: center; font-size: 1.3rem; font-weight: 700; color: var(--neon-blue);">F = G(m₁m₂)/r²</p>
+                    <br>
+                    <p><strong>Where:</strong></p>
+                    <p>• <strong>F</strong> = gravitational force between objects</p>
+                    <p>• <strong>G</strong> = gravitational constant (6.67 × 10⁻¹¹)</p>
+                    <p>• <strong>m₁, m₂</strong> = masses of the two objects</p>
+                    <p>• <strong>r</strong> = distance between object centers</p>
+                </div>
+                <p><strong>🌍 Real World Applications:</strong></p>
+                <p>• Keeps the Moon orbiting Earth (27.3 days per orbit)</p>
+                <p>• Controls planetary motion around the Sun</p>
+                <p>• Enables satellite navigation (GPS systems)</p>
+                <p>• Governs tidal forces in our oceans</p>
+            `
+        },
+        2: {
+            title: 'Gravity on Different Worlds',
+            content: `
+                <h3 style="color: var(--neon-blue);">Gravity Varies Throughout the Universe</h3>
+                <p>Different celestial bodies have different gravitational strengths based on their mass and size!</p>
+                <div style="background: rgba(0, 243, 255, 0.1); padding: 20px; border-radius: 12px; margin: 20px 0; border: 2px solid var(--neon-blue);">
+                    <p><strong>Surface Gravity Comparison:</strong></p>
+                    <p>• <strong>Earth:</strong> 9.8 m/s² (our reference)</p>
+                    <p>• <strong>Moon:</strong> 1.6 m/s² (1/6 of Earth)</p>
+                    <p>• <strong>Mars:</strong> 3.7 m/s² (38% of Earth)</p>
+                    <p>• <strong>Jupiter:</strong> 24.8 m/s² (2.5× Earth)</p>
+                </div>
+                <p><strong>🚀 Fun Facts:</strong></p>
+                <p>• On the Moon, you could jump 6 times higher!</p>
+                <p>• On Jupiter, you'd weigh 2.5 times more</p>
+                <p>• Gravity depends on both mass AND radius of the planet</p>
+                <p>• Surface gravity formula: g = GM/r²</p>
+            `
+        }
+    };
+    
+    const lesson = lessons[GameState.level] || lessons[1];
+    document.getElementById('physics-lesson-content').innerHTML = lesson.content;
+    document.getElementById('physics-lesson-modal').style.display = 'flex';
+}
+
+function closePhysicsLesson() {
+    document.getElementById('physics-lesson-modal').style.display = 'none';
+    nextLevel();
+}
+
+function showAchievement(text) {
+    const achievement = document.createElement('div');
+    achievement.className = 'achievement';
+    achievement.textContent = text;
+    document.body.appendChild(achievement);
+    
+    setTimeout(() => {
+        if (document.body.contains(achievement)) {
+            document.body.removeChild(achievement);
+        }
+    }, 4000);
+}
+
+// Initialize game when page loads
+window.addEventListener('load', initGame);
+</script>
+
+</body>
+</html>

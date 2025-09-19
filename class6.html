@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STEM Universe - Class 6 | HackNRun</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Original+Surfer&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        /*
+        ================================================================================
+        |                                                                              |
+        |               HackNRun - STEM Universe Stylesheet                            |
+        |               Version: 6.4 - "Galaxy Glow" Edition                           |
+        |               Author: Gemini AI                                              |
+        |                                                                              |
+        ================================================================================
+        */
+
+        /*
+        ========================================
+        * 1. ROOT VARIABLES & GLOBAL SETUP
+        ========================================
+        */
+        :root {
+            /* Core Color Palette */
+            --primary: #4e32d5;
+            --primary-light: #7259f9;
+            --primary-lighter: #a993ff;
+            --accent: #ff478c;
+            --accent-light: #ff689c;
+            --secondary: #00bcd4;
+            --tertiary: #1b006a;
+            --deep-space: #0b001f; /* A darker space color for more contrast */
+            --navbar-bg: #1a0038; /* Changed to a distinct purple color */
+            
+            /* Neutral & Text Colors */
+            --white: #ffffff;
+            --dark: #1f014b;
+            --text-light: rgba(255, 255, 255, 0.9);
+            --text-muted: rgba(255, 255, 255, 0.7);
+
+            /* Subject-specific Colors & Glows for high visibility */
+            --science-color: #7259f9;
+            --tech-color: #ff478c;
+            --eng-color: #00bcd4;
+            --math-color: #fbbf24;
+            --science-glow: 0 0 25px rgba(114, 89, 249, 0.7);
+            --tech-glow: 0 0 25px rgba(255, 71, 140, 0.7);
+            --eng-glow: 0 0 25px rgba(0, 188, 212, 0.7);
+            --math-glow: 0 0 25px rgba(251, 191, 36, 0.7);
+
+            /* UI Sizing & Spacing - Increased button sizes */
+            --header-height: 150px;
+            --border-radius: 24px;
+            --card-width: 380px;
+            --card-height: 520px;
+            --btn-padding: 1.4rem 2.5rem; /* Increased button padding */
+            --btn-font-size: 1.3rem; /* Increased button font size */
+
+            /* Transitions & Effects */
+            --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --shadow-card: 0 10px 20px rgba(0, 0, 0, 0.2);
+            --shadow-card-hover: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* Universal Box Sizing */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* Smooth Scrolling Behavior */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /*
+        ========================================
+        * 2. BODY & BACKGROUND STYLES
+        ========================================
+        */
+        body {
+            background: linear-gradient(135deg, var(--deep-space) 0%, var(--tertiary) 100%);
+            color: var(--text-light);
+            overflow: hidden;
+            line-height: 1.6;
+            font-family: "Nunito", sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Particle.js canvas container */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+        
+        /* General Typography */
+        h1, h2, h3, h4 {
+            font-family: "Original Surfer", sans-serif;
+            color: var(--white);
+            font-weight: 400;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /*
+        ========================================
+        * 3. HEADER & NAVIGATION BAR
+        ========================================
+        */
+        header {
+            padding-top: 0rem;
+            background: var(--navbar-bg); /* Now uses a distinct color */
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            transition: var(--transition-smooth);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3); /* Thicker, more visible border */
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 100vw;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .logo a { text-decoration: none; display: flex; align-items: center; }
+        .logo h1 { font-size: 2.2rem; color: var(--white); }
+        .logo span { color: var(--accent-light); }
+        .logo-icon { font-size: 2.5rem; margin-right: 15px; color: var(--white); }
+        
+        nav ul { display: flex; list-style: none; gap: 1.5rem; }
+        nav ul li a { 
+            color: var(--white); 
+            text-decoration: none; 
+            font-weight: 600; 
+            font-size: 1.6rem;
+            transition: var(--transition-smooth); 
+            padding: 0.8rem 1.6rem;
+            border-radius: 30px;
+            position: relative;
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--secondary));
+            border-radius: 3px;
+            transition: width 0.4s ease;
+        }
+        
+        nav ul li a:hover { color: var(--primary-lighter); }
+        nav ul li a:hover::after { width: 80%; }
+        
+        .nav-cta { 
+            background: linear-gradient(to right, var(--accent), var(--secondary)); 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .nav-cta:hover { 
+            transform: translateY(-2px) scale(1.05); 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            color: var(--white) !important;
+        }
+        .nav-cta:hover::after { width: 0; }
+
+        .mobile-menu-btn { display: none; }
+
+        /*
+        ========================================
+        * 4. MAIN CONTENT & PAGE LAYOUT
+        ========================================
+        */
+        .subject-main {
+            padding-top: var(--header-height);
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 95vw;
+            margin: 0 auto;
+            padding: 1.5rem 2rem 2rem 2rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            overflow: hidden;
+            perspective: 2000px;
+        }
+
+        .page-title {
+            text-align: center;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--accent-light), var(--primary-lighter), var(--white));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            animation: shimmer 5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { text-shadow: 0 0 10px var(--accent-light); }
+            50% { text-shadow: 0 0 25px var(--primary-lighter); }
+            100% { text-shadow: 0 0 10px var(--accent-light); }
+        }
+        
+        .page-subtitle {
+            text-align: center;
+            font-size: clamp(1rem, 2.5vw, 1.1rem);
+            color: var(--primary-lighter);
+            margin-bottom: 2rem;
+            font-family: "Nunito", sans-serif;
+            font-weight: 400;
+        }
+        
+        /*
+        =======================================
+        * 5. SUBJECT NAVIGATION TABS
+        =======================================
+        */
+        .subject-nav {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .subject-nav-btn {
+            padding: var(--btn-padding); /* Using the larger button size */
+            border-radius: 50px;
+            font-size: var(--btn-font-size); /* Using the larger font size */
+            font-family: "Original Surfer", sans-serif;
+            font-weight: 400;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            border: 2px solid rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--white);
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(5px);
+        }
+        
+        .subject-nav-btn.active {
+            transform: translateY(-3px) scale(1.05);
+            color: var(--white);
+            border-color: var(--accent-light);
+        }
+
+        .subject-nav-btn.sci-btn.active { background: var(--science-color); box-shadow: var(--science-glow); }
+        .subject-nav-btn.tech-btn.active { background: var(--tech-color); box-shadow: var(--tech-glow); }
+        .subject-nav-btn.eng-btn.active { background: var(--eng-color); box-shadow: var(--eng-glow); }
+        .subject-nav-btn.math-btn.active { background: var(--math-color); box-shadow: var(--math-glow); }
+        
+        /*
+        ========================================
+        * 6. HORIZONTAL SCROLLING SECTIONS
+        ========================================
+        */
+        .subject-section {
+            display: none;
+            flex-grow: 1;
+            overflow: hidden;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+        
+        .subject-section.active { display: flex; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .topics-grid-container {
+            flex-grow: 1;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding-bottom: 20px;
+        }
+        
+        /* Custom Scrollbar Styling */
+        .topics-grid-container::-webkit-scrollbar { height: 12px; }
+        .topics-grid-container::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.3); border-radius: 10px; }
+        .topics-grid-container::-webkit-scrollbar-thumb { background-image: linear-gradient(to right, var(--accent), var(--secondary)); border-radius: 10px; }
+
+        .topics-grid {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 2.5rem;
+            padding: 1.5rem;
+            min-height: 100%;
+            align-items: center;
+        }
+
+        /*
+        ========================================
+        * 7. REVAMPED TOPIC CARD DESIGN
+        ========================================
+        */
+        .topic-card {
+            flex: 0 0 var(--card-width);
+            height: var(--card-height);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.2s ease-out;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .topic-card:hover {
+            transform: translateY(-10px) rotateX(5deg) rotateY(-5deg) scale(1.03);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        /* The Aurora Glow Effect */
+        .topic-card::before {
+            content: '';
+            position: absolute;
+            top: var(--mouse-y, 50%);
+            left: var(--mouse-x, 50%);
+            width: 500px;
+            height: 500px;
+            background-image: radial-gradient(circle, var(--glow-color, var(--primary-light)) 0%, transparent 60%);
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 0.4s ease, background-image 0.4s ease;
+            pointer-events: none;
+        }
+
+        .topic-card:hover::before {
+            opacity: 0.25;
+        }
+
+        /* Set glow color based on card type */
+        .science-card { --glow-color: var(--science-color); }
+        .tech-card { --glow-color: var(--tech-color); }
+        .eng-card { --glow-color: var(--eng-color); }
+        .math-card { --glow-color: var(--math-color); }
+
+        .topic-icon {
+            height: 70px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .topic-icon i, .topic-icon svg {
+            font-size: 60px;
+            transition: var(--transition-smooth);
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+            color: currentColor;
+            fill: currentColor;
+        }
+
+        .topic-card:hover .topic-icon i,
+        .topic-card:hover .topic-icon svg {
+            transform: scale(1.2) rotate(-10deg);
+            filter: drop-shadow(0 8px 15px rgba(0,0,0,0.5));
+        }
+
+        .topic-card-content {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .topic-card h3 {
+            color: var(--white);
+            font-size: 1.8rem;
+            line-height: 1.3;
+            margin-bottom: 1rem;
+            flex-shrink: 0;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 0.5rem;
+        }
+
+        /* Animated underline for titles */
+        .topic-card h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0%;
+            height: 3px;
+            background: var(--glow-color, var(--primary-light));
+            border-radius: 3px;
+            transition: all 0.4s ease-in-out;
+            transform: translateX(-50%);
+        }
+
+        .topic-card:hover h3::after {
+            width: 80%;
+        }
+        
+        .topic-card p {
+            color: var(--primary-lighter);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            flex-grow: 1;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 400;
+        }
+        
+        .button-group { display: flex; justify-content: center; gap: 1.5rem; flex-shrink: 0; }
+        
+        .btn {
+            padding: var(--btn-padding); /* Using the larger button size */
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: var(--btn-font-size); /* Using the larger font size */
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            color: var(--white);
+            text-decoration: none;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .btn i { font-size: 1.2rem; }
+        .btn:hover { transform: scale(1.05); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); }
+        
+        /* New, more vibrant gradients for buttons */
+        .btn-theory { background: linear-gradient(45deg, #00c6ff, #0072ff); }
+        .btn-game { background: linear-gradient(45deg, #ff0073, #ff66a3); }
+
+        /*
+        ========================================
+        * 8. RESPONSIVE DESIGN
+        ========================================
+        */
+        @media (max-width: 968px) {
+            body { 
+                overflow-y: auto;
+                height: auto;
+            }
+            .subject-main {
+                padding-top: var(--header-height);
+                overflow: visible;
+            }
+            .topics-grid-container { 
+                overflow-x: visible;
+            }
+            .topics-grid { 
+                flex-wrap: wrap;
+                justify-content: center;
+                padding-bottom: 0;
+                gap: 2rem;
+            }
+            .topic-card { 
+                flex: 1 1 90%;
+                max-width: var(--card-width);
+                margin: 1rem 0;
+                transform: none !important;
+                perspective: none;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+            .topic-card:hover {
+                transform: translateY(-5px) scale(1.02);
+            }
+            nav ul {
+                display: none;
+            }
+            .mobile-menu-btn { 
+                display: block; 
+                background: transparent; 
+                border: none; 
+                font-size: 1.8rem; 
+                color: var(--white); 
+                cursor: pointer; 
+                z-index: 1001; 
+            }
+            .page-title { font-size: 2.5rem; }
+            .container { max-width: 100%; padding: 1rem; }
+            
+            /* Adjust button sizes for mobile */
+            .btn, .subject-nav-btn {
+                padding: 1.2rem 2rem;
+                font-size: 1.2rem;
+            }
+
+        }
+        #full-logo{
+            display: flex;
+            align-items: center;
+        }
+        #full-logo .logo-icon{
+            list-style-type: none;
+            text-decoration: none;
+            font-size:2.5rem;
+            margin-right: 15px;
+            color: var(--secondary);
+            filter: drop-shadow(0 0 10px var(--secondary));
+            animation: float 5s infinite ease-in-out;
+        
+}      
+   @keyframes float {
+  0% { transform: translateY(0px) translateX(0px) rotate(0deg) scale(1); }
+     33% { transform: translateY(-40px) translateX(60px) rotate(120deg) scale(1.1); }
+     66% { transform: translateY(30px) translateX(60px) rotate(240deg) scale(1.2); }
+     100% { transform: translateY(-7px) translateX(12px) rotate(360deg) scale(1.3); }
+        }
+         .profile-dropdown {
+            position: relative;
+        }
+           .profile-trigger .fa-user-circle {
+            font-size: 3.8rem; /* Larger icon */
+            color: yellowgreen;
+            transition: color 0.3s ease, transform 0.3s ease;
+            padding-top: 0;
+            padding-bottom: 12px;
+            margin-right: 20px;
+            padding-left: 20px;
+        }
+
+        .profile-trigger {
+            /* background: linear-gradient(135deg, #fd746c 0%, #ff9068 100%); */
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+        
+        .profile-trigger:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .profile-trigger i {
+            /* color: rgb(212, 52, 52); */
+            font-size: 24px;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 105px;
+            right: 45px;
+            background: transparent;
+            width: 240px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            opacity: 1;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .profile-dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .dropdown-menu ul {
+            display: flex;
+            flex-direction: column;
+            padding: 10px 0;
+            background: rgba(0, 0, 0, 4);
+            width: 300px;
+            border-radius: 25px;
+        }
+        
+        .dropdown-menu ul li {
+            margin: 0;
+        }
+        
+        .dropdown-menu ul li a {
+            color: white;
+            padding: 12px 20px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+        }
+        
+        .dropdown-menu ul li a:hover {
+            background: #f0f5ff;
+            color: #4b6cb7;
+        }
+        
+        .dropdown-menu ul li a i {
+            color: #6c757d;
+            width: 24px;
+            font-size:30px;
+            padding-right: 40px;
+        }
+        
+        .dropdown-divider {
+            height: 1px;
+            background: #e9ecef;
+            margin: 8px 0;
+        }
+        
+        .content {
+            padding: 30px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+        
+        p {
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            nav ul {
+                justify-content: center;
+            }
+            
+            .dropdown-menu {
+                right: 50%;
+                transform: translateX(50%) translateY(-10px);
+            }
+            
+            .profile-dropdown:hover .dropdown-menu {
+                transform: translateX(50%) translateY(0);
+            }
+        }
+   
+    </style>
+</head>
+<body>
+    
+    <div id="particles-js"></div>
+
+    <header>
+        <div class="header-container">
+            <a style="text-decoration: none;" href="index.html" class="logo">
+                <div id="full-logo">
+                    <i class="fas fa-graduation-cap logo-icon"></i>
+                    <h1>Hack<span>NRun</span></h1>
+                </div>
+            </a>
+            <nav id="main-nav">
+                 <ul>
+                    <li><a href="./home.html#home"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="./home.html#classes"><i class="fas fa-school"></i> Classes</a></li>
+                    <li><a href="./home.html#features"><i class="fas fa-star"></i> Features</a></li>
+                    <li><a href="./home.html#subjects"><i class="fas fa-book"></i> Subjects</a></li>
+                    <li><a href="./home.html#demo"><i class="fas fa-play-circle"></i> Demo</a></li>
+                    <li><a href="./home.html#testimonials"><i class="fas fa-chart-pie"></i>Testimonials</a></li>
+                    <li><a href="./home.html#contact" class="nav-cta"><i class="fas fa-envelope"></i> Contact</a></li>
+
+                 <li class="profile-dropdown">
+                        <button class="profile-trigger" aria-haspopup="true" aria-expanded="false" aria-label="Open user menu">
+                            <i class="fas fa-user-circle"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                            <ul>
+                                <li><a href="profile.html"><i class="fas fa-user-alt"></i> Profile</a></li>
+                                <li><a href="leaderboard.html"><i class="fas fa-trophy"></i> Leaderboard</a></li>
+                                <li><a href="./home.html#demo"><i class="fas fa-bookmark"></i>  Request Demo</a></li>
+                                <li><a href="./certifications.html"><i class="fas fa-users"></i> Certifications</a></li>
+                                <li class="dropdown-divider"></li>
+                                <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                                <li><a href="index.html"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    </ul>
+            </nav>
+            <button class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
+        </div>
+    </header>
+
+    <main class="subject-main">
+        <div class="container">
+            <h1 class="page-title" data-aos="fade-down">STEM Universe - Class 6</h1>
+            <h2 class="page-subtitle" data-aos="fade-down" data-aos-delay="100">Your adventure into Science, Technology, Engineering, and Math starts here!</h2>
+            
+            <div class="subject-nav" data-aos="fade-up">
+                <button class="subject-nav-btn sci-btn active" data-subject="science"><i class="fas fa-flask"></i> Science</button>
+                <button class="subject-nav-btn tech-btn" data-subject="technology"><i class="fas fa-laptop-code"></i> Technology</button>
+                <button class="subject-nav-btn eng-btn" data-subject="engineering"><i class="fas fa-cogs"></i> Engineering</button>
+                <button class="subject-nav-btn math-btn" data-subject="math"><i class="fas fa-calculator"></i> Mathematics</button>
+            </div>
+            
+            <section id="science-section" class="subject-section active">
+                <div class="topics-grid-container">
+                    <div class="topics-grid">
+                        <div class="topic-card science-card"><div class="topic-icon" style="color:var(--science-color)"><i class="fas fa-apple-alt"></i></div><div class="topic-card-content"><h3>Food: Our Fuel</h3><p>Explore where our food comes from, the difference between plant and animal sources, and why it's vital for energy.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card science-card"><div class="topic-icon" style="color:var(--science-color)"><i class="fas fa-utensils"></i></div><div class="topic-card-content"><h3>Components of Food</h3><p>Discover the building blocks of a healthy diet: carbohydrates, proteins, fats, vitamins, and minerals.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card science-card"><div class="topic-icon" style="color:var(--science-color)"><i class="fas fa-tshirt"></i></div><div class="topic-card-content"><h3>Fibre to Fabric</h3><p>Unravel the amazing journey of how natural fibres like cotton are spun into yarn and woven into the clothes we wear.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card science-card"><div class="topic-icon" style="color:var(--science-color)"><i class="fas fa-boxes"></i></div><div class="topic-card-content"><h3>Sorting Materials</h3><p>Become a master sorter! Learn to classify materials based on properties like hardness, solubility, and transparency.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card science-card"><div class="topic-icon" style="color:var(--science-color)"><i class="fas fa-filter"></i></div><div class="topic-card-content"><h3>Separation of Substances</h3><p>Explore different methods of separating mixtures like handpicking, winnowing, sieving, and evaporation.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card science-card"><div class="topic-icon" style="color:var(--science-color)"><i class="fas fa-recycle"></i></div><div class="topic-card-content"><h3>Changes Around Us</h3><p>Understand the difference between physical and chemical changes happening in our everyday life.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card science-card"><div class="topic-icon" style="color:var(--science-color)"><i class="fas fa-tree"></i></div><div class="topic-card-content"><h3>Getting to Know Plants</h3><p>Learn about the different parts of plants and their functions, and how plants are classified into various groups.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card science-card"><div class="topic-icon" style="color:var(--science-color)"><i class="fas fa-running"></i></div><div class="topic-card-content"><h3>Body Movements</h3><p>Discover how humans and animals move, and learn about the skeletal and muscular systems that enable movement.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card science-card"><div class="topic-icon" style="color:var(--science-color)"><i class="fas fa-dna"></i></div><div class="topic-card-content"><h3>Living Organisms</h3><p>Understand how living organisms adapt to their environment and the characteristics that define living things.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card science-card"><div class="topic-icon" style="color:var(--science-color)"><i class="fas fa-ruler-combined"></i></div><div class="topic-card-content"><h3>Motion & Measurement</h3><p>Learn about different types of motion and the various units used to measure distance in the metric system.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card science-card"><div class="topic-icon" style="color:var(--science-color)"><i class="fas fa-lightbulb"></i></div><div class="topic-card-content"><h3>Light, Shadows, Reflections</h3><p>Explore how light travels, how shadows are formed, and the phenomenon of reflection.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card science-card"><div class="topic-icon" style="color:var(--science-color)"><i class="fas fa-bolt"></i></div><div class="topic-card-content"><h3>Electricity & Circuits</h3><p>Learn the basics of electric circuits, conductors, insulators, and how to make a simple electric circuit.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="technology-section" class="subject-section">
+                <div class="topics-grid-container">
+                    <div class="topics-grid">
+                        <div class="topic-card tech-card"><div class="topic-icon" style="color:var(--tech-color)"><i class="fas fa-desktop"></i></div><div class="topic-card-content"><h3>1. Intro to Computers</h3><p>Meet the amazing machine! Learn about computer hardware, software, and basic computer operations.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card tech-card"><div class="topic-icon" style="color:var(--tech-color)"><i class="fas fa-code"></i></div><div class="topic-card-content"><h3>2. First Steps in Coding</h3><p>Become a creator! Get started with basic coding concepts using fun, visual blocks to make your own stories.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card tech-card"><div class="topic-icon" style="color:var(--tech-color)"><i class="fas fa-user-shield"></i></div><div class="topic-card-content"><h3>3. Internet Safety</h3><p>Explore the web like a superhero. Learn how to browse safely, protect your info, and be a good digital citizen.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card tech-card"><div class="topic-icon" style="color:var(--tech-color)"><i class="fas fa-keyboard"></i></div><div class="topic-card-content"><h3>4. Using a Keyboard</h3><p>Master the keys! Learn the layout of a keyboard and practice typing to become faster and more accurate.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card tech-card"><div class="topic-icon" style="color:var(--tech-color)"><i class="fas fa-paint-brush"></i></div><div class="topic-card-content"><h3>5. Digital Art</h3><p>Unleash your creativity! Learn to use digital tools to draw, paint, and create amazing artwork on the computer.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card tech-card"><div class="topic-icon" style="color:var(--tech-color)"><i class="fas fa-file-powerpoint"></i></div><div class="topic-card-content"><h3>6. Making Presentations</h3><p>Share your ideas with the world! Learn how to create engaging presentations with text, images, and fun animations.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card tech-card"><div class="topic-icon" style="color:var(--tech-color)"><i class="fas fa-file-word"></i></div><div class="topic-card-content"><h3>7. Word Processing</h3><p>Become a document master. Learn to format text, add tables, and create professional-looking documents.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card tech-card"><div class="topic-icon" style="color:var(--tech-color)"><i class="fas fa-microchip"></i></div><div class="topic-card-content"><h3>8. Understanding Hardware</h3><p>Look inside the machine! Discover the main parts of a computer like the CPU, RAM, and hard drive.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card tech-card"><div class="topic-icon" style="color:var(--tech-color)"><i class="fas fa-box-open"></i></div><div class="topic-card-content"><h3>9. What is Software?</h3><p>Learn the difference between application software (like games) and system software (like Windows).</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card tech-card"><div class="topic-icon" style="color:var(--tech-color)"><i class="fas fa-users-cog"></i></div><div class="topic-card-content"><h3>10. Digital Citizenship</h3><p>Be a hero online! Understand the rights and responsibilities of using the internet respectfully and ethically.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card tech-card"><div class="topic-icon" style="color:var(--tech-color)"><i class="fas fa-envelope"></i></div><div class="topic-card-content"><h3>11. Email Basics</h3><p>Send your first digital letter! Learn how to compose, send, and receive emails safely and effectively.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card tech-card"><div class="topic-icon" style="color:var(--tech-color)"><i class="fas fa-table"></i></div><div class="topic-card-content"><h3>12. Intro to Spreadsheets</h3><p>Organize data like a pro. Discover how to use spreadsheets to create lists, tables, and simple charts.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="engineering-section" class="subject-section">
+                <div class="topics-grid-container">
+                    <div class="topics-grid">
+                        <div class="topic-card eng-card"><div class="topic-icon" style="color:var(--eng-color)"><i class="fas fa-wrench"></i></div><div class="topic-card-content"><h3>1. Simple Machines: Levers</h3><p>Discover the magic of levers and fulcrums, and see how these simple tools give us superpowers!</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card eng-card"><div class="topic-icon" style="color:var(--eng-color)"><i class="fas fa-building"></i></div><div class="topic-card-content"><h3>2. Building Strong Structures</h3><p>Why don't skyscrapers fall down? Explore how engineers use shapes like triangles to design strong bridges and buildings.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card eng-card"><div class="topic-icon" style="color:var(--eng-color)"><i class="fas fa-drafting-compass"></i></div><div class="topic-card-content"><h3>3. The Design Process</h3><p>Think like an inventor! Learn the creative steps engineers use to identify problems, brainstorm ideas, and build cool solutions.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card eng-card"><div class="topic-icon" style="color:var(--eng-color)"><i class="fas fa-satellite-dish"></i></div><div class="topic-card-content"><h3>4. Introduction to Circuits</h3><p>Learn how to build simple circuits with batteries, wires, and bulbs to understand electrical engineering basics.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card eng-card"><div class="topic-icon" style="color:var(--eng-color)"><i class="fas fa-pulley"></i></div><div class="topic-card-content"><h3>5. Simple Machines: Pulleys</h3><p>Learn how pulleys can lift heavy objects with ease and discover how they are used in everyday life, from wells to cranes.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card eng-card"><div class="topic-icon" style="color:var(--eng-color)"><i class="fas fa-tower-broadcast"></i></div><div class="topic-card-content"><h3>6. Engineering with Paper</h3><p>Challenge yourself to build the tallest tower or the strongest bridge using only paper. A fun way to learn about structural integrity.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card eng-card"><div class="topic-icon" style="color:var(--eng-color)"><i class="fas fa-bridge"></i></div><div class="topic-card-content"><h3>7. Intro to Bridges</h3><p>Discover the engineering behind beam, arch, and suspension bridges and what makes each type unique.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card eng-card"><div class="topic-icon" style="color:var(--eng-color)"><i class="fas fa-ruler"></i></div><div class="topic-card-content"><h3>8. Measuring and Tools</h3><p>An engineer's best friends are their tools. Learn how to use rulers, protractors, and other tools for precise measurements.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card eng-card"><div class="topic-icon" style="color:var(--eng-color)"><i class="fas fa-wind"></i></div><div class="topic-card-content"><h3>9. Renewable Energy</h3><p>Explore how engineers harness the power of the sun, wind, and water to create clean energy for our world.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card eng-card"><div class="topic-icon" style="color:var(--eng-color)"><i class="fas fa-pencil-ruler"></i></div><div class="topic-card-content"><h3>10. Prototyping Your Ideas</h3><p>Learn how to take an idea from your head and build a simple model, or prototype, to test it out.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card eng-card"><div class="topic-icon" style="color:var(--eng-color)"><i class="fas fa-hand-holding-water"></i></div><div class="topic-card-content"><h3>11. Water Purification</h3><p>Discover the engineering challenge of cleaning dirty water and build your own simple water filter.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card eng-card"><div class="topic-icon" style="color:var(--eng-color)"><i class="fas fa-trash-alt"></i></div><div class="topic-card-content"><h3>12. Waste Management</h3><p>Learn how engineers design systems to handle garbage, recycling, and composting to keep our planet clean.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="math-section" class="subject-section">
+                <div class="topics-grid-container">
+                    <div class="topics-grid">
+                        <div class="topic-card math-card"><div class="topic-icon" style="color:var(--math-color)"><i class="fas fa-sort-numeric-up-alt"></i></div><div class="topic-card-content"><h3>1. Knowing Our Numbers</h3><p>Go big! Learn about large numbers, place value, how to compare them, and the clever art of estimation.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card math-card"><div class="topic-icon" style="color:var(--math-color)"><i class="fas fa-calculator"></i></div><div class="topic-card-content"><h3>2. Whole Numbers</h3><p>Explore the world of whole numbers, their properties, and master basic operations like addition and subtraction.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card math-card"><div class="topic-icon" style="color:var(--math-color)"><i class="fas fa-dice"></i></div><div class="topic-card-content"><h3>3. Playing with Numbers</h3><p>Become a number detective! Learn about factors, multiples, prime numbers, and handy tests for divisibility.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card math-card"><div class="topic-icon" style="color:var(--math-color)"><i class="fas fa-draw-polygon"></i></div><div class="topic-card-content"><h3>4. Basic Geometrical Ideas</h3><p>Discover the building blocks of shapes: points, lines, angles, triangles, and circles.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card math-card"><div class="topic-icon" style="color:var(--math-color)"><i class="fas fa-shapes"></i></div><div class="topic-card-content"><h3>5. Understanding Shapes</h3><p>Learn to measure and classify different types of angles, triangles, quadrilaterals, and 3D shapes.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card math-card"><div class="topic-icon" style="color:var(--math-color)"><i class="fas fa-plus-minus"></i></div><div class="topic-card-content"><h3>6. Integers</h3><p>Explore positive and negative numbers, their representation on number line, and basic operations.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card math-card"><div class="topic-icon" style="color:var(--math-color)"><i class="fas fa-chart-pie"></i></div><div class="topic-card-content"><h3>7. Fractions</h3><p>Understand fractions, types of fractions, equivalent fractions, and operations with fractions.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card math-card"><div class="topic-icon" style="color:var(--math-color)"><i class="fas fa-sliders-h"></i></div><div class="topic-card-content"><h3>8. Decimals</h3><p>Understand decimal numbers, place value, and operations with decimals.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card math-card"><div class="topic-icon" style="color:var(--math-color)"><i class="fas fa-chart-bar"></i></div><div class="topic-card-content"><h3>9. Data Handling</h3><p>Learn to collect, organize and represent data using pictographs and bar graphs.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card math-card"><div class="topic-icon" style="color:var(--math-color)"><i class="fas fa-tape"></i></div><div class="topic-card-content"><h3>10. Mensuration</h3><p>Discover how to measure perimeter and area of simple shapes.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card math-card"><div class="topic-icon" style="color:var(--math-color)"><i class="fas fa-superscript"></i></div><div class="topic-card-content"><h3>11. Algebra</h3><p>Introduction to algebraic expressions, variables and simple equations.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card math-card"><div class="topic-icon" style="color:var(--math-color)"><i class="fas fa-balance-scale"></i></div><div class="topic-card-content"><h3>12. Ratio and Proportion</h3><p>Learn to compare quantities using ratios and understand proportional relationships.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Animate on Scroll library
+            AOS.init({ duration: 600, once: true, offset: 50 });
+
+            // Mobile menu functionality
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            const mainNav = document.getElementById('main-nav');
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', () => mainNav.classList.toggle('active'));
+            }
+
+            // Subject navigation functionality
+            const subjectButtons = document.querySelectorAll('.subject-nav-btn');
+            const subjectSections = document.querySelectorAll('.subject-section');
+            
+            function switchTab(subject) {
+                subjectButtons.forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-subject') === subject));
+                subjectSections.forEach(section => section.classList.toggle('active', section.id === `${subject}-section`));
+            }
+
+            subjectButtons.forEach(button => {
+                button.addEventListener('click', () => switchTab(button.getAttribute('data-subject')));
+            });
+
+            // Aurora glow effect on cards
+            const cards = document.querySelectorAll('.topic-card');
+            cards.forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    card.style.setProperty('--mouse-x', `${x}px`);
+                    card.style.setProperty('--mouse-y', `${y}px`);
+                });
+            });
+
+            // Initialize Particles.js with an engaging configuration
+            particlesJS('particles-js', {
+                particles: {
+                    number: { value: 80, density: { enable: true, value_area: 800 } },
+                    color: { value: "#ffffff" },
+                    shape: { type: "circle" },
+                    opacity: { value: 0.5, random: true, anim: { enable: true, speed: 1, opacity_min: 0.1, sync: false } },
+                    size: { value: 2, random: true, anim: { enable: false } },
+                    line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.15, width: 1 },
+                    move: { enable: true, speed: 1, direction: "none", random: true, straight: false, out_mode: "out", bounce: false }
+                },
+                interactivity: {
+                    detect_on: "canvas",
+                    events: { onhover: { enable: true, mode: "bubble" }, onclick: { enable: true, mode: "push" }, resize: true },
+                    modes: {
+                        bubble: { distance: 200, size: 4, duration: 2, opacity: 0.8 },
+                        push: { particles_nb: 4 }
+                    }
+                },
+                retina_detect: true
+            });
+        });
+    </script>
+</body>
+</html>

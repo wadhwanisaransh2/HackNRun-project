@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quadratic Launcher - Ultimate Edition</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --glass-bg: rgba(255,255,255,0.1);
+      --glass-border: rgba(255,255,255,0.2);
+      --text-color: #f0f0f0;
+      --glow-color: #00ffff;
+      --correct-color: #4CAF50;
+      --incorrect-color: #F44336;
+      --focus-color: #ffd600;
+      --font-body: 'Poppins', sans-serif;
+      --font-display: 'Press Start 2P', monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+    body {
+      margin: 0; padding: 20px; height: 100vh;
+      background: linear-gradient(135deg, #1d2b64 0%, #0d0d2b 100%);
+      color: var(--text-color);
+      display: flex; justify-content: center; align-items: center;
+      font-family: var(--font-body);
+      transition: background 1s;
+    }
+    .game-world {
+      width: 100%; max-width: 700px; height: 95vh; max-height: 900px;
+      display: flex; flex-direction: column; gap: 15px;
+    }
+    .hud { padding: 10px 20px; border-radius: 15px; border: 1px solid var(--glass-border); background: var(--glass-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
+    .hud-left, .hud-right { display: flex; align-items: center; gap: 15px; }
+    .hud-button { padding: 8px 12px; border: none; border-radius: 8px; background-color: rgba(0,0,0,0.2); color: var(--text-color); cursor: pointer; font-family: var(--font-body); font-size: 1.1rem; }
+    .canvas-container { position: relative; flex-grow: 1; border-radius: 15px; overflow: hidden; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); }
+    #parabolaCanvas { width: 100%; height: 100%; display: block; }
+    .equation-box { padding: 10px; text-align: center; border-radius: 15px; background: rgba(0,0,0,0.2); font-family: var(--font-display); font-size: 1.2rem; color: var(--glow-color); text-shadow: 0 0 8px var(--glow-color); }
+    .options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+    .options-grid.accessible { grid-template-columns: 1fr; }
+    .option-btn { padding: 15px; font-size: 1.1rem; font-weight: 600; border-radius: 12px; border: 1px solid var(--glass-border); background: var(--glass-bg); color: var(--text-color); cursor: pointer; transition: all 0.2s; font-family: var(--font-body); outline: none; }
+    .option-btn:focus { outline: 3px solid var(--focus-color); }
+    .option-btn:hover:not(:disabled) { background: rgba(255,255,255,0.2); box-shadow: 0 0 15px rgba(0,255,255,0.5); }
+    .option-btn:active:not(:disabled) { transform: scale(0.95); }
+    .option-btn.correct { background: var(--correct-color); box-shadow: 0 0 15px var(--correct-color); }
+    .option-btn.incorrect { background: var(--incorrect-color); box-shadow: 0 0 15px var(--incorrect-color); }
+    .option-btn:disabled { cursor: not-allowed; opacity: 0.6; }
+    .feedback-area { padding: 12px 20px; border-radius: 15px; background: rgba(0,0,0,0.3); font-weight: bold; opacity: 0; transform: translateY(20px); transition: opacity 0.4s, transform 0.4s; min-height: 50px; }
+    .feedback-area.show { opacity: 1; transform: translateY(0); }
+    .feedback-status { font-size: 1.2em; margin-bottom: 8px; }
+    .solution-steps { font-size: 0.9em; text-align: left; line-height: 1.5; border-top: 1px solid var(--glass-border); padding-top: 8px; }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 1000; }
+    .modal-overlay.show { opacity: 1; visibility: visible; }
+    .modal-content { width: 90%; max-width: 450px; padding: 30px; border-radius: 20px; border: 1px solid var(--glass-border); background: rgba(40,40,80,0.8); backdrop-filter: blur(15px); text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); color: var(--text-color); }
+    .modal-content h1 { font-family: var(--font-display); }
+    .modal-content h2 { font-size: 2.5rem; margin-top: 0; }
+    .mode-selection button, .restart-btn, .share-btn, .accessibility-btn, .customize-btn { display: block; width: 100%; margin: 10px 0; padding: 15px; font-size: 1.2em; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; }
+    .mode-selection button { background: var(--glass-bg); color: var(--text-color); border: 1px solid var(--glass-border); }
+    .restart-btn { background: linear-gradient(45deg, #ff4e50, #f9d423); color: white; }
+    .share-btn { background: #1da1f2; color: white; }
+    .accessibility-btn { background: #9147ff; color: #fff; }
+    .customize-btn { background: #00b894; color: #fff; }
+    .analytics { text-align: left; margin: 20px 0; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px;}
+    .leaderboard ol { list-style: none; padding: 0; }
+    .leaderboard li { display: flex; justify-content: space-between; padding: 8px; border-radius: 5px; }
+    .leaderboard li:nth-child(odd) { background: rgba(0,0,0,0.1); }
+    .initials-input { margin: 20px 0; }
+    .initials-input input { width: 100px; text-align: center; font-size: 1.5rem; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: var(--text-color); border-radius: 5px; padding: 5px; font-family: var(--font-display); text-transform: uppercase; }
+    #achievement-popup { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: #222; color: #fff; padding: 15px 25px; border-radius: 10px; z-index: 2000; transition: bottom 0.5s; }
+    #achievement-popup.show { bottom: 20px; }
+    #level-up-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 500; opacity: 0; visibility: hidden; transition: all 0.5s; }
+    #level-up-overlay.show { opacity: 1; visibility: visible; }
+    #level-up-text { font-family: var(--font-display); font-size: 2rem; color: #fff; text-shadow: 0 0 20px #ffeb3b; animation: level-up-anim 2s forwards; }
+    @keyframes level-up-anim {
+      0% { opacity: 0; transform: scale(0.5);}
+      25% { opacity: 1; transform: scale(1.2);}
+      75% { opacity: 1; transform: scale(1);}
+      100% { opacity: 0; transform: scale(1.5);}
+    }
+    .tutorial { margin: 15px auto; font-size: 1.1rem; background: rgba(0,0,0,0.2); border-radius: 10px; padding: 18px; text-align: left; color: #fff; max-width: 600px; border: 1px solid var(--glass-border);}
+    .badge-bar { display: flex; gap: 8px; margin: 8px 0;}
+    .badge { border-radius: 50%; background: #2d3436; padding: 7px; color: #fff; font-size: 1.25em; border: 2px solid #00b894; }
+    .avatar-select { display: flex; gap: 10px; justify-content: center; margin: 15px 0;}
+    .avatar-choice {font-size:1.7em;cursor:pointer; border: 2px solid transparent; border-radius: 50%;padding: 3px;}
+    .avatar-choice.selected { border: 2px solid #ffd600; background:#273c75;}
+    @media (max-width: 600px) {
+      body { padding: 10px; }
+      .options-grid { grid-template-columns: 1fr; }
+      .option-btn { padding: 20px; font-size: 1.2rem; }
+      .hud { flex-direction: column; gap: 10px; }
+      .equation-box { font-size: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-world" id="main-wrap">
+    <header class="hud">
+      <div class="hud-left">
+        <span id="score">🏆 Score: 0</span>
+        <span id="lives-display"></span>
+        <div class="badge-bar" id="badge-bar"></div>
+      </div>
+      <div class="hud-right">
+        <span id="powerup-indicator"></span>
+        <div id="timer">Time: 60</div>
+        <button class="hud-button" id="hint-btn">Hint (3)</button>
+        <button class="hud-button" id="music-mute-btn" title="Toggle Music">🎵</button>
+        <button class="hud-button" id="sfx-mute-btn" title="Toggle SFX">🔊</button>
+      </div>
+    </header>
+    <div class="tutorial" id="tutorial" style="display:none;">
+      <b>Welcome to Quadratic Launcher!</b><br>
+      In this game, you identify the roots of quadratic equations by launching rockets! Choose the option with the right roots (or 'No Real Roots'). Watch visual paths and receive explanations after each question.<br>
+      <ul>
+        <li>Win points, level up, unlock achievements, and customize your avatar!</li>
+        <li>Adaptive levels: Answer well for bigger challenges; struggle, and it helps you learn.</li>
+        <li>Try different modes: Race in Timed, practice your streak in Survival, or learn in Campaign!</li>
+      </ul>
+      Press any key or click 'Close Tutorial' below to start!
+      <br>
+      <button id="close-tutorial" style="margin-top:8px">Close Tutorial</button>
+    </div>
+    <main class="canvas-container">
+      <canvas id="parabolaCanvas"></canvas>
+      <div id="level-up-overlay"><h2 id="level-up-text"></h2></div>
+    </main>
+    <section class="equation-box"><p id="equation-text">y = ax² + bx + c</p></section>
+    <section class="options-grid" id="options-container"></section>
+    <footer class="feedback-area" id="feedback-area"></footer>
+  </div>
+  <div class="modal-overlay show" id="main-menu">
+    <div class="modal-content">
+      <h1>Quadratic Launcher</h1>
+      <div class="avatar-select" id="avatar-select">
+        <span class="avatar-choice selected" data-avatar="🚀">🚀</span>
+        <span class="avatar-choice" data-avatar="🛰️">🛰️</span>
+        <span class="avatar-choice" data-avatar="🦄">🦄</span>
+        <span class="avatar-choice" data-avatar="🐲">🐲</span>
+      </div>
+      <p>Select a game mode to begin!</p>
+      <div class="mode-selection">
+        <button data-mode="Campaign">🚀 Campaign Mode</button>
+        <button data-mode="Timed">⏱️ Timed Mode</button>
+        <button data-mode="Survival">☠️ Survival Mode</button>
+        <button class="accessibility-btn" id="accessibility-btn">♿ Accessibility</button>
+        <button class="customize-btn" id="customize-btn">Customize Color</button>
+        <button id="tutorial-btn">Show Tutorial</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-overlay" id="result-screen">
+    <div class="modal-content">
+      <h2 id="result-title">Game Over!</h2>
+      <p id="final-score" class="final-score">Final Score: 0</p>
+      <div id="analytics-display" class="analytics"></div>
+      <div id="leaderboard" class="leaderboard"></div>
+      <div class="initials-input"><label for="initials">Enter Initials:</label><input type="text" id="initials" maxlength="3" placeholder="AAA"></div>
+      <button id="share-btn" class="share-btn">Share Score</button>
+      <button id="restart-btn" class="restart-btn">Back to Menu</button>
+    </div>
+  </div>
+  <div id="achievement-popup"></div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const dom = {
+        mainMenu: document.getElementById('main-menu'), resultScreen: document.getElementById('result-screen'),
+        canvas: document.getElementById('parabolaCanvas'), score: document.getElementById('score'), lives: document.getElementById('lives-display'),
+        timer: document.getElementById('timer'), powerupIndicator: document.getElementById('powerup-indicator'), hintBtn: document.getElementById('hint-btn'),
+        musicMuteBtn: document.getElementById('music-mute-btn'), sfxMuteBtn: document.getElementById('sfx-mute-btn'),
+        equation: document.getElementById('equation-text'), options: document.getElementById('options-container'),
+        feedback: document.getElementById('feedback-area'), resultTitle: document.getElementById('result-title'),
+        finalScore: document.getElementById('final-score'), analyticsDisplay: document.getElementById('analytics-display'),
+        leaderboard: document.getElementById('leaderboard'), initialsInput: document.getElementById('initials'),
+        restartBtn: document.getElementById('restart-btn'), shareBtn: document.getElementById('share-btn'),
+        achievementPopup: document.getElementById('achievement-popup'), levelUpOverlay: document.getElementById('level-up-overlay'),
+        levelUpText: document.getElementById('level-up-text'), badgeBar: document.getElementById('badge-bar'),
+        avatarSelect: document.getElementById('avatar-select'), tutorial: document.getElementById('tutorial'),
+        tutorialBtn: document.getElementById('tutorial-btn'), closeTutorial: document.getElementById('close-tutorial'),
+        accessibilityBtn: document.getElementById('accessibility-btn'), customizeBtn: document.getElementById('customize-btn'), mainWrap: document.getElementById('main-wrap')
+      };
+      const ctx = dom.canvas.getContext('2d');
+      let state = {};
+      let stats = JSON.parse(localStorage.getItem('ql_stats') || '{}');
+      let gameAccessibility = JSON.parse(localStorage.getItem('ql_accessibility')) || { largeText: false, highContrast: false, oneColumn: false };
+      let particles = [];
+      const allAvatars = ['🚀','🛰️','🦄','🐲'];
+      const allBadges = [
+        { name:'First Try!', emoji:'🌟', trigger:(s)=>s.totalAnswers===1 && s.correctAnswers===1 },
+        { name:'Accuracy Star', emoji:'💯', trigger:(s)=>s.correctAnswers/s.totalAnswers>0.95 && s.totalAnswers>=10 },
+        { name:'Streaker', emoji:'🔥', trigger:(s)=>s.bestStreak>=5 },
+        { name:'Mathlete', emoji:'🏅', trigger:(s)=>s.score>=200 },
+        { name:'Survivor', emoji:'👑', trigger:(s)=>s.gameMode==='Survival' && s.lives>0 },
+        { name:'Resilient', emoji:'🦾', trigger:(s)=>s.lives===1 && s.score>60 }
+      ];
+      let currentAvatar = (localStorage.getItem('ql_avatar') || '🚀');
+      function saveStats() { localStorage.setItem('ql_stats', JSON.stringify(stats)); }
+      // ---- SOUND SYSTEM ----
+      const sounds = {
+        correct: new Audio('https://cdn.jsdelivr.net/gh/k-luna/js-space-shooter-2022/assets/snd/snd_pickup.mp3'),
+        wrong: new Audio('https://cdn.jsdelivr.net/gh/k-luna/js-space-shooter-2022/assets/snd/snd_explosion.mp3'),
+        powerup: new Audio('https://cdn.jsdelivr.net/gh/k-luna/js-space-shooter-2022/assets/snd/snd_powerup.mp3'),
+        click: new Audio('https://cdn.jsdelivr.net/gh/k-luna/js-space-shooter-2022/assets/snd/snd_shoot.mp3'),
+        music: new Audio()
+      }; sounds.music.loop = true;
+      // ---- GAME CONFIG ----
+      const CONFIG = {
+        ANIMATION_DURATION: 120, PARTICLE_COUNT: 100,
+        difficultySettings: [
+          { key:'Easy', range: 3, nextScore:30, allowDecimals: false, music: 'https://cdn.jsdelivr.net/gh/k-luna/js-space-shooter-2022/assets/bgm/bgm_h.mp3' },
+          { key:'Medium', range: 7, nextScore:70, allowDecimals: false, music: 'https://cdn.jsdelivr.net/gh/k-luna/js-space-shooter-2022/assets/bgm/bgm_l.mp3' },
+          { key:'Hard', range: 10, nextScore:120, allowDecimals: true, music: 'https://cdn.jsdelivr.net/gh/k-luna/js-space-shooter-2022/assets/bgm/bgm_d.mp3' },
+          { key:'Boss', range: 12, nextScore:200, allowDecimals: true, music: 'https://cdn.jsdelivr.net/gh/k-luna/js-space-shooter-2022/assets/bgm/bgm_b.mp3' },
+          { key:'Expert', range: 15, nextScore:Infinity, allowDecimals: true, music: 'https://cdn.jsdelivr.net/gh/k-luna/js-space-shooter-2022/assets/bgm/bgm_e.mp3' }
+        ],
+        powerUps: [
+          { name: 'Shield', emoji: '🛡️' },
+          { name: 'DoublePoints', emoji: '✨' }
+        ],
+        achievements: allBadges,
+        rocketSkins: { default: '🚀', pro: '🏆', boss: '⭐' }
+      };
+      // --- ACCESSIBILITY ---
+      function applyAccessibility() {
+        dom.mainWrap.style.fontSize = gameAccessibility.largeText ? '1.27em' : '';
+        document.body.style.background = gameAccessibility.highContrast ?
+          'linear-gradient(#101010 0%, #444 100%)' :
+          'linear-gradient(135deg, #1d2b64 0%, #0d0d2b 100%)';
+        dom.options.classList.toggle('accessible', !!gameAccessibility.oneColumn);
+      }
+      dom.accessibilityBtn.onclick = () => {
+        gameAccessibility.largeText = !gameAccessibility.largeText;
+        gameAccessibility.highContrast = !gameAccessibility.highContrast;
+        gameAccessibility.oneColumn = !gameAccessibility.oneColumn;
+        localStorage.setItem('ql_accessibility', JSON.stringify(gameAccessibility));
+        applyAccessibility();
+      };
+      dom.customizeBtn.onclick = () => {
+        const color = prompt("Enter a hex color for your game theme, e.g., #007FFF");
+        if(color && /^#([0-9A-F]{3}){1,2}$/i.test(color)) {
+          document.body.style.background =
+           `linear-gradient(135deg, ${color} 0%, #0d0d2b 100%)`;
+        }
+      }
+      // ---- AVATAR SYSTEM ----
+      dom.avatarSelect.querySelectorAll('.avatar-choice').forEach(ac=>{
+        ac.onclick=()=> {
+          currentAvatar = ac.dataset.avatar;
+          document.querySelectorAll('.avatar-choice').forEach(c=>c.classList.remove('selected'));
+          ac.classList.add('selected');
+          localStorage.setItem('ql_avatar',currentAvatar);
+        }
+      });
+      // ---- BADGE/GAMIFICATION BAR ----
+      function updateBadges() {
+        dom.badgeBar.innerHTML = '';
+        for(const badge of CONFIG.achievements) {
+          if(badge.trigger(state || stats)) {
+            const b = document.createElement('span'); b.className='badge'; b.title=badge.name; b.textContent=badge.emoji;
+            dom.badgeBar.appendChild(b);
+          }
+        }
+      }
+      // ---- TUTORIAL ----
+      function showTutorial() { dom.tutorial.style.display='block'; dom.mainMenu.classList.remove('show'); }
+      dom.tutorialBtn.onclick = showTutorial;
+      dom.closeTutorial.onclick = () => { dom.tutorial.style.display='none'; dom.mainMenu.classList.add('show'); }
+      dom.tutorial.addEventListener('click',()=>{ dom.tutorial.style.display='none'; dom.mainMenu.classList.add('show'); });
+      document.addEventListener('keydown', () => { if(dom.tutorial.style.display==='block') {dom.tutorial.style.display='none'; dom.mainMenu.classList.add('show');}});
+      // ---- GAME STATE ----
+      function showScreen(screen) {
+        [dom.mainMenu, dom.resultScreen].forEach(s => s.classList.remove('show'));
+        if (screen) screen.classList.add('show');
+      }
+      function initGame(mode) {
+        state = {
+          score: 0, lives: mode === 'Survival' ? 1 : 3, timer: 60, streak: 0, bestStreak:0, roundCounter: 0,
+          difficultyIndex:0, // Adaptive: start at easiest
+          hintsUsed: 0, gameMode: mode, hintCount: 3, currentPowerUp: null, activePowerUps: {},
+          rocketSkin: currentAvatar, survivalShield: mode === 'Survival', particles: [],
+          isMusicMuted: sounds.music.muted, isSfxMuted: false, correctAnswers: 0, totalAnswers: 0,
+          playerProgress: [], badgesUnlocked: []
+        };
+        playMusic();
+        clearInterval(state.timerInterval);
+        if (mode !== 'Survival') startTimer();
+        updateAllUI();
+        showScreen(null);
+        nextRound();
+      }
+      function endGame() {
+        sounds.music.pause(); clearInterval(state.timerInterval); cancelAnimationFrame(state.animationFrameId);
+        dom.resultTitle.textContent = state.lives > 0 ? 'You Win!' : 'Game Over!';
+        dom.finalScore.textContent = `Final Score: ${state.score}`;
+        displayAnalytics();
+        displayLeaderboard(state.gameMode);
+        showScreen(dom.resultScreen);
+        updateStats();
+      }
+      function updateStats() {
+        // Adaptive Difficulty and Skill Analytics
+        stats.bestStreak = Math.max(stats.bestStreak||0, state.streak, state.bestStreak);
+        stats.correctAnswers = (stats.correctAnswers||0) + state.correctAnswers;
+        stats.totalAnswers = (stats.totalAnswers||0) + state.totalAnswers;
+        stats.gamesPlayed = (stats.gamesPlayed||0) + 1;
+        stats.highScore = Math.max(stats.highScore||0, state.score);
+        stats.lastMode = state.gameMode;
+        saveStats();
+      }
+      // ---- ADAPTIVE DIFFICULTY ----
+      function updateDifficulty() {
+        if(state.totalAnswers > 2) {
+          let ratio = state.correctAnswers/state.totalAnswers;
+          if(ratio>0.8 && state.difficultyIndex < CONFIG.difficultySettings.length-1) state.difficultyIndex++;
+          else if(ratio<0.4 && state.difficultyIndex > 0) state.difficultyIndex--;
+        }
+      }
+      // ---- GAME LOGIC ----
+      function nextRound() {
+        state.roundCounter++;
+        cancelAnimationFrame(state.animationFrameId);
+        dom.feedback.classList.remove('show');
+        particles = [];
+        state.currentPowerUp = Math.random() < 0.25 ? spawnPowerUp() : null;
+        updateDifficulty();
+        state.currentEquation = generateQuadratic(CONFIG.difficultySettings[state.difficultyIndex].key);
+        displayEquation(state.currentEquation);
+        displayOptions(generateOptions(state.currentEquation));
+        resizeCanvas(); drawScene();
+      }
+      function checkAnswer(selectedRoots) {
+        state.totalAnswers++;
+        const isCorrect = JSON.stringify(selectedRoots) == JSON.stringify(state.currentEquation.roots);
+        disableOptions();
+        let feedbackMessage = '';
+        if (isCorrect) {
+          state.correctAnswers++; state.streak++; state.bestStreak=Math.max(state.bestStreak,state.streak);
+          playSound(sounds.correct);
+          let points = 10 + (state.difficultyIndex * 5); if (state.activePowerUps.DoublePoints) points *= 2;
+          state.score += points; feedbackMessage = `<div class="feedback-status">✅ Correct!</div>`;
+          animateRocketFlight(true), checkLevelUp();
+        } else {
+          if(state.streak > state.bestStreak) state.bestStreak = state.streak;
+          state.streak = 0;
+          if (state.activePowerUps.Shield) {
+            delete state.activePowerUps.Shield;
+            feedbackMessage = `<div class="feedback-status">🛡️ Shield protected you!</div>`;
+          } else { state.lives--; feedbackMessage = `<div class="feedback-status">❌ Incorrect.</div>`; }
+          animateRocketFlight(false);
+        }
+        dom.feedback.innerHTML = feedbackMessage + getSolutionHTML(state.currentEquation);
+        dom.feedback.classList.add('show');
+        updateAllUI(); updateBadges();
+        if (state.lives <= 0) return setTimeout(endGame, 3000);
+        setTimeout(nextRound, 4000);
+      }
+      // ---- EQUATION GENERATION ----
+      function generateQuadratic(level) {
+        const ds = CONFIG.difficultySettings.find(d=>d.key===level);
+        if (level === 'Expert' && Math.random() < 0.33) {
+          const a = 1; let b = Math.floor(Math.random() * ds.range); let c = Math.floor(Math.random() * ds.range);
+          while (b*b - 4*a*c >= 0) { c++; }
+          return { a, b, c, roots: "Complex" };
+        }
+        const getRoot = () => ds.allowDecimals ? (Math.random()*ds.range*2-ds.range).toFixed(1)*1 : Math.floor(Math.random()*(2*ds.range+1))-ds.range;
+        let r1 = getRoot(); let r2 = getRoot(); const a = 1;
+        let b = -a * (r1 + r2); let c = a * r1 * r2;
+        if (ds.allowDecimals) { b = parseFloat(b.toFixed(2)); c = parseFloat(c.toFixed(2)); }
+        return { a, b, c, roots: [r1, r2].sort((x, y) => x - y) };
+      }
+      function generateOptions({ roots }) {
+        let options = new Set(); options.add(JSON.stringify(roots));
+        if (roots !== "Complex") { options.add(JSON.stringify(roots.map(r => -r).sort((x,y)=>x-y))); }
+        else { options.add(JSON.stringify([-1, 1])); }
+        while(options.size < 4) { const fakeRoot = () => (Math.random() * 10 - 5).toFixed(1) * 1; options.add(JSON.stringify([fakeRoot(), fakeRoot()].sort((x,y)=>x-y))); }
+        return Array.from(options).map(JSON.parse).sort(() => Math.random() - 0.5);
+      }
+      // ---- UI/UX ----
+      function updateAllUI() {
+        dom.score.textContent = `🏆 Score: ${state.score}`;
+        dom.lives.textContent = state.rocketSkin.repeat(state.lives);
+        dom.timer.textContent = state.gameMode === 'Survival' ? `Round: ${state.roundCounter}` : `Time: ${state.timer}`;
+        dom.hintBtn.textContent = `Hint (${state.hintCount})`;
+        dom.powerupIndicator.innerHTML = `${state.activePowerUps.Shield ? '🛡️' : ''} ${state.activePowerUps.DoublePoints ? '✨' : ''}`;
+        updateBadges();
+      }
+      function displayEquation({ a, b, c }) {
+        const format = (val, term, isFirst) => {
+          if (val === 0) return ''; const sign = val > 0 ? (isFirst ? '' : '+ ') : '- ';
+          const absVal = Math.abs(val); const num = (absVal === 1 && term) ? '' : absVal; return `${sign}${num}${term || ''} `;
+        };
+        dom.equation.textContent = `y = ${format(a, 'x²', true)}${format(b, 'x')}${format(c)}`;
+      }
+      function displayOptions(options) {
+        dom.options.innerHTML = '';
+        options.forEach((opt, idx) => {
+          const btn = document.createElement('button'); btn.className = 'option-btn';
+          btn.textContent = opt === "Complex" ? "No Real Roots" : `(${opt[0]}, ${opt[1]})`;
+          btn.tabIndex=idx+1;
+          btn.addEventListener('click', e => { e.preventDefault(); if (!btn.disabled) checkAnswer(opt); });
+          dom.options.appendChild(btn);
+        });
+        if(gameAccessibility.oneColumn) dom.options.classList.add('accessible');
+      }
+      function disableOptions() { dom.options.querySelectorAll('button').forEach(btn => btn.disabled = true); }
+      dom.options.addEventListener('keydown', (e) => {
+        // Keyboard navigation
+        let focus = document.activeElement;
+        if(focus.classList.contains('option-btn')) {
+          if(e.key==='ArrowDown'||e.key==='ArrowRight') { focus.nextElementSibling?.focus(); e.preventDefault();}
+          if(e.key==='ArrowUp'||e.key==='ArrowLeft') { focus.previousElementSibling?.focus(); e.preventDefault();}
+        }
+      });
+      function getSolutionHTML({ a, b, c, roots }) {
+        const discriminant = b * b - 4 * a * c;
+        let solutionText = '';
+        if (roots === "Complex") {
+          const realPart = (-b / (2 * a)).toFixed(2);
+          const imaginaryPart = (Math.sqrt(-discriminant) / (2 * a)).toFixed(2);
+          solutionText = `D = ${discriminant.toFixed(2)} (negative), so roots are complex.<br>x = ${realPart} ± ${imaginaryPart}i`;
+        } else {
+          solutionText = `1. Discriminant (D) = b²-4ac = <strong>${discriminant.toFixed(2)}</strong><br>2. Roots are <strong>${roots.join(" and ")}</strong>.`;
+        }
+        return `<div class="solution-steps">${solutionText}</div>`;
+      }
+      function resizeCanvas() { dom.canvas.width = dom.canvas.parentElement.clientWidth; dom.canvas.height = dom.canvas.parentElement.clientHeight; state.canvasWidth = dom.canvas.width; state.canvasHeight = dom.canvas.height; state.scale = state.canvasWidth / 25; state.origin = { x: state.canvasWidth / 2, y: state.canvasHeight * 0.9 }; }
+      function drawScene() {
+        ctx.clearRect(0, 0, state.canvasWidth, state.canvasHeight);
+        ctx.save(); ctx.setLineDash([5, 10]); ctx.strokeStyle = 'rgba(0, 255, 255, 0.5)'; drawParabolaPath(); ctx.restore();
+        if (state.currentEquation.roots !== "Complex") drawTargets(); else drawArgandDiagram();
+        if (state.currentPowerUp) ctx.fillText(state.currentPowerUp.emoji, state.currentPowerUp.px, state.currentPowerUp.py);
+      }
+      function drawParabolaPath() { const {a, b, c} = state.currentEquation; ctx.beginPath(); for (let px = 0; px < state.canvasWidth; px++) { const x = (px - state.origin.x) / state.scale; const y = a * x * x + b * x + c; const py = state.origin.y - y * state.scale; if (px === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); } ctx.stroke(); }
+      function drawTargets() { const uniqueRoots = [...new Set(state.currentEquation.roots)]; uniqueRoots.forEach(root => { const px = state.origin.x + root * state.scale; ctx.font = '24px serif'; ctx.fillText('🎯', px - 12, state.origin.y + 8); }); }
+      function drawArgandDiagram() {
+        const {a, b} = state.currentEquation;
+        const centerX = state.canvasWidth / 2, centerY = state.canvasHeight / 3, axisLength = 100;
+        ctx.save(); ctx.strokeStyle = '#FFF'; ctx.fillStyle = '#FFF'; ctx.lineWidth = 1; ctx.globalAlpha = 0.8;
+        ctx.beginPath(); ctx.moveTo(centerX - axisLength, centerY); ctx.lineTo(centerX + axisLength, centerY); ctx.moveTo(centerX, centerY - axisLength); ctx.lineTo(centerX, centerY + axisLength); ctx.stroke();
+        ctx.font = '12px Poppins'; ctx.fillText('Re', centerX + axisLength + 5, centerY); ctx.fillText('Im', centerX, centerY - axisLength - 5);
+        const discriminant = b*b - 4*a*state.currentEquation.c;
+        const realPart = -b / (2 * a); const imaginaryPart = Math.sqrt(-discriminant) / (2 * a);
+        const plotScale = 15;
+        const root1X = centerX + realPart * plotScale; const root1Y = centerY - imaginaryPart * plotScale;
+        const root2X = centerX + realPart * plotScale; const root2Y = centerY + imaginaryPart * plotScale;
+        ctx.fillStyle = 'cyan';
+        ctx.beginPath(); ctx.arc(root1X, root1Y, 5, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(root2X, root2Y, 5, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      }
+      // --- ANIMATION ---
+      function animateRocketFlight(isSuccess) {
+        let frame = 0, duration = CONFIG.ANIMATION_DURATION;
+        const { a, b, c, roots } = state.currentEquation;
+        const startX = -state.canvasWidth / (2 * state.scale);
+        const endX = isSuccess && roots !== "Complex" ? roots[0] : (b / (2 * a)) * -1.5;
+        function flightLoop() {
+          frame++; let p = frame / duration;
+          let easedP = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+          drawScene();
+          const x = startX + (endX - startX) * easedP;
+          const y = a*x*x+b*x+c;
+          const px = state.origin.x + x * state.scale; const py = state.origin.y - y * state.scale;
+          let particleColor = `hsl(60, 100%, ${100 - p*50}%)`;
+          if(state.activePowerUps.DoublePoints) particleColor = `hsl(180, 100%, ${100 - p*50}%)`;
+          if(state.activePowerUps.Shield) particleColor = `hsl(280, 100%, ${100 - p*50}%)`;
+          particles.push({ x: px, y: py, vx: (Math.random()-0.5), vy: (Math.random()-0.5), size: 3 * (1-p), color: particleColor, alpha: 1, gravity: 0 });
+          updateAndDrawParticles();
+          if (state.currentPowerUp) checkPowerUpCollision({px, py});
+          ctx.save(); ctx.translate(px, py);
+          const nextY = a*(x+0.1)*(x+0.1)+b*(x+0.1)+c; const angle = Math.atan2((state.origin.y - nextY*state.scale) - py, 0.1*state.scale);
+          ctx.rotate(angle); ctx.font = '24px serif'; ctx.fillText(state.rocketSkin, -12, 8); ctx.restore();
+          if (frame < duration) state.animationFrameId = requestAnimationFrame(flightLoop);
+          else if (!isSuccess) { for(let i=0; i<50; i++) particles.push({ x: px, y: py, vx: (Math.random()-0.5)*4, vy: (Math.random()-0.5)*4, size: 3, color: 'red', alpha: 1, gravity: 0.1 }); }
+        }
+        flightLoop();
+      }
+      function updateAndDrawParticles() { for (let i = particles.length - 1; i >= 0; i--) { const p = particles[i]; p.x += p.vx; p.y += p.vy; p.vy += p.gravity; p.alpha -= 0.02; if (p.alpha <= 0) { particles.splice(i, 1); } else { ctx.globalAlpha = p.alpha; ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1.0; } } }
+      // --- POWERUPS ---
+      function spawnPowerUp() {
+        const p=CONFIG.powerUps[Math.floor(Math.random()*CONFIG.powerUps.length)];
+        return {name:p.name, emoji:p.emoji,
+          px: Math.random()*state.canvasWidth*0.6+state.canvasWidth*0.2,
+          py: Math.random()*state.canvasHeight*0.4};
+      }
+      function checkPowerUpCollision({px,py}){
+        if(!state.currentPowerUp)return;
+        if(Math.hypot(px-state.currentPowerUp.px, py-state.currentPowerUp.py)<30){
+          playSound(sounds.powerup);
+          if(state.currentPowerUp.name==='Shield')state.activePowerUps.Shield=true;
+          else if(state.currentPowerUp.name==='DoublePoints')state.activePowerUps.DoublePoints=10;
+          state.currentPowerUp=null; updateAllUI();
+        }
+      }
+      // --- TIMER ---
+      function startTimer() {
+        state.timerInterval = setInterval(() => {
+          state.timer--; updateAllUI();
+          if (state.timer <= 0) endGame();
+        }, 1000);
+      }
+      // --- MUSIC, SFX ---
+      function playSound(sound) { if (!state.isSfxMuted) { sound.currentTime = 0; sound.play().catch(e => {}); } }
+      function playMusic() {
+        const musicSrc = CONFIG.difficultySettings[state.difficultyIndex].music;
+        if (sounds.music.src !== musicSrc) { sounds.music.src = musicSrc; }
+        if (!state.isMusicMuted) { sounds.music.play(); } else { sounds.music.pause(); }
+      }
+      function toggleMusicMute() { state.isMusicMuted = !state.isMusicMuted; dom.musicMuteBtn.textContent = state.isMusicMuted ? '🎵' : '🎶'; playMusic(); }
+      function toggleSfxMute() { state.isSfxMuted = !state.isSfxMuted; dom.sfxMuteBtn.textContent = state.isSfxMuted ? '🔇' : '🔊'; }
+      // ---LEVELUP---
+      function checkLevelUp() {
+        let dl = CONFIG.difficultySettings[state.difficultyIndex];
+        if (state.difficultyIndex < CONFIG.difficultySettings.length-1 && state.score >= dl.nextScore) {
+          state.difficultyIndex++;
+          dom.levelUpText.textContent = `Level Up: ${CONFIG.difficultySettings[state.difficultyIndex].key}!`;
+          dom.levelUpOverlay.classList.add('show');
+          setTimeout(() => dom.levelUpOverlay.classList.remove('show'), 2000);
+          playMusic();
+        }
+      }
+      // --- ACHIEVEMENTS ---
+      function showAchievementPopup(ach) { dom.achievementPopup.textContent = `🏆 ${ach.name}!`; dom.achievementPopup.classList.add('show'); setTimeout(() => dom.achievementPopup.classList.remove('show'), 3000); }
+      // --- LEADERBOARD ---
+      function updateLeaderboard(mode, score, initials) {
+        if (!score || mode === "Survival") return;
+        const key = `leaderboard_${mode}`;
+        let scores = JSON.parse(localStorage.getItem(key)) || [];
+        scores.push({ initials: initials || 'AAA', score });
+        scores.sort((a, b) => b.score - a.score);
+        localStorage.setItem(key, JSON.stringify(scores.slice(0, 5)));
+      }
+      function displayLeaderboard(mode) {
+        if (mode === "Survival") { dom.leaderboard.innerHTML = ''; return; }
+        const key = `leaderboard_${mode}`;
+        const scores = JSON.parse(localStorage.getItem(key)) || [];
+        dom.leaderboard.innerHTML =
+          `<h3>Leaderboard</h3><ol>${scores.map(s => `<li><span>${s.initials}</span><span>${s.score}</span></li>`).join('') || '<li>No scores yet!</li>'}</ol>`;
+      }
+      function displayAnalytics() {
+        const accuracy = state.totalAnswers > 0 ? (state.correctAnswers / state.totalAnswers * 100).toFixed(1) : 0;
+        dom.analyticsDisplay.innerHTML =
+           `<strong>Best Streak:</strong> ${state.bestStreak} 🔥<br><strong>Accuracy:</strong> ${accuracy}% (${state.correctAnswers}/${state.totalAnswers})<br><strong>Hints Used:</strong> ${state.hintsUsed}`;
+      }
+      async function shareScore() {
+        const text = `I scored ${state.score} in Quadratic Launcher! Can you beat it?`;
+        if (navigator.share) { await navigator.share({ title: 'Quadratic Launcher Score', text }); }
+        else { await navigator.clipboard.writeText(text); alert('Score copied to clipboard!'); }
+      }
+      // --- HINT SYSTEM ---
+      dom.hintBtn.onclick = () => {
+        if(state.hintCount>0) {
+          state.hintCount--; state.hintsUsed++;
+          dom.feedback.innerHTML = `<div class="feedback-status">💡 Hint: The product of roots is c/a, sum is -b/a.</div><div class="solution-steps">${getSolutionHTML(state.currentEquation)}</div>`;
+          dom.feedback.classList.add('show'); updateAllUI();
+        }
+      };
+      // --- CONTROLS/BUTTONS ---
+      dom.mainMenu.querySelectorAll('button[data-mode]').forEach(btn => {
+        btn.onclick = () => { playSound(sounds.click); initGame(btn.dataset.mode); }
+      });
+      dom.restartBtn.onclick = () => {
+        playSound(sounds.click);
+        const initials = dom.initialsInput.value.toUpperCase(); updateLeaderboard(state.gameMode, state.score, initials);
+        showScreen(dom.mainMenu);
+      };
+      dom.musicMuteBtn.onclick = toggleMusicMute;
+      dom.sfxMuteBtn.onclick = toggleSfxMute;
+      dom.shareBtn.onclick = shareScore;
+      window.addEventListener('resize', () => { if (!dom.mainMenu.classList.contains('show')) { resizeCanvas(); drawScene(); } });
+      // --- INIT ---
+      applyAccessibility();
+      updateBadges();
+    });
+  </script>
+</body>
+</html>

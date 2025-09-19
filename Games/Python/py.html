@@ -1,0 +1,1935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HackNRun - Space Station Code Rescue</title>
+  <script src="https://skulpt.org/js/skulpt.min.js" type="text/javascript"></script>
+  <script src="https://skulpt.org/js/skulpt-stdlib.js" type="text/javascript"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Code+Pro:wght@400;500&display=swap');
+    
+    :root {
+      --space-blue: #0066cc;
+      --cyber-green: #00ff88;
+      --alert-red: #ff3366;
+      --warning-orange: #ff9900;
+      --deep-space: #0a0a1a;
+      --station-gray: #1a1a2e;
+      --panel-dark: #141428;
+      --text-bright: #ffffff;
+      --text-dim: #b0c4de;
+      --energy-purple: #8844ff;
+      --success-glow: #00ff88;
+      --danger-pulse: #ff3366;
+      --neon-pink: #ff0080;
+      --electric-blue: #00ffff;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--deep-space);
+      color: var(--text-bright);
+      overflow-x: hidden;
+      min-height: 100vh;
+      font-size: 16px;
+      line-height: 1.5;
+      position: relative;
+    }
+
+    /* Enhanced Space Background with Matrix Rain */
+    .space-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background: linear-gradient(45deg, #000008 0%, #001122 25%, #000030 50%, #001122 75%, #000008 100%);
+      background-size: 400% 400%;
+      animation: backgroundShift 20s ease-in-out infinite;
+    }
+
+    @keyframes backgroundShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    /* Matrix Digital Rain Effect */
+    .matrix-rain {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.1;
+    }
+
+    .matrix-column {
+      position: absolute;
+      top: -100%;
+      color: var(--cyber-green);
+      font-family: 'Source Code Pro', monospace;
+      font-size: 14px;
+      animation: matrixFall linear infinite;
+    }
+
+    @keyframes matrixFall {
+      to { transform: translateY(100vh); }
+    }
+
+    /* Floating Code Particles */
+    .code-particle {
+      position: fixed;
+      font-family: 'Source Code Pro', monospace;
+      color: var(--cyber-green);
+      font-size: 12px;
+      pointer-events: none;
+      z-index: 5;
+      animation: codeFloat 8s linear infinite;
+      opacity: 0.6;
+    }
+
+    @keyframes codeFloat {
+      0% { 
+        transform: translate(-50px, 100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% { opacity: 0.6; }
+      90% { opacity: 0.6; }
+      100% { 
+        transform: translate(100vw, -50px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Hologram Scanner Lines */
+    .scanner-line {
+      position: fixed;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--electric-blue), transparent);
+      top: -2px;
+      z-index: 2;
+      animation: scannerSweep 4s ease-in-out infinite;
+    }
+
+    @keyframes scannerSweep {
+      0% { top: -2px; opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { top: 100vh; opacity: 0; }
+    }
+
+    /* Pulsing Energy Orbs */
+    .energy-orb {
+      position: fixed;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 255, 255, 0.3) 0%, rgba(0, 255, 255, 0) 70%);
+      pointer-events: none;
+      z-index: 3;
+      animation: orbPulse 6s ease-in-out infinite, orbMove 15s linear infinite;
+    }
+
+    @keyframes orbPulse {
+      0%, 100% { transform: scale(0.8); opacity: 0.3; }
+      50% { transform: scale(1.2); opacity: 0.6; }
+    }
+
+    @keyframes orbMove {
+      0% { left: -100px; top: 20%; }
+      25% { left: 25%; top: 80%; }
+      50% { left: 75%; top: 10%; }
+      75% { left: 50%; top: 70%; }
+      100% { left: 110%; top: 40%; }
+    }
+
+    /* Success Code Run Animation Effects */
+    .success-wave {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0;
+    }
+
+    .wave-ripple {
+      position: absolute;
+      border: 2px solid var(--success-glow);
+      border-radius: 50%;
+      animation: waveExpand 2s ease-out;
+    }
+
+    @keyframes waveExpand {
+      0% { width: 0; height: 0; opacity: 1; }
+      100% { width: 300px; height: 300px; opacity: 0; }
+    }
+
+    .success-burst {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 4px;
+      height: 4px;
+      background: var(--success-glow);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1001;
+      animation: successBurst 1.5s ease-out forwards;
+    }
+
+    @keyframes successBurst {
+      0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+      50% { transform: translate(-50%, -50%) scale(20); opacity: 0.8; }
+      100% { transform: translate(-50%, -50%) scale(50); opacity: 0; }
+    }
+
+    .code-success-text {
+      position: fixed;
+      top: 30%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 48px;
+      font-weight: 900;
+      color: var(--success-glow);
+      text-shadow: 0 0 20px var(--success-glow);
+      pointer-events: none;
+      z-index: 1002;
+      animation: successTextReveal 2s ease-out forwards;
+    }
+
+    @keyframes successTextReveal {
+      0% { 
+        opacity: 0; 
+        transform: translateX(-50%) translateY(50px) scale(0.5);
+        filter: blur(10px);
+      }
+      50% { 
+        opacity: 1; 
+        transform: translateX(-50%) translateY(0) scale(1.1);
+        filter: blur(0);
+      }
+      100% { 
+        opacity: 0; 
+        transform: translateX(-50%) translateY(-50px) scale(1);
+      }
+    }
+
+    .lightning-bolt {
+      position: fixed;
+      font-size: 60px;
+      color: var(--electric-blue);
+      pointer-events: none;
+      z-index: 1003;
+      animation: lightningStrike 0.8s ease-out forwards;
+      filter: drop-shadow(0 0 15px var(--electric-blue));
+    }
+
+    @keyframes lightningStrike {
+      0% { 
+        opacity: 0; 
+        transform: scale(0) rotate(0deg);
+      }
+      20% { 
+        opacity: 1; 
+        transform: scale(1.5) rotate(10deg);
+      }
+      40% { 
+        opacity: 0.8; 
+        transform: scale(1.2) rotate(-5deg);
+      }
+      60% { 
+        opacity: 1; 
+        transform: scale(1.3) rotate(5deg);
+      }
+      100% { 
+        opacity: 0; 
+        transform: scale(0.8) rotate(0deg);
+      }
+    }
+
+    /* Cyber Grid Lines */
+    .cyber-grid {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.05;
+      background-image: 
+        linear-gradient(var(--cyber-green) 1px, transparent 1px),
+        linear-gradient(90deg, var(--cyber-green) 1px, transparent 1px);
+      background-size: 50px 50px;
+      animation: gridShift 10s linear infinite;
+    }
+
+    @keyframes gridShift {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(50px, 50px); }
+    }
+
+    /* Container and Layout */
+    .space-station {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 15px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      position: relative;
+      z-index: 10;
+    }
+
+    @media (min-width: 1024px) {
+      .space-station {
+        grid-template-columns: 2fr 1fr;
+        gap: 25px;
+      }
+    }
+
+    /* Mission Status Header */
+    .mission-status-header {
+      background: linear-gradient(135deg, rgba(26, 26, 46, 0.9) 0%, rgba(20, 20, 40, 0.9) 100%);
+      border: 2px solid var(--cyber-green);
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 20px;
+      grid-column: 1 / -1;
+      box-shadow: 
+        0 0 20px rgba(0, 255, 136, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mission-status-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cyber-green), transparent);
+      animation: headerScan 3s linear infinite;
+    }
+
+    @keyframes headerScan {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .status-display {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .mission-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .mission-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--cyber-green);
+    }
+
+    .logo-icon {
+      width: 35px;
+      height: 35px;
+      background: linear-gradient(135deg, var(--space-blue), var(--cyber-green));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      animation: logoHologram 4s ease-in-out infinite;
+    }
+
+    @keyframes logoHologram {
+      0%, 100% { 
+        box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+        transform: scale(1);
+      }
+      50% { 
+        box-shadow: 0 0 30px rgba(0, 255, 136, 0.8), 0 0 60px rgba(0, 102, 204, 0.4);
+        transform: scale(1.05);
+      }
+    }
+
+    .mission-status {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: rgba(0, 255, 136, 0.1);
+      border: 1px solid var(--cyber-green);
+      border-radius: 16px;
+      font-size: 14px;
+      font-weight: 600;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .status-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      animation: statusShimmer 2s infinite;
+    }
+
+    @keyframes statusShimmer {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    .status-icon {
+      width: 16px;
+      height: 16px;
+      background: var(--cyber-green);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: var(--deep-space);
+      animation: iconPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes iconPulse {
+      0%, 100% { box-shadow: 0 0 5px var(--cyber-green); }
+      50% { box-shadow: 0 0 15px var(--cyber-green), 0 0 25px rgba(0, 255, 136, 0.5); }
+    }
+
+    /* Enhanced Main Terminal */
+    .main-terminal {
+      background: linear-gradient(135deg, rgba(20, 20, 40, 0.9) 0%, rgba(26, 26, 46, 0.9) 100%);
+      border: 2px solid var(--space-blue);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 
+        0 0 30px rgba(0, 102, 204, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      position: relative;
+    }
+
+    .terminal-header {
+      background: linear-gradient(135deg, var(--space-blue) 0%, #0088ff 100%);
+      color: white;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+    }
+
+    .terminal-header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+      animation: terminalScan 2s linear infinite;
+    }
+
+    @keyframes terminalScan {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .terminal-title {
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .system-status {
+      display: flex;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      animation: statusBlink 1.5s infinite;
+    }
+
+    .status-dot.critical { 
+      background: var(--alert-red); 
+      box-shadow: 0 0 10px var(--alert-red);
+    }
+    .status-dot.warning { 
+      background: var(--warning-orange);
+      box-shadow: 0 0 10px var(--warning-orange);
+    }
+    .status-dot.operational { 
+      background: var(--cyber-green);
+      box-shadow: 0 0 10px var(--cyber-green);
+    }
+
+    @keyframes statusBlink {
+      0%, 50% { opacity: 1; transform: scale(1); }
+      51%, 100% { opacity: 0.3; transform: scale(0.8); }
+    }
+
+    .terminal-body {
+      padding: 20px;
+      position: relative;
+    }
+
+    /* Enhanced Mission Briefing */
+    .mission-briefing {
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, rgba(0, 255, 136, 0.05) 100%);
+      border-left: 4px solid var(--cyber-green);
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 0 8px 8px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mission-briefing::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, var(--cyber-green), transparent, var(--cyber-green));
+      animation: briefingScan 4s linear infinite;
+    }
+
+    @keyframes briefingScan {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .mission-title {
+      font-size: 18px;
+      color: var(--cyber-green);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+    }
+
+    .emergency-level {
+      padding: 3px 8px;
+      background: linear-gradient(135deg, var(--alert-red), #ff6699);
+      color: white;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 700;
+      animation: emergencyPulse 1s infinite;
+      box-shadow: 0 0 10px rgba(255, 51, 102, 0.5);
+    }
+
+    @keyframes emergencyPulse {
+      0%, 100% { 
+        opacity: 1; 
+        transform: scale(1);
+        box-shadow: 0 0 10px rgba(255, 51, 102, 0.5);
+      }
+      50% { 
+        opacity: 0.8; 
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(255, 51, 102, 0.8);
+      }
+    }
+
+    .briefing-text {
+      line-height: 1.5;
+      font-size: 14px;
+      color: #e0e6f0;
+    }
+
+    /* Code Interface Enhancements */
+    .code-interface {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .interface-header {
+      background: linear-gradient(135deg, rgba(26, 26, 46, 0.9) 0%, rgba(20, 20, 40, 0.9) 100%);
+      padding: 10px 16px;
+      border-radius: 8px 8px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--space-blue);
+      position: relative;
+    }
+
+    .interface-title {
+      font-size: 14px;
+      color: var(--cyber-green);
+      font-weight: 600;
+      text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+    }
+
+    .code-metrics {
+      display: flex;
+      gap: 12px;
+      font-size: 12px;
+    }
+
+    .metric {
+      color: #b0c4de;
+      font-family: 'Source Code Pro', monospace;
+    }
+
+    #code-terminal {
+      width: 100%;
+      min-height: 180px;
+      padding: 16px;
+      background: linear-gradient(135deg, #0a0a1a 0%, #0f0f1f 100%);
+      color: #e0e6f0;
+      border: none;
+      border-radius: 0 0 8px 8px;
+      font-family: 'Source Code Pro', monospace;
+      font-size: 14px;
+      line-height: 1.5;
+      resize: vertical;
+      outline: none;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    #code-terminal:focus {
+      box-shadow: 
+        inset 0 0 20px rgba(0, 255, 136, 0.2),
+        0 0 20px rgba(0, 255, 136, 0.3);
+      color: var(--cyber-green);
+    }
+
+    /* Enhanced Control Buttons */
+    .control-buttons {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .control-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      letter-spacing: 0.3px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .control-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.5s;
+    }
+
+    .control-btn:hover::before {
+      left: 100%;
+    }
+
+    .btn-execute {
+      background: linear-gradient(135deg, var(--cyber-green), #00cc66);
+      color: var(--deep-space);
+      box-shadow: 0 4px 15px rgba(0, 255, 136, 0.4);
+    }
+
+    .btn-execute:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(0, 255, 136, 0.6);
+    }
+
+    .btn-analyze {
+      background: linear-gradient(135deg, var(--space-blue), #0088ff);
+      color: white;
+      box-shadow: 0 4px 15px rgba(0, 102, 204, 0.4);
+    }
+
+    .btn-analyze:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(0, 102, 204, 0.6);
+    }
+
+    .btn-hint {
+      background: linear-gradient(135deg, var(--energy-purple), #aa66ff);
+      color: white;
+      box-shadow: 0 4px 15px rgba(136, 68, 255, 0.4);
+    }
+
+    .btn-hint:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(136, 68, 255, 0.6);
+    }
+
+    .control-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Enhanced Output Console */
+    .output-console {
+      background: linear-gradient(135deg, #0a0a1a 0%, #0f0f1f 100%);
+      border: 1px solid var(--space-blue);
+      border-radius: 8px;
+      min-height: 80px;
+      padding: 16px;
+      font-family: 'Source Code Pro', monospace;
+      position: relative;
+      overflow: hidden;
+      font-size: 14px;
+      line-height: 1.4;
+      color: #e0e6f0;
+    }
+
+    .output-console::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cyber-green), transparent);
+      animation: scanLine 2s infinite;
+    }
+
+    @keyframes scanLine {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .output-console.success {
+      border-color: var(--success-glow);
+      color: var(--success-glow);
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, rgba(0, 255, 136, 0.05) 100%);
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+      animation: successGlow 2s ease-out;
+    }
+
+    @keyframes successGlow {
+      0% { 
+        box-shadow: 0 0 5px rgba(0, 255, 136, 0.3);
+        transform: scale(1);
+      }
+      50% { 
+        box-shadow: 0 0 30px rgba(0, 255, 136, 0.6);
+        transform: scale(1.02);
+      }
+      100% { 
+        box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        transform: scale(1);
+      }
+    }
+
+    .output-console.error {
+      border-color: var(--danger-pulse);
+      color: var(--danger-pulse);
+      background: linear-gradient(135deg, rgba(255, 51, 102, 0.1) 0%, rgba(255, 51, 102, 0.05) 100%);
+      box-shadow: 0 0 20px rgba(255, 51, 102, 0.3);
+      animation: errorShake 0.6s ease-out;
+    }
+
+    @keyframes errorShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .output-console.info {
+      border-color: var(--space-blue);
+      color: #7dd3fc;
+      background: linear-gradient(135deg, rgba(0, 102, 204, 0.1) 0%, rgba(0, 102, 204, 0.05) 100%);
+      box-shadow: 0 0 20px rgba(0, 102, 204, 0.3);
+    }
+
+    /* Side Systems Panel */
+    .systems-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .system-module {
+      background: linear-gradient(135deg, rgba(20, 20, 40, 0.9) 0%, rgba(26, 26, 46, 0.9) 100%);
+      border: 1px solid var(--space-blue);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 20px rgba(0, 102, 204, 0.2);
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .system-module::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--space-blue), transparent);
+      animation: moduleScan 3s linear infinite;
+    }
+
+    @keyframes moduleScan {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .module-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--cyber-green);
+      text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+    }
+
+    .module-icon {
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, var(--cyber-green), #00cc66);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--deep-space);
+      font-size: 12px;
+      box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+    }
+
+    /* Progress Systems */
+    .progress-module {
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, rgba(0, 255, 136, 0.05) 100%);
+      border-color: var(--cyber-green);
+    }
+
+    .progress-display {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: #e0e6f0;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: rgba(10, 10, 26, 0.8);
+      border-radius: 3px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--cyber-green), var(--space-blue), var(--electric-blue));
+      border-radius: 3px;
+      transition: width 1s ease;
+      position: relative;
+    }
+
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      animation: progressScan 2s infinite;
+    }
+
+    @keyframes progressScan {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    /* Mission Log */
+    .mission-log {
+      max-height: 150px;
+      overflow-y: auto;
+      background: linear-gradient(135deg, #0a0a1a 0%, #0f0f1f 100%);
+      border-radius: 6px;
+      padding: 12px;
+    }
+
+    .log-entry {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 11px;
+      line-height: 1.3;
+      opacity: 0;
+      animation: logEntryAppear 0.5s ease-out forwards;
+    }
+
+    @keyframes logEntryAppear {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .log-timestamp {
+      color: #6b7280;
+      min-width: 50px;
+      font-family: 'Source Code Pro', monospace;
+    }
+
+    .log-message {
+      color: #e0e6f0;
+    }
+
+    .log-message.success { 
+      color: var(--success-glow); 
+      text-shadow: 0 0 5px rgba(0, 255, 136, 0.3);
+    }
+    .log-message.error { 
+      color: var(--danger-pulse);
+      text-shadow: 0 0 5px rgba(255, 51, 102, 0.3);
+    }
+    .log-message.warning { 
+      color: var(--warning-orange);
+      text-shadow: 0 0 5px rgba(255, 153, 0, 0.3);
+    }
+
+    /* System Status Grid */
+    .status-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .status-card {
+      background: linear-gradient(135deg, #0a0a1a 0%, #0f0f1f 100%);
+      border-radius: 6px;
+      padding: 12px;
+      text-align: center;
+      border: 1px solid var(--space-blue);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .status-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 102, 204, 0.2), transparent);
+      animation: cardShimmer 3s infinite;
+    }
+
+    @keyframes cardShimmer {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    .status-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--cyber-green);
+      margin-bottom: 4px;
+      text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+      font-family: 'Source Code Pro', monospace;
+    }
+
+    .status-label {
+      font-size: 10px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    /* Loading Spinner */
+    .loading-spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--cyber-green);
+      animation: loadingSpin 1s linear infinite;
+    }
+
+    @keyframes loadingSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Special Effects */
+    .glitch {
+      animation: glitchEffect 0.3s infinite;
+    }
+
+    @keyframes glitchEffect {
+      0% { transform: translateX(0); }
+      20% { transform: translateX(-2px); }
+      40% { transform: translateX(2px); }
+      60% { transform: translateX(-1px); }
+      80% { transform: translateX(1px); }
+      100% { transform: translateX(0); }
+    }
+
+    .power-surge {
+      animation: powerSurge 2s infinite;
+    }
+
+    @keyframes powerSurge {
+      0%, 100% { 
+        box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+        border-color: var(--cyber-green);
+      }
+      50% { 
+        box-shadow: 
+          0 0 30px var(--cyber-green), 
+          inset 0 0 20px rgba(0, 255, 136, 0.3);
+        border-color: var(--electric-blue);
+      }
+    }
+
+    /* Scrollbar styling */
+    .mission-log::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .mission-log::-webkit-scrollbar-track {
+      background: var(--deep-space);
+    }
+
+    .mission-log::-webkit-scrollbar-thumb {
+      background: var(--space-blue);
+      border-radius: 2px;
+    }
+
+    /* Mobile Optimizations */
+    @media (max-width: 768px) {
+      body {
+        font-size: 14px;
+      }
+
+      .space-station {
+        margin: 10px auto;
+        padding: 0 10px;
+        gap: 15px;
+      }
+      
+      .status-display {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+      }
+      
+      .mission-status {
+        gap: 10px;
+        justify-content: center;
+      }
+      
+      .control-buttons {
+        flex-direction: column;
+        gap: 8px;
+      }
+      
+      .control-btn {
+        padding: 12px 20px;
+        font-size: 14px;
+      }
+      
+      .status-grid {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+      
+      #code-terminal {
+        font-size: 13px;
+        min-height: 150px;
+      }
+
+      /* Hide heavy animations on mobile */
+      .matrix-rain,
+      .cyber-grid,
+      .energy-orb,
+      .scanner-line {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="space-bg"></div>
+  <div class="matrix-rain" id="matrix-rain"></div>
+  <div class="cyber-grid"></div>
+  <div class="scanner-line"></div>
+  <div class="energy-orb"></div>
+  <div class="success-wave" id="success-wave"></div>
+  
+  <!-- Main Game Area -->
+  <main class="space-station">
+    <!-- Mission Status Header -->
+    <div class="mission-status-header">
+      <div class="status-display">
+        <div class="mission-info">
+          <div class="mission-logo">
+            <div class="logo-icon">🚀</div>
+            <div>
+              <div>SPACE RESCUE</div>
+              <div style="font-size: 10px; color: #b0c4de; font-weight: 400;">Emergency Protocol</div>
+            </div>
+          </div>
+        </div>
+        <div class="mission-status">
+          <div class="status-item">
+            <div class="status-icon">🎯</div>
+            <span>Mission <span id="current-mission">1</span>/5</span>
+          </div>
+          <div class="status-item">
+            <div class="status-icon">⚡</div>
+            <span id="energy-level">1000</span> Energy
+          </div>
+          <div class="status-item">
+            <div class="status-icon">⭐</div>
+            <span id="rescue-score">0</span> Rescued
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Terminal -->
+    <section class="main-terminal">
+      <div class="terminal-header">
+        <div class="terminal-title">
+          🖥️ EMERGENCY CODING TERMINAL
+        </div>
+        <div class="system-status">
+          <div class="status-dot critical" id="system-critical"></div>
+          <div class="status-dot warning" id="system-warning"></div>
+          <div class="status-dot operational" id="system-operational"></div>
+        </div>
+      </div>
+      
+      <div class="terminal-body">
+        <!-- Mission Briefing -->
+        <div class="mission-briefing">
+          <div class="mission-title">
+            <span id="mission-icon">🚨</span>
+            <span id="mission-title-text">CRITICAL SYSTEM FAILURE</span>
+            <div class="emergency-level" id="threat-level">HIGH ALERT</div>
+          </div>
+          <div class="briefing-text" id="mission-description">
+            Space station systems are failing! Your coding skills are needed to restore critical operations.
+          </div>
+        </div>
+
+        <!-- Code Interface -->
+        <div class="code-interface">
+          <div class="interface-header">
+            <div class="interface-title">🔧 SYSTEM REPAIR CONSOLE</div>
+            <div class="code-metrics">
+              <span class="metric">Lines: <span id="line-count">0</span></span>
+              <span class="metric">Chars: <span id="char-count">0</span></span>
+            </div>
+          </div>
+          <textarea 
+            id="code-terminal"
+            placeholder="# EMERGENCY PROTOCOLS ACTIVE
+# Enter Python commands to restore systems..."
+            spellcheck="false"
+          ></textarea>
+        </div>
+
+        <!-- Control Buttons -->
+        <div class="control-buttons">
+          <button class="control-btn btn-hint" onclick="requestHint()">
+            💡 Hint
+          </button>
+          <button class="control-btn btn-analyze" onclick="analyzeCode()">
+            🔍 Analyze
+          </button>
+          <button class="control-btn btn-execute" onclick="executeRepair()">
+            ⚡ Execute
+          </button>
+        </div>
+
+        <!-- Output Console -->
+        <div class="output-console" id="system-output">
+          <div style="color: #b0c4de;">
+            >>> SYSTEM READY FOR EMERGENCY REPAIRS
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Systems Panel -->
+    <aside class="systems-panel">
+      <!-- Mission Progress -->
+      <div class="system-module progress-module">
+        <div class="module-header">
+          <div class="module-icon">📊</div>
+          <span>RESCUE PROGRESS</span>
+        </div>
+        <div class="progress-display">
+          <span>Station Restoration</span>
+          <span id="progress-percent">0%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="rescue-progress"></div>
+        </div>
+      </div>
+
+      <!-- System Status -->
+      <div class="system-module">
+        <div class="module-header">
+          <div class="module-icon">⚙️</div>
+          <span>SYSTEM STATUS</span>
+        </div>
+        <div class="status-grid">
+          <div class="status-card">
+            <div class="status-value" id="attempts-count">0</div>
+            <div class="status-label">Attempts</div>
+          </div>
+          <div class="status-card">
+            <div class="status-value" id="hints-used">0</div>
+            <div class="status-label">Hints</div>
+          </div>
+          <div class="status-card">
+            <div class="status-value" id="mission-time">0s</div>
+            <div class="status-label">Time</div>
+          </div>
+          <div class="status-card">
+            <div class="status-value" id="efficiency">100%</div>
+            <div class="status-label">Efficiency</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mission Log -->
+      <div class="system-module">
+        <div class="module-header">
+          <div class="module-icon">📡</div>
+          <span>MISSION LOG</span>
+        </div>
+        <div class="mission-log" id="mission-log">
+          <div class="log-entry">
+            <span class="log-timestamp">00:01</span>
+            <span class="log-message">Emergency protocol activated</span>
+          </div>
+          <div class="log-entry">
+            <span class="log-timestamp">00:02</span>
+            <span class="log-message warning">Critical systems offline</span>
+          </div>
+          <div class="log-entry">
+            <span class="log-timestamp">00:03</span>
+            <span class="log-message">Awaiting repair commands...</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    class SpaceRescueMission {
+      constructor() {
+        this.currentMission = 0;
+        this.gameStats = {
+          energy: 1000,
+          rescueScore: 0,
+          totalAttempts: 0,
+          hintsUsed: 0,
+          startTime: Date.now(),
+          missionStartTime: Date.now(),
+          successfulMissions: 0
+        };
+        this.hintLevel = 0;
+        this.isExecuting = false;
+        this.missionData = {};
+        
+        this.initializeAnimations();
+        this.setupEventListeners();
+        this.startMission();
+        this.startSystemTimer();
+      }
+
+      // 5 Unique Space Rescue Missions
+      missions = [
+        {
+          title: "📡 COMMUNICATIONS ARRAY FAILURE",
+          icon: "📡",
+          threatLevel: "CRITICAL",
+          description: "The main communications array is down! Crew members are stranded. Send a distress signal by printing 'SOS' to restore emergency communications.",
+          objective: "Print the emergency signal 'SOS'",
+          placeholder: "# EMERGENCY: Send SOS signal\nprint(?)",
+          hints: [
+            "🚨 Use print() to send the emergency signal",
+            "📡 The signal must be exactly 'SOS' in quotes",
+            "✅ Solution: print('SOS')"
+          ],
+          validate: (output) => output.trim() === "SOS",
+          energyReward: 200,
+          successMessage: "📡 COMMUNICATIONS RESTORED! Emergency signal sent successfully.",
+          failureMessage: "❌ Signal transmission failed. Check your distress code."
+        },
+        {
+          title: "⚡ POWER CORE STABILIZATION",
+          icon: "⚡",
+          threatLevel: "HIGH",
+          description: "Power core is unstable! Store the critical power level of 750 in variable 'power_level' to stabilize the reactor before it overloads.",
+          objective: "Store power level 750 in variable 'power_level'",
+          placeholder: "# URGENT: Stabilize power core\n# power_level = ?",
+          hints: [
+            "⚡ Create a variable: variable_name = value",
+            "🔋 Store 750 in power_level: power_level = 750",
+            "✅ Solution: power_level = 750"
+          ],
+          validate: (output, code, globals) => {
+            if (globals?.power_level && Sk.ffi.remapToJs(globals.power_level) === 750) {
+              this.missionData.powerLevel = 750;
+              return true;
+            }
+            return false;
+          },
+          energyReward: 250,
+          successMessage: "⚡ POWER CORE STABILIZED! Reactor operating at safe levels.",
+          failureMessage: "💥 Power core unstable! Check your stabilization code."
+        },
+        {
+          title: "🚀 CREW EVACUATION SEQUENCE",
+          icon: "🚀",
+          threatLevel: "EXTREME",
+          description: "Emergency evacuation! Launch 4 escape pods by printing 'LAUNCH' for each pod. Use a for loop to automate the launch sequence.",
+          objective: "Launch 4 escape pods using a for loop",
+          placeholder: "# EVACUATION: Launch escape pods\nfor pod in range(?):\n    # Launch command here",
+          hints: [
+            "🚀 Use for loop: for pod in range(4):",
+            "📋 Print 'LAUNCH' inside the loop with proper indentation",
+            "✅ Solution:\nfor pod in range(4):\n    print('LAUNCH')"
+          ],
+          validate: (output) => {
+            const lines = output.trim().split('\n');
+            return lines.length === 4 && lines.every(line => line.trim() === "LAUNCH");
+          },
+          energyReward: 300,
+          successMessage: "🚀 ALL PODS LAUNCHED! Crew evacuation successful.",
+          failureMessage: "⚠️ Evacuation incomplete! Some pods failed to launch."
+        },
+        {
+          title: "🛡️ SECURITY SYSTEM AUTHORIZATION",
+          icon: "🛡️",
+          threatLevel: "HIGH",
+          description: "Security lockdown activated! Check if stored power_level equals 750. Print 'ACCESS_GRANTED' if correct, 'ACCESS_DENIED' if incorrect.",
+          objective: "Validate power level using if-else statement",
+          placeholder: "# SECURITY: Validate authorization\nif power_level == ?:\n    print(?)\nelse:\n    print(?)",
+          hints: [
+            "🔐 Check power_level == 750 using if statement",
+            "✅ Print 'ACCESS_GRANTED' if true, 'ACCESS_DENIED' if false",
+            "🎯 Solution:\nif power_level == 750:\n    print('ACCESS_GRANTED')\nelse:\n    print('ACCESS_DENIED')"
+          ],
+          validate: (output) => output.trim() === "ACCESS_GRANTED",
+          energyReward: 350,
+          successMessage: "🛡️ SECURITY CLEARED! Access authorization confirmed.",
+          failureMessage: "🚫 ACCESS DENIED! Security validation failed."
+        },
+        {
+          title: "👑 FINAL RESCUE: STATION COMMANDER",
+          icon: "👑",
+          threatLevel: "MAXIMUM",
+          description: "FINAL MISSION: Create function 'calculate_rescue_time' that takes 'distance' parameter and returns distance * 2. Call it with distance=15 and print result.",
+          objective: "Create rescue calculation function",
+          placeholder: "# FINAL RESCUE: Calculate commander rescue time\ndef calculate_rescue_time(?):\n    # Return calculation\n    return ?\n\n# Execute rescue calculation\nprint(?)",
+          hints: [
+            "👑 Define function: def calculate_rescue_time(distance):",
+            "⏱️ Return distance * 2 for travel time",
+            "🎯 Solution:\ndef calculate_rescue_time(distance):\n    return distance * 2\n\nprint(calculate_rescue_time(15))"
+          ],
+          validate: (output) => output.trim() === "30",
+          energyReward: 400,
+          successMessage: "👑 STATION COMMANDER RESCUED! Mission accomplished!",
+          failureMessage: "⚠️ Rescue calculation error! Commander still in danger."
+        }
+      ];
+
+      initializeAnimations() {
+        this.createMatrixRain();
+        this.createCodeParticles();
+        
+        // Periodic effects
+        setInterval(() => {
+          this.createCodeParticles();
+        }, 3000);
+      }
+
+      createMatrixRain() {
+        const matrixContainer = document.getElementById('matrix-rain');
+        const characters = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+        
+        for (let i = 0; i < 15; i++) {
+          const column = document.createElement('div');
+          column.className = 'matrix-column';
+          column.style.left = Math.random() * 100 + '%';
+          column.style.animationDuration = (Math.random() * 3 + 2) + 's';
+          column.style.animationDelay = Math.random() * 2 + 's';
+          
+          let text = '';
+          for (let j = 0; j < 20; j++) {
+            text += characters.charAt(Math.floor(Math.random() * characters.length)) + '<br>';
+          }
+          column.innerHTML = text;
+          
+          matrixContainer.appendChild(column);
+        }
+      }
+
+      createCodeParticles() {
+        const codeSnippets = ['def', 'if', 'for', 'print()', '==', 'return', '{', '}', '[]', '()', 'x=5', 'True', 'False'];
+        
+        for (let i = 0; i < 3; i++) {
+          const particle = document.createElement('div');
+          particle.className = 'code-particle';
+          particle.textContent = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
+          particle.style.left = Math.random() * 100 + '%';
+          particle.style.animationDuration = (Math.random() * 4 + 6) + 's';
+          particle.style.fontSize = (Math.random() * 6 + 10) + 'px';
+          
+          document.body.appendChild(particle);
+          
+          setTimeout(() => {
+            if (particle.parentNode) {
+              particle.remove();
+            }
+          }, 8000);
+        }
+      }
+
+      createSuccessAnimation() {
+        const successWave = document.getElementById('success-wave');
+        successWave.style.opacity = '1';
+
+        // Success burst
+        const burst = document.createElement('div');
+        burst.className = 'success-burst';
+        document.body.appendChild(burst);
+
+        // Success text
+        const successText = document.createElement('div');
+        successText.className = 'code-success-text';
+        successText.textContent = 'CODE EXECUTED!';
+        document.body.appendChild(successText);
+
+        // Wave ripples
+        for (let i = 0; i < 5; i++) {
+          setTimeout(() => {
+            const ripple = document.createElement('div');
+            ripple.className = 'wave-ripple';
+            ripple.style.left = Math.random() * window.innerWidth + 'px';
+            ripple.style.top = Math.random() * window.innerHeight + 'px';
+            successWave.appendChild(ripple);
+            
+            setTimeout(() => ripple.remove(), 2000);
+          }, i * 200);
+        }
+
+        // Lightning bolts
+        for (let i = 0; i < 3; i++) {
+          setTimeout(() => {
+            const lightning = document.createElement('div');
+            lightning.className = 'lightning-bolt';
+            lightning.textContent = '⚡';
+            lightning.style.left = Math.random() * window.innerWidth + 'px';
+            lightning.style.top = Math.random() * window.innerHeight + 'px';
+            document.body.appendChild(lightning);
+            
+            setTimeout(() => lightning.remove(), 800);
+          }, i * 300);
+        }
+
+        // Digital rain burst
+        this.createDigitalRainBurst();
+
+        // Reset after animation
+        setTimeout(() => {
+          successWave.style.opacity = '0';
+          burst.remove();
+          successText.remove();
+        }, 3000);
+      }
+
+      createDigitalRainBurst() {
+        const symbols = ['1', '0', '⚡', '🚀', '💚', '✓', '>>>', '{', '}'];
+        
+        for (let i = 0; i < 25; i++) {
+          const symbol = document.createElement('div');
+          symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+          symbol.style.cssText = `
+            position: fixed;
+            font-size: ${Math.random() * 20 + 15}px;
+            color: var(--cyber-green);
+            left: ${Math.random() * 100}vw;
+            top: ${Math.random() * 100}vh;
+            pointer-events: none;
+            z-index: 1004;
+            font-family: 'Source Code Pro', monospace;
+            animation: digitalBurst 2s ease-out forwards;
+          `;
+          
+          document.body.appendChild(symbol);
+          setTimeout(() => symbol.remove(), 2000);
+        }
+      }
+
+      setupEventListeners() {
+        const codeTerminal = document.getElementById('code-terminal');
+        
+        codeTerminal.addEventListener('input', () => {
+          this.updateCodeMetrics();
+        });
+
+        codeTerminal.addEventListener('keydown', (e) => {
+          this.handleTerminalInput(e);
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            e.preventDefault();
+            this.executeRepair();
+          }
+        });
+      }
+
+      handleTerminalInput(e) {
+        const terminal = e.target;
+        const start = terminal.selectionStart;
+        const end = terminal.selectionEnd;
+        
+        if (e.key === 'Tab') {
+          e.preventDefault();
+          terminal.value = terminal.value.substring(0, start) + '    ' + terminal.value.substring(end);
+          terminal.selectionStart = terminal.selectionEnd = start + 4;
+        }
+        
+        if (e.key === 'Enter') {
+          const textBefore = terminal.value.substring(0, start);
+          const currentLine = textBefore.split('\n').pop();
+          const indent = currentLine.match(/^\s*/)[0];
+          
+          if (currentLine.trim().endsWith(':')) {
+            e.preventDefault();
+            const newIndent = indent + '    ';
+            terminal.value = terminal.value.substring(0, start) + '\n' + newIndent + terminal.value.substring(end);
+            terminal.selectionStart = terminal.selectionEnd = start + 1 + newIndent.length;
+          }
+        }
+      }
+
+      updateCodeMetrics() {
+        const code = document.getElementById('code-terminal').value;
+        const lines = code.split('\n').length;
+        const chars = code.length;
+        
+        document.getElementById('line-count').textContent = lines;
+        document.getElementById('char-count').textContent = chars;
+      }
+
+      async executeRepair() {
+        if (this.isExecuting) return;
+        
+        this.isExecuting = true;
+        this.showSystemMessage('🔄 EXECUTING REPAIR SEQUENCE...', 'info');
+        
+        const executeBtn = document.querySelector('.btn-execute');
+        executeBtn.disabled = true;
+        executeBtn.innerHTML = '<div class="loading-spinner"></div> Running';
+        
+        const code = document.getElementById('code-terminal').value.trim();
+        if (!code) {
+          this.showSystemMessage('❌ ERROR: No repair code detected!', 'error');
+          this.resetExecutionState();
+          return;
+        }
+        
+        this.gameStats.totalAttempts++;
+        this.updateSystemStatus();
+        this.logMessage('Executing repair sequence...', 'info');
+        
+        try {
+          await new Promise(resolve => setTimeout(resolve, 1200));
+          
+          const result = await this.executePython(code);
+          const mission = this.missions[this.currentMission];
+          
+          if (mission.validate(result.output, code, result.globals)) {
+            this.missionSuccess();
+          } else {
+            this.missionFailure(mission.failureMessage);
+          }
+        } catch (error) {
+          this.systemError(error);
+        }
+        
+        this.resetExecutionState();
+      }
+
+      async executePython(code) {
+        return new Promise((resolve, reject) => {
+          let output = '';
+          
+          Sk.configure({
+            output: (text) => { output += text; },
+            read: (filename) => {
+              if (Sk.builtinFiles?.files?.[filename]) {
+                return Sk.builtinFiles.files[filename];
+              }
+              throw new Error("File not found: " + filename);
+            }
+          });
+          
+          let contextCode = '';
+          if (this.currentMission >= 1 && this.missionData.powerLevel) {
+            contextCode = `power_level = ${this.missionData.powerLevel}\n`;
+          }
+          
+          const fullCode = contextCode + code;
+          
+          const timeout = setTimeout(() => {
+            reject(new Error('⚠️ SYSTEM TIMEOUT: Code execution exceeded safety limits!'));
+          }, 5000);
+          
+          Sk.misceval.asyncToPromise(() => Sk.importMainWithBody("<stdin>", false, fullCode, true))
+            .then(mod => {
+              clearTimeout(timeout);
+              resolve({ output, globals: mod.$d });
+            })
+            .catch(err => {
+              clearTimeout(timeout);
+              reject(err);
+            });
+        });
+      }
+
+      missionSuccess() {
+        const mission = this.missions[this.currentMission];
+        
+        this.gameStats.energy += mission.energyReward;
+        this.gameStats.rescueScore += 100;
+        this.gameStats.successfulMissions++;
+        
+        this.showSystemMessage(mission.successMessage, 'success');
+        this.logMessage(mission.successMessage, 'success');
+        
+        // Trigger spectacular success animation
+        this.createSuccessAnimation();
+        this.triggerSuccessEffects();
+        
+        const progress = ((this.currentMission + 1) / this.missions.length) * 100;
+        document.getElementById('rescue-progress').style.width = progress + '%';
+        document.getElementById('progress-percent').textContent = Math.round(progress) + '%';
+        
+        setTimeout(() => {
+          this.currentMission++;
+          if (this.currentMission >= this.missions.length) {
+            this.missionComplete();
+          } else {
+            this.startMission();
+          }
+        }, 4000);
+      }
+
+      missionFailure(message) {
+        this.gameStats.energy -= 50;
+        this.showSystemMessage(message, 'error');
+        this.logMessage(message, 'error');
+        this.triggerErrorEffects();
+        this.updateSystemStatus();
+      }
+
+      systemError(error) {
+        const errorMessage = this.parseSystemError(error);
+        this.showSystemMessage(errorMessage, 'error');
+        this.logMessage('System error detected', 'error');
+        this.triggerErrorEffects();
+      }
+
+      parseSystemError(error) {
+        const errorStr = error.toString();
+        
+        if (errorStr.includes('SyntaxError')) {
+          return '🔧 SYNTAX ERROR: Check command structure, colons, and parentheses!';
+        } else if (errorStr.includes('NameError')) {
+          return '🔧 VARIABLE ERROR: Undefined variable detected!';
+        } else if (errorStr.includes('IndentationError')) {
+          return '🔧 INDENTATION ERROR: Code formatting incorrect!';
+        }
+        
+        return `🔧 SYSTEM ERROR: ${errorStr}`;
+      }
+
+      requestHint() {
+        const mission = this.missions[this.currentMission];
+        const hint = mission.hints[this.hintLevel] || mission.hints[mission.hints.length - 1];
+        
+        this.showSystemMessage(`💡 HINT: ${hint}`, 'info');
+        this.logMessage('Emergency hint requested', 'warning');
+        
+        this.hintLevel = Math.min(this.hintLevel + 1, mission.hints.length - 1);
+        this.gameStats.hintsUsed++;
+        this.gameStats.energy -= 25;
+        this.updateSystemStatus();
+      }
+
+      analyzeCode() {
+        const code = document.getElementById('code-terminal').value.trim();
+        if (!code) {
+          this.showSystemMessage('🔍 NO CODE TO ANALYZE', 'info');
+          return;
+        }
+        
+        const analysis = this.performCodeAnalysis(code);
+        this.showSystemMessage(`🔍 ANALYSIS: ${analysis}`, 'info');
+        this.logMessage('Code analysis performed', 'info');
+      }
+
+      performCodeAnalysis(code) {
+        const patterns = [];
+        const lines = code.split('\n');
+        
+        lines.forEach((line, i) => {
+          const trimmed = line.trim();
+          if (trimmed.includes('print(')) patterns.push(`Print [Line ${i + 1}]`);
+          if (trimmed.includes('=') && !trimmed.includes('==')) patterns.push(`Assignment [Line ${i + 1}]`);
+          if (trimmed.includes('if ') || trimmed.includes('else:')) patterns.push(`Condition [Line ${i + 1}]`);
+          if (trimmed.includes('for ')) patterns.push(`Loop [Line ${i + 1}]`);
+          if (trimmed.includes('def ')) patterns.push(`Function [Line ${i + 1}]`);
+        });
+        
+        return patterns.length ? patterns.join(' | ') : 'No Python patterns detected';
+      }
+
+      startMission() {
+        const mission = this.missions[this.currentMission];
+        
+        this.hintLevel = 0;
+        this.gameStats.missionStartTime = Date.now();
+        
+        document.getElementById('current-mission').textContent = this.currentMission + 1;
+        document.getElementById('mission-icon').textContent = mission.icon;
+        document.getElementById('mission-title-text').textContent = mission.title;
+        document.getElementById('threat-level').textContent = mission.threatLevel;
+        document.getElementById('mission-description').textContent = mission.description;
+        document.getElementById('code-terminal').value = '';
+        document.getElementById('code-terminal').placeholder = mission.placeholder;
+        
+        this.showSystemMessage(`🚨 NEW MISSION: ${mission.objective}`, 'info');
+        this.logMessage(`Mission ${this.currentMission + 1} initiated`, 'info');
+        this.updateSystemStatus();
+        this.updateThreatLevel(mission.threatLevel);
+      }
+
+      updateThreatLevel(level) {
+        const dots = document.querySelectorAll('.status-dot');
+        dots.forEach(dot => dot.style.display = 'none');
+        
+        switch (level) {
+          case 'CRITICAL':
+          case 'EXTREME':
+          case 'MAXIMUM':
+            document.getElementById('system-critical').style.display = 'block';
+            break;
+          case 'HIGH':
+            document.getElementById('system-warning').style.display = 'block';
+            break;
+          default:
+            document.getElementById('system-operational').style.display = 'block';
+        }
+      }
+
+      showSystemMessage(message, type) {
+        const output = document.getElementById('system-output');
+        output.className = `output-console ${type}`;
+        output.innerHTML = `<div style="animation: fadeIn 0.5s;">${message}</div>`;
+      }
+
+      logMessage(message, type = 'info') {
+        const log = document.getElementById('mission-log');
+        const timestamp = new Date().toISOString().substr(14, 5);
+        
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        entry.innerHTML = `
+          <span class="log-timestamp">${timestamp}</span>
+          <span class="log-message ${type}">${message}</span>
+        `;
+        
+        log.appendChild(entry);
+        log.scrollTop = log.scrollHeight;
+        
+        while (log.children.length > 8) {
+          log.removeChild(log.firstChild);
+        }
+      }
+
+      updateSystemStatus() {
+        document.getElementById('energy-level').textContent = this.gameStats.energy;
+        document.getElementById('rescue-score').textContent = this.gameStats.rescueScore;
+        document.getElementById('attempts-count').textContent = this.gameStats.totalAttempts;
+        document.getElementById('hints-used').textContent = this.gameStats.hintsUsed;
+        
+        const efficiency = this.gameStats.totalAttempts > 0 
+          ? Math.round((this.gameStats.successfulMissions / this.gameStats.totalAttempts) * 100)
+          : 100;
+        document.getElementById('efficiency').textContent = efficiency + '%';
+      }
+
+      startSystemTimer() {
+        setInterval(() => {
+          const elapsed = Math.floor((Date.now() - this.gameStats.startTime) / 1000);
+          document.getElementById('mission-time').textContent = elapsed + 's';
+        }, 1000);
+      }
+
+      triggerSuccessEffects() {
+        document.querySelector('.main-terminal').classList.add('power-surge');
+        setTimeout(() => {
+          document.querySelector('.main-terminal').classList.remove('power-surge');
+        }, 2000);
+      }
+
+      triggerErrorEffects() {
+        document.querySelector('.terminal-header').classList.add('glitch');
+        setTimeout(() => {
+          document.querySelector('.terminal-header').classList.remove('glitch');
+        }, 500);
+      }
+
+      missionComplete() {
+        document.getElementById('mission-title-text').textContent = '🎉 ALL MISSIONS COMPLETE!';
+        document.getElementById('mission-description').innerHTML = `
+          <div style="text-align: center; line-height: 1.6;">
+            <div style="font-size: 2em; margin: 15px 0;">🌟 STATION RESTORED 🌟</div>
+            <p style="font-size: 16px; color: #ffffff;"><strong>Congratulations, Space Engineer!</strong></p>
+            <p style="font-size: 14px; margin: 8px 0;">You've successfully rescued the entire space station crew!</p>
+            <div style="background: linear-gradient(135deg, #0a0a1a 0%, #0f0f1f 100%); padding: 15px; border-radius: 8px; margin: 15px 0; border: 1px solid var(--cyber-green);">
+              <p style="color: var(--cyber-green); font-size: 14px; margin: 3px 0;">🏆 Score: ${this.gameStats.rescueScore} points</p>
+              <p style="color: var(--cyber-green); font-size: 14px; margin: 3px 0;">⚡ Energy: ${1000 - this.gameStats.energy} used</p>
+              <p style="color: var(--cyber-green); font-size: 14px; margin: 3px 0;">⏱️ Time: ${Math.floor((Date.now() - this.gameStats.startTime) / 1000)}s</p>
+            </div>
+            <button onclick="location.reload()" style="padding: 12px 24px; background: linear-gradient(135deg, var(--cyber-green), #00cc66); color: var(--deep-space); border: none; border-radius: 20px; font-weight: 700; cursor: pointer; margin-top: 15px; font-size: 14px; box-shadow: 0 4px 15px rgba(0, 255, 136, 0.4);">
+              🚀 NEW MISSION
+            </button>
+          </div>
+        `;
+        
+        document.getElementById('code-terminal').style.display = 'none';
+        document.querySelector('.control-buttons').style.display = 'none';
+        document.getElementById('rescue-progress').style.width = '100%';
+        document.getElementById('progress-percent').textContent = '100%';
+        
+        // Final celebration
+        setTimeout(() => {
+          this.createSuccessAnimation();
+        }, 500);
+      }
+
+      resetExecutionState() {
+        this.isExecuting = false;
+        const executeBtn = document.querySelector('.btn-execute');
+        executeBtn.disabled = false;
+        executeBtn.innerHTML = '⚡ Execute';
+      }
+    }
+
+    // Global functions
+    function executeRepair() {
+      if (window.spaceRescue) {
+        window.spaceRescue.executeRepair();
+      }
+    }
+
+    function requestHint() {
+      if (window.spaceRescue) {
+        window.spaceRescue.requestHint();
+      }
+    }
+
+    function analyzeCode() {
+      if (window.spaceRescue) {
+        window.spaceRescue.analyzeCode();
+      }
+    }
+
+    // Additional animation keyframes
+    const additionalStyles = document.createElement('style');
+    additionalStyles.textContent = `
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      @keyframes digitalBurst {
+        0% { opacity: 1; transform: scale(0.5) rotate(0deg); }
+        50% { opacity: 1; transform: scale(1.2) rotate(180deg); }
+        100% { opacity: 0; transform: scale(0.8) rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(additionalStyles);
+
+    // Initialize the Space Rescue Mission
+    document.addEventListener('DOMContentLoaded', () => {
+      window.spaceRescue = new SpaceRescueMission();
+    });
+  </script>
+</body>
+</html>

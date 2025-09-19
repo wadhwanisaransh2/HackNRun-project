@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Achievement Certifications</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #f72585;
+            --success: #4cc9f0;
+            --warning: #f9c74f;
+            --danger: #f94144;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --card-bg: linear-gradient(135deg, #ffffff 0%, #f5f7ff 100%);
+            --progress-bg: linear-gradient(to right, #4361ee, #3a0ca3, #7209b7);
+        }
+
+        body {
+            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        h1 {
+            color: var(--secondary);
+            margin-bottom: 15px;
+            font-size: 3.2rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            color: #6c757d;
+            font-size: 1.4rem;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 2.5fr;
+            gap: 30px;
+        }
+
+        .progress-section {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .progress-title {
+            color: var(--secondary);
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .progress-circle {
+            width: 220px;
+            height: 220px;
+            margin: 0 auto 35px;
+            position: relative;
+        }
+
+        .outer-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(var(--primary) 0% var(--progress), #e6e6ff var(--progress) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 25px rgba(67, 97, 238, 0.3);
+        }
+
+        .inner-circle {
+            width: 170px;
+            height: 170px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .badges-container {
+            margin-top: 35px;
+        }
+
+        .badges-title {
+            color: var(--secondary);
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.6rem;
+            font-weight: 600;
+        }
+
+        .badges {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .badge {
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--warning), #ff9e00);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid white;
+        }
+
+        .badge:hover {
+            transform: scale(1.15) rotate(5deg);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .badge.locked {
+            background: linear-gradient(45deg, #adb5bd, #6c757d);
+            color: #dee2e6;
+        }
+
+        .badge .tooltip {
+            position: absolute;
+            bottom: -45px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 10;
+        }
+
+        .badge:hover .tooltip {
+            opacity: 1;
+        }
+
+        .certificates-section {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            color: var(--secondary);
+            font-size: 1.9rem;
+            font-weight: 600;
+        }
+
+        .filter-options {
+            display: flex;
+            gap: 12px;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            background: #e6e6ff;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+
+        .filter-btn:hover {
+            background: #d0d0ff;
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .certificates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .certificate-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s ease;
+            border: 1px solid rgba(67, 97, 238, 0.1);
+        }
+
+        .certificate-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .certificate-header {
+            padding: 25px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            position: relative;
+        }
+
+        .certificate-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--success), var(--accent));
+        }
+
+        .certificate-icon {
+            font-size: 3.2rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .certificate-title {
+            font-size: 1.6rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .certificate-body {
+            padding: 25px;
+        }
+
+        .certificate-desc {
+            color: #6c757d;
+            margin-bottom: 25px;
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        .progress-container {
+            margin-bottom: 20px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .progress-label {
+            color: #495057;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+
+        .progress-percentage {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--progress-bg);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 1s ease-in-out;
+            box-shadow: 0 0 10px rgba(67, 97, 238, 0.4);
+        }
+
+        .certificate-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .progress-text {
+            color: #6c757d;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .action-btn {
+            padding: 12px 22px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
+        }
+
+        .action-btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(67, 97, 238, 0.4);
+        }
+
+        .action-btn.locked {
+            background: #adb5bd;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .action-btn.locked:hover {
+            transform: none;
+            background: #adb5bd;
+        }
+
+        .notification {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            padding: 18px 28px;
+            background: var(--success);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(76, 201, 240, 0.3);
+            transform: translateX(100%);
+            opacity: 0;
+            transition: transform 0.5s, opacity 0.5s;
+            z-index: 1000;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .notification i {
+            font-size: 1.4rem;
+        }
+
+        .celebrate {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .celebrate.show {
+            opacity: 1;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background: var(--accent);
+            opacity: 0.8;
+        }
+
+        @media (max-width: 1100px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .progress-section {
+                position: static;
+            }
+            
+            .certificates-grid {
+                grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .section-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .filter-options {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Animation for badges */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .badge.unlocked {
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Hover effect for cards */
+        .certificate-card:hover .certificate-icon {
+            animation: bounce 0.8s ease;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-15px);}
+            60% {transform: translateY(-7px);}
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Learning Achievement Certifications</h1>
+            <p class="subtitle">Track your progress, unlock achievements, and showcase your skills with our interactive certification system</p>
+        </header>
+
+        <div class="dashboard">
+            <div class="progress-section">
+                <h2 class="progress-title">Your Learning Journey</h2>
+                <div class="progress-circle">
+                    <div class="outer-circle" style="--progress: 65%">
+                        <div class="inner-circle">65%</div>
+                    </div>
+                </div>
+                
+                <div class="badges-container">
+                    <h3 class="badges-title">Earned Badges</h3>
+                    <div class="badges">
+                        <div class="badge unlocked">
+                            <i class="fas fa-code"></i>
+                            <div class="tooltip">HTML Expert</div>
+                        </div>
+                        <div class="badge unlocked">
+                            <i class="fas fa-paint-brush"></i>
+                            <div class="tooltip">CSS Master</div>
+                        </div>
+                        <div class="badge unlocked">
+                            <i class="fas fa-mobile-alt"></i>
+                            <div class="tooltip">Responsive Design</div>
+                        </div>
+                        <div class="badge locked">
+                            <i class="fab fa-js"></i>
+                            <div class="tooltip">JavaScript Ninja (Locked)</div>
+                        </div>
+                        <div class="badge locked">
+                            <i class="fas fa-server"></i>
+                            <div class="tooltip">Backend Expert (Locked)</div>
+                        </div>
+                        <div class="badge locked">
+                            <i class="fas fa-database"></i>
+                            <div class="tooltip">Database Master (Locked)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="certificates-section">
+                <div class="section-header">
+                    <h2 class="section-title">Available Certifications</h2>
+                    <div class="filter-options">
+                        <button class="filter-btn active">All</button>
+                        <button class="filter-btn">In Progress</button>
+                        <button class="filter-btn">Completed</button>
+                    </div>
+                </div>
+
+                <div class="certificates-grid">
+                    <!-- Certificate 1 -->
+                    <div class="certificate-card">
+                        <div class="certificate-header">
+                            <div class="certificate-icon">
+                                <i class="fab fa-html5"></i>
+                            </div>
+                            <h3 class="certificate-title">HTML5 Mastery</h3>
+                        </div>
+                        <div class="certificate-body">
+                            <p class="certificate-desc">Master modern HTML5 features, semantic markup, accessibility standards, and advanced web structuring techniques.</p>
+                            <div class="progress-container">
+                                <div class="progress-info">
+                                    <span class="progress-label">Progress</span>
+                                    <span class="progress-percentage">100%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 100%"></div>
+                                </div>
+                            </div>
+                            <div class="certificate-footer">
+                                <span class="progress-text">Completed</span>
+                                <button class="action-btn">View Certificate</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Certificate 2 -->
+                    <div class="certificate-card">
+                        <div class="certificate-header">
+                            <div class="certificate-icon">
+                                <i class="fab fa-css3-alt"></i>
+                            </div>
+                            <h3 class="certificate-title">CSS3 Expert</h3>
+                        </div>
+                        <div class="certificate-body">
+                            <p class="certificate-desc">Learn advanced CSS3 techniques including Flexbox, Grid, animations, transitions, and responsive design principles.</p>
+                            <div class="progress-container">
+                                <div class="progress-info">
+                                    <span class="progress-label">Progress</span>
+                                    <span class="progress-percentage">85%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 85%"></div>
+                                </div>
+                            </div>
+                            <div class="certificate-footer">
+                                <span class="progress-text">85% Complete</span>
+                                <button class="action-btn">Continue</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Certificate 3 -->
+                    <div class="certificate-card">
+                        <div class="certificate-header">
+                            <div class="certificate-icon">
+                                <i class="fab fa-js"></i>
+                            </div>
+                            <h3 class="certificate-title">JavaScript Fundamentals</h3>
+                        </div>
+                        <div class="certificate-body">
+                            <p class="certificate-desc">Learn core JavaScript concepts, DOM manipulation, modern ES6+ features, and asynchronous programming techniques.</p>
+                            <div class="progress-container">
+                                <div class="progress-info">
+                                    <span class="progress-label">Progress</span>
+                                    <span class="progress-percentage">65%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 65%"></div>
+                                </div>
+                            </div>
+                            <div class="certificate-footer">
+                                <span class="progress-text">65% Complete</span>
+                                <button class="action-btn">Continue</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Certificate 4 -->
+                    <div class="certificate-card">
+                        <div class="certificate-header">
+                            <div class="certificate-icon">
+                                <i class="fab fa-react"></i>
+                            </div>
+                            <h3 class="certificate-title">React Development</h3>
+                        </div>
+                        <div class="certificate-body">
+                            <p class="certificate-desc">Build modern web applications with React, hooks, state management, context API, and advanced component patterns.</p>
+                            <div class="progress-container">
+                                <div class="progress-info">
+                                    <span class="progress-label">Progress</span>
+                                    <span class="progress-percentage">30%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 30%"></div>
+                                </div>
+                            </div>
+                            <div class="certificate-footer">
+                                <span class="progress-text">30% Complete</span>
+                                <button class="action-btn">Continue</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Certificate 5 -->
+                    <div class="certificate-card">
+                        <div class="certificate-header">
+                            <div class="certificate-icon">
+                                <i class="fas fa-server"></i>
+                            </div>
+                            <h3 class="certificate-title">Backend Development</h3>
+                        </div>
+                        <div class="certificate-body">
+                            <p class="certificate-desc">Learn server-side programming, RESTful APIs, databases, authentication, and deployment strategies for backend systems.</p>
+                            <div class="progress-container">
+                                <div class="progress-info">
+                                    <span class="progress-label">Progress</span>
+                                    <span class="progress-percentage">10%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 10%"></div>
+                                </div>
+                            </div>
+                            <div class="certificate-footer">
+                                <span class="progress-text">10% Complete</span>
+                                <button class="action-btn">Continue</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Certificate 6 -->
+                    <div class="certificate-card">
+                        <div class="certificate-header">
+                            <div class="certificate-icon">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <h3 class="certificate-title">Responsive Web Design</h3>
+                        </div>
+                        <div class="certificate-body">
+                            <p class="certificate-desc">Create websites that work beautifully across all device sizes using responsive design principles and techniques.</p>
+                            <div class="progress-container">
+                                <div class="progress-info">
+                                    <span class="progress-label">Progress</span>
+                                    <span class="progress-percentage">0%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <div class="certificate-footer">
+                                <span class="progress-text">Not Started</span>
+                                <button class="action-btn locked">Start Learning</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        <i class="fas fa-trophy"></i>
+        <span>Certificate unlocked! Check your achievements.</span>
+    </div>
+
+    <div class="celebrate" id="celebrate"></div>
+
+    <script>
+        // Simulate real-time progress updates
+        document.addEventListener('DOMContentLoaded', function() {
+            // Progress animation
+            const progressBars = document.querySelectorAll('.progress-fill');
+            
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 500);
+            });
+            
+            // Simulate progress updates
+            setInterval(updateRandomProgress, 5000);
+            
+            // Filter functionality
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    // In a real app, this would filter the certificates
+                });
+            });
+            
+            // Certificate action buttons
+            const actionButtons = document.querySelectorAll('.action-btn:not(.locked)');
+            
+            actionButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    showNotification();
+                    celebrate();
+                });
+            });
+            
+            // Badge tooltips
+            const badges = document.querySelectorAll('.badge');
+            
+            badges.forEach(badge => {
+                badge.addEventListener('click', () => {
+                    if (!badge.classList.contains('locked')) {
+                        showNotification();
+                        celebrate();
+                    }
+                });
+            });
+        });
+        
+        function updateRandomProgress() {
+            // Randomly update one progress bar to simulate real-time progress
+            const randomIndex = Math.floor(Math.random() * 5); // 0-5
+            const progressBars = document.querySelectorAll('.progress-fill');
+            const progressTexts = document.querySelectorAll('.progress-text');
+            const progressPercentages = document.querySelectorAll('.progress-percentage');
+            
+            if (randomIndex < progressBars.length) {
+                const currentWidth = parseInt(progressBars[randomIndex].style.width);
+                if (currentWidth < 100) {
+                    const newWidth = currentWidth + Math.floor(Math.random() * 10) + 1;
+                    progressBars[randomIndex].style.width = Math.min(newWidth, 100) + '%';
+                    
+                    // Update progress text
+                    const newProgress = Math.min(newWidth, 100);
+                    progressPercentages[randomIndex].textContent = newProgress + '%';
+                    
+                    if (newProgress === 100) {
+                        progressTexts[randomIndex].textContent = 'Completed';
+                        // Change button to "View Certificate"
+                        const card = progressBars[randomIndex].closest('.certificate-card');
+                        const button = card.querySelector('.action-btn');
+                        button.textContent = 'View Certificate';
+                        
+                        // Show notification if just completed
+                        if (currentWidth < 100) {
+                            showNotification();
+                            celebrate();
+                        }
+                    } else {
+                        progressTexts[randomIndex].textContent = newProgress + '% Complete';
+                    }
+                }
+            }
+            
+            // Update overall progress
+            const overallProgress = document.querySelector('.inner-circle');
+            const progressBarsAll = document.querySelectorAll('.progress-fill');
+            let totalProgress = 0;
+            
+            progressBarsAll.forEach(bar => {
+                totalProgress += parseInt(bar.style.width);
+            });
+            
+            const avgProgress = Math.floor(totalProgress / progressBarsAll.length);
+            overallProgress.textContent = avgProgress + '%';
+            
+            // Update outer circle progress
+            const outerCircle = document.querySelector('.outer-circle');
+            outerCircle.style.setProperty('--progress', avgProgress + '%');
+            
+            // Unlock badges based on progress
+            if (avgProgress >= 20) {
+                document.querySelectorAll('.badge')[0].classList.remove('locked');
+                document.querySelectorAll('.badge')[0].classList.add('unlocked');
+            }
+            if (avgProgress >= 40) {
+                document.querySelectorAll('.badge')[1].classList.remove('locked');
+                document.querySelectorAll('.badge')[1].classList.add('unlocked');
+            }
+            if (avgProgress >= 60) {
+                document.querySelectorAll('.badge')[2].classList.remove('locked');
+                document.querySelectorAll('.badge')[2].classList.add('unlocked');
+            }
+            if (avgProgress >= 80) {
+                document.querySelectorAll('.badge')[3].classList.remove('locked');
+                document.querySelectorAll('.badge')[3].classList.add('unlocked');
+            }
+        }
+        
+        function showNotification() {
+            const notification = document.getElementById('notification');
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        function celebrate() {
+            const celebrateEl = document.getElementById('celebrate');
+            celebrateEl.innerHTML = '';
+            celebrateEl.classList.add('show');
+            
+            // Create confetti
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = Math.random() * 100 + 'vh';
+                confetti.style.backgroundColor = getRandomColor();
+                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                celebrateEl.appendChild(confetti);
+            }
+            
+            setTimeout(() => {
+                celebrateEl.classList.remove('show');
+            }, 2000);
+        }
+        
+        function getRandomColor() {
+            const colors = ['#4361ee', '#3a0ca3', '#7209b7', '#f72585', '#4cc9f0', '#f9c74f'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+    </script>
+</body>
+</html>

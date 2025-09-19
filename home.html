@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HackNRun - Gamified Learning for Rural Education</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Love+Ya+Like+A+Sister&family=Original+Surfer&family=Updock&display=swap" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <div id="particles-js"></div>
+
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <a href="./profile.html">
+                    <div id="full-logo">
+                    <i class="fas fa-graduation-cap logo-icon"></i>
+                    <h1>Hack<span>NRun</span></h1>
+                        </div>
+                </a>
+            </div>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <nav id="main-nav">
+                <ul>
+                    <li><a href="#home"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="#classes"><i class="fas fa-school"></i> Classes</a></li>
+                    <li><a href="#features"><i class="fas fa-star"></i> Features</a></li>
+                    <li><a href="#subjects"><i class="fas fa-book"></i> Subjects</a></li>
+                    <li><a href="#demo"><i class="fas fa-play-circle"></i> Demo</a></li>
+                    <li><a href="#testimonials"><i class="fas fa-chart-pie"></i>Testimonials</a></li>
+                    <li><a href="#contact" class="nav-cta"><i class="fas fa-envelope"></i> Contact</a></li>
+                    
+                 <li class="profile-dropdown">
+                        <button class="profile-trigger" aria-haspopup="true" aria-expanded="false" aria-label="Open user menu">
+                            <i class="fas fa-user-circle"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                            <ul>
+                                <li><a href="profile.html"><i class="fas fa-user-alt"></i> Profile</a></li>
+                                <li><a href="leaderboard.html"><i class="fas fa-trophy"></i> Leaderboard</a></li>
+                                <li><a href="#"><i class="fas fa-bookmark"></i> Request Demo</a></li>
+                                <li><a href="#"><i class="fa    s fa-users"></i>  Certifications</a></li>
+                                <li class="dropdown-divider"></li>
+                                <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                                <li><a href="index.html"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h2 data-aos="fade-up" data-aos-duration="1000">Transform Learning Into an Adventure!</h2>
+            <div class="hero-typed" id="typed-text"></div>
+        <a style="text-decoration: none;" href="#classes">
+    <button onclick="document.getElementById('classes').scrollIntoView({behavior: 'smooth'})" class="cta-button" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="400">
+        <i class="fas fa-rocket"></i> Start Your Journey
+    </button>
+</a></div>
+    </section>
+        
+    <section class="stats" id="stats">
+        <div class="stats-container">
+            <div class="stat-item" data-aos="fade-up" data-aos-delay="100">
+                <div class="stat-number" data-target="95">0</div>
+                <div class="stat-text">Higher Engagement</div>
+            </div>
+            <div class="stat-item" data-aos="fade-up" data-aos-delay="200">
+                <div class="stat-number" data-target="120">0</div>
+                <div class="stat-text">Interactive Games</div>
+            </div>
+            <div class="stat-item" data-aos="fade-up" data-aos-delay="300">
+                <div class="stat-number" data-target="85">0</div>
+                <div class="stat-text">STEM Subjects</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="classes" id="classes">
+        <div class="classes-container">
+            <h2 class="section-title class-title" data-aos="fade-up">Explore Classes</h2>
+            <div class="classes-grid">
+                <a href="class6.html" class="class-card class-6" data-aos="zoom-in" data-aos-delay="100">
+                    <div class="card-content">
+                        <h3>Class 6</h3>
+                        <p>Start your foundation in STEM with fun, interactive lessons and games.</p>
+                        <button class="explore-btn">Explore Now</button>
+                    </div>
+                </a>
+                <a href="class7.html" class="class-card class-7" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="card-content">
+                        <h3>Class 7</h3>
+                        <p>Dive deeper into core subjects with engaging challenges and virtual labs.</p>
+                        <button class="explore-btn">Explore Now</button>
+                    </div>
+                </a>
+                <a href="class8.html" class="class-card class-8" data-aos="zoom-in" data-aos-delay="300">
+                    <div class="card-content">
+                        <h3>Class 8</h3>
+                        <p>Build on your knowledge with advanced topics and puzzle-based learning.</p>
+                        <button class="explore-btn">Explore Now</button>
+                    </div>
+                </a>
+                <a href="class9.html" class="class-card class-9" data-aos="zoom-in" data-aos-delay="400">
+                    <div class="card-content">
+                        <h3>Class 9</h3>
+                        <p>Prepare for board exams with focused content and mock tests in a gamified way.</p>
+                        <button class="explore-btn">Explore Now</button>
+                    </div>
+                </a>
+                <a href="class10.html" class="class-card class-10" data-aos="zoom-in" data-aos-delay="500">
+                    <div class="card-content">
+                        <h3>Class 10</h3>
+                        <p>Master critical concepts and strengthen your skills for future studies.</p>
+                        <button class="explore-btn">Explore Now</button>
+                    </div>
+                </a>
+                <a href="class11.html" class="class-card class-11" data-aos="zoom-in" data-aos-delay="600">
+                    <div class="card-content">
+                        <h3>Class 11</h3>
+                        <p>Explore specialized streams with in-depth modules for science and technology.</p>
+                        <button class="explore-btn">Explore Now</button>
+                    </div>
+                </a>
+                <a href="class12.html" class="class-card class-12" data-aos="zoom-in" data-aos-delay="700">
+                    <div class="card-content">
+                        <h3>Class 12</h3>
+                        <p>Ace your final exams and prepare for competitive entrances with our advanced content.</p>
+                        <button class="explore-btn">Explore Now</button>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="features" id="features">
+        <div class="features-container">
+            <h2 class="section-title" data-aos="fade-up">Powerful Features</h2>
+            <div class="features-grid">
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="feature-icon">
+                        <i class="ri-gamepad-line"></i>
+                    </div>
+                    <h3>Immersive Game-Based Learning</h3>
+                    <p>Transform STEM education into exciting adventures with our interactive game-based approach that makes learning addictive.</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="feature-icon">
+                        <i class="ri-global-line"></i>
+                    </div>
+                    <h3>Multilingual Content Library</h3>
+                    <p>Access educational content in multiple regional languages to support diverse rural communities across India.</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="feature-icon">
+                        <i class="ri-wifi-off-line"></i>
+                    </div>
+                    <h3>Smart Offline Mode</h3>
+                    <p>Download lessons, games, and resources to continue learning without internet connectivity. Perfect for low-connectivity areas.</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="feature-icon">
+                        <i class="ri-line-chart-line"></i>
+                    </div>
+                    <h3>Real-Time Progress Analytics</h3>
+                    <p>Teachers can monitor student progress, identify knowledge gaps, and celebrate achievements with our detailed analytics dashboard.</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="500">
+                    <div class="feature-icon">
+                        <i class="ri-smartphone-line"></i>
+                    </div>
+                    <h3>Low-Device Optimization</h3>
+                    <p>Specifically designed to run smoothly on low-cost devices commonly available in rural areas with limited resources.</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="600">
+                    <div class="feature-icon">
+                        <i class="ri-trophy-line"></i>
+                    </div>
+                    <h3>Motivational Reward System</h3>
+                    <p>Earn badges, points, and unlock special powers as you progress. Our gamified reward system keeps students motivated and engaged.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="subjects" id="subjects">
+
+        <div class="subjects-container">
+
+        <h2 class="section-title" style="color: white;" data-aos="fade-up">Explore STEM Subjects</h2>
+
+        <div class="subjects-grid">
+
+            <div class="subject-card" data-aos="fade-up" data-aos-delay="100">
+
+            <div class="subject-icon">
+
+                <i class="ri-calculator-line"></i>
+
+            </div>
+
+            <h3>Mathematics</h3>
+
+            <p>Master algebra, geometry, calculus, and more through interactive puzzles, challenges, and real-world problem-solving.</p>
+
+            </div>
+
+        
+
+            <div class="subject-card" data-aos="fade-up" data-aos-delay="300">
+
+            <div class="subject-icon">
+
+                <i class="ri-flask-line"></i>
+
+            </div>
+
+            <h3>Science</h3>
+
+            <p>Experiment with elements, compounds, and reactions in our virtual lab. Create amazing chemical reactions safely!</p>
+
+            </div>
+
+        
+
+            <div class="subject-card" data-aos="fade-up" data-aos-delay="500">
+
+            <div class="subject-icon">
+
+                <i class="ri-robot-line"></i>
+
+            </div>
+
+            <h3>Technology</h3>
+
+            <p>Dive into the world of coding, robotics, and artificial intelligence with engaging, project-based learning modules.</p>
+
+            </div>
+
+            <div class="subject-card" data-aos="fade-up" data-aos-delay="600">
+
+            <div class="subject-icon">
+
+                <i class="ri-bar-chart-2-line"></i>
+
+            </div>
+
+            <h3>Engineering</h3>
+
+            <p>Understand data, probability, and statistical analysis through real-world applications and interactive data visualization games.</p>
+
+            </div>
+
+        </div>
+
+        </div>
+
+    </section>
+
+
+
+        <section class="testimonials" id="testimonials">
+            <div class="testimonials-container">
+                <h2 class="section-title" data-aos="fade-up">What Students & Teachers Say</h2>
+                <div class="swiper testimonialsSwiper" data-aos="fade-up" data-aos-delay="200">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide">
+                            <div class="testimonial-avatar">
+                                <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Student">
+                            </div>
+                            <p class="testimonial-text">"HackNRun made math fun for me! I used to hate calculations, but now I look forward to solving problems to unlock new levels."</p>
+                            <h4 class="testimonial-author">Rahul Sharma</h4>
+                            <p class="testimonial-role">Grade 9 Student</p>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="testimonial-avatar">
+                                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Teacher">
+                            </div>
+                            <p class="testimonial-text">"As a teacher in a rural school, I've seen engagement levels skyrocket since we started using HackNRun. The offline feature is a game-changer!"</p>
+                            <h4 class="testimonial-author">Priya Mehta</h4>
+                            <p class="testimonial-role">Science Teacher</p>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="testimonial-avatar">
+                                <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Student">
+                            </div>
+                            <p class="testimonial-text">"The biology games helped me understand complex concepts easily. I never thought learning about cells could be this exciting!"</p>
+                            <h4 class="testimonial-author">Anjali Patel</h4>
+                            <p class="testimonial-role">Grade 11 Student</p>
+                        </div>
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="demo" id="demo">
+            <div class="demo-container">
+                <h2 class="section-title" style="color: white;" data-aos="fade-up">Experience HackNRun</h2>
+                <div class="demo-content">
+                    <h3 style="color: white; max-width: 800px; margin-bottom: 2rem;" data-aos="fade-up" data-aos-delay="100">Our platform is specifically designed to work seamlessly on low-cost devices with limited internet connectivity.</h3>
+                    <div class="demo-image" data-aos="fade-up" data-aos-delay="200">
+                        <div class="demo-image-content">
+                            <i class="fas fa-play-circle" style="font-size: 4rem; margin-bottom: 1.5rem;"></i>
+                            <br>
+                            Interactive Learning Demo
+                        </div>
+                    </div>
+                    <button class="cta-button" data-aos="fade-up" data-aos-delay="300"><i class="fas fa-play"></i> Try Live Demo Now</button>
+                </div>
+            </div>
+        </section>
+
+        <footer id="contact">
+            <div class="footer-container">
+                <div class="footer-logo" data-aos="fade-up">
+                    <h2>Hack<span>NRun</span></h2>
+                    <p>Transforming rural education through gamified learning experiences. Making STEM education accessible, engaging, and effective for students in remote areas.</p>
+                </div>
+                <div class="footer-links" data-aos="fade-up" data-aos-delay="100">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#home"><i class="fas fa-arrow-right"></i> Home</a></li>
+                        <li><a href="#classes"><i class="fas fa-arrow-right"></i> Classes</a></li>
+                        <li><a href="#features"><i class="fas fa-arrow-right"></i> Features</a></li>
+                        <li><a href="#subjects"><i class="fas fa-arrow-right"></i> Subjects</a></li>
+                        <li><a href="#stats"><i class="fas fa-arrow-right"></i> Statistics</a></li>
+                        <li><a href="#demo"><i class="fas fa-arrow-right"></i> Demo</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact" data-aos="fade-up" data-aos-delay="200">
+                    <h3>Contact Us</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> Techno NJR Institute of Technology, Udaipur, India</p>
+                    <p><i class="fas fa-envelope"></i> hacknrun@.org</p>
+                    <p><i class="fas fa-phone"></i> +91 98765 43210</p>
+                    <p><i class="fas fa-clock"></i> Web services available 24/7</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 HackNRun. All rights reserved. | Designed with <i class="fas fa-heart" style="color: var(--accent-light);"></i> for rural education</p>
+            </div>
+        </footer>
+
+        <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+        <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <script src="app.js"></script>
+</body>
+</html>

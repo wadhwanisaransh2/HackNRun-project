@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reproduction MCQ Adventure - Jump Animation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+        .game-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 10px; /* MODIFIED */
+            padding: 0px; /* MODIFIED */
+            box-shadow: 0 8px 32px rgba(0,0,0,1);
+            max-width: 900px; /* MODIFIED */
+            margin: 2px auto;
+            position: relative;
+        }
+        .lives-counter {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.35rem; /* MODIFIED */
+            margin-bottom: 20px;
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .star-icon {
+            color: #f39c12;
+            font-size: 1.8rem; /* MODIFIED */
+            animation: pulse 2s infinite;
+        }
+        .question-section {
+            margin-bottom: 20px;
+        }
+        .question-text {
+            font-size: 1.35rem; /* MODIFIED */
+            font-weight: bold;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(225px, 1fr)); /* MODIFIED */
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .option-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: #fff;
+            padding: 13px 18px; /* MODIFIED */
+            border: none;
+            border-radius: 10px; /* MODIFIED */
+            cursor: pointer;
+            font-size: 0.9rem; /* MODIFIED */
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+        .option-btn.selected {
+            background: linear-gradient(45deg, #f093fb, #f5576c);
+            transform: scale(1.05);
+        }
+        .message-area {
+            min-height: 45px; /* MODIFIED */
+            font-size: 1.1rem; /* MODIFIED */
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .success-msg { color: #a8e6cf; }
+        .error-msg { color: #ffd1dc; }
+        .control-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .submit-btn {
+            background: #1abc9c;
+            color: #fff;
+        }
+        .next-btn {
+            background: #e74c3c;
+            color: #fff;
+        }
+        .restart-btn {
+            background: #f39c12;
+            color: #fff;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-icon {
+            font-size: 1.8rem; /* MODIFIED */
+            margin-bottom: 5px;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .hidden { display: none; }
+        @media (max-width: 768px) {
+            .options-grid { grid-template-columns: 1fr; }
+            .game-container { padding: 18px; margin: 10px; } /* MODIFIED */
+            .question-text { font-size: 1.1rem; } /* MODIFIED */
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto px-4 py-8">
+        <div class="game-container fade-in">
+            <h1 class="text-3xl font-bold text-center mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Reproduction MCQ Adventure</h1> <p class="text-center text-md mb-6">Climb to the top by answering questions correctly! Wrong answers cost a life. Reach the top with your 3 lives intact!</p> <div class="lives-counter">
+                <span class="text-lg font-semibold">Lives Remaining:</span>
+                <span id="starCount" class="flex gap-2">★ ★ ★</span>
+            </div>
+            <canvas id="gameCanvas" class="game-canvas mx-auto" width="450" height="270" style="border: 18px solid beige;"></canvas>
+            <div class="question-section">
+                <div class="question-text" id="questionDisplay">Test your knowledge to begin!</div>
+                <div class="options-grid" id="optionsContainer"></div>
+            </div>
+            <div class="message-area text-center" id="messageDisplay"></div>
+            <div class="control-buttons">
+                <button class="option-btn submit-btn" id="submitBtn">Submit Answer</button>
+                <button class="option-btn next-btn hidden" id="nextBtn">Next Level</button>
+                <button class="option-btn restart-btn hidden" id="restartBtn">Restart Journey</button>
+            </div>
+            <div class="stats hidden" id="statsDisplay">
+                <div class="stat-item">
+                    <div class="stat-icon">🏔</div>
+                    <div>Stairs Climbed: <span id="stairsCount">0</span></div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">🎯</div>
+                    <div>Accuracy: <span id="accuracy">0%</span></div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">⏱</div>
+                    <div>Time Taken: <span id="timeTaken">00:00</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const starCount = document.getElementById('starCount');
+        const questionDisplay = document.getElementById('questionDisplay');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const messageDisplay = document.getElementById('messageDisplay');
+        const submitBtn = document.getElementById('submitBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const statsDisplay = document.getElementById('statsDisplay');
+        const stairsCount = document.getElementById('stairsCount');
+        const accuracy = document.getElementById('accuracy');
+        const timeTaken = document.getElementById('timeTaken');
+        let lives = 3;
+        let currentStair = 0;
+        const maxStairs = 10;
+        let currentQuestion = null;
+        let selectedOption = null;
+        let gameStartTime = Date.now();
+        let totalQuestionsAnswered = 0;
+        let correctAnswers = 0;
+        let questionStartTime;
+        // Animation variables
+        let isJumping = false;
+        let jumpStart = null;
+        let jumpDuration = 400; // ms
+        let jumpFrom = 0;
+        let jumpTo = 0;
+
+        const playerImg = new Image();
+        playerImg.src = 'https://www.pikpng.com/pngl/b/79-790899_8-bit-mario-8-bit-mario-png-clipart.png';
+
+        playerImg.onload = () => { drawStairs(); };
+
+        // MODIFIED: Questions are now based on Class 10 Reproduction
+        let questions = [
+            { q: "The fusion of male and female gametes is called:", options: ["Pollination", "Fertilization", "Implantation", "Gestation"], a: 1 },
+            { q: "Which of the following is a part of the male reproductive system in humans?", options: ["Ovary", "Uterus", "Vas deferens", "Fallopian tube"], a: 2 },
+            { q: "Budding is a common mode of asexual reproduction in:", options: ["Amoeba", "Yeast and Hydra", "Planaria", "Spirogyra"], a: 1 },
+            { q: "The transfer of pollen from the anther to the stigma is known as:", options: ["Germination", "Pollination", "Fertilization", "Adhesion"], a: 1 },
+            { q: "In human females, where does fertilization typically occur?", options: ["Uterus", "Cervix", "Ovary", "Fallopian tube (Oviduct)"], a: 3 },
+            { q: "Which of the following is a sexually transmitted disease (STD) caused by a virus?", options: ["Syphilis", "Gonorrhoea", "AIDS", "Cholera"], a: 2 },
+            { q: "The part of the flower that develops into a fruit after fertilization is the:", options: ["Ovary", "Petal", "Sepal", "Stigma"], a: 0 },
+            { q: "A unisexual flower contains:", options: ["Both stamen and pistil", "Only stamen or only pistil", "Only stamen and petals", "Only pistil and sepals"], a: 1 },
+            { q: "The process of shedding the uterine lining, blood, and unfertilized egg is called:", options: ["Ovulation", "Menstruation", "Gestation", "Fertilization"], a: 1 },
+            { q: "Vegetative propagation refers to the formation of new plants from:", options: ["Seeds", "Spores", "Stem, roots, and leaves", "Gametes"], a: 2 },
+            { q: "The anther of a stamen contains:", options: ["Ovules", "Pollen grains", "Sepals", "Nectar"], a: 1 },
+            { q: "Which method of contraception provides protection from acquiring STDs?", options: ["Copper-T", "Oral pills", "Condoms", "Surgical methods"], a: 2 },
+            { q: "The embryo in humans gets nutrition from the mother's blood via the:", options: ["Placenta", "Fallopian tube", "Cervix", "Uterus wall"], a: 0 },
+            { q: "Planaria reproduces asexually through a process called:", options: ["Budding", "Spore formation", "Fission", "Regeneration"], a: 3 },
+            { q: "The site of implantation for the zygote in the human female is the:", options: ["Ovary", "Vagina", "Uterus", "Fallopian tube"], a: 2 }
+        ];
+
+        // MODIFIED: All drawing logic values reduced by ~10%
+        function drawStairs(jumpOffsetY = 0, stairNumOverride = null) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#0c0c0c');
+            gradient.addColorStop(1, '#1a1a2e');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            const stairWidth = 72;
+            const stairSpacing = 13;
+            const stairHeight = 16;
+            const totalWidth = stairWidth + (maxStairs - 1) * stairSpacing;
+            const startX = (canvas.width - totalWidth) / 2;
+            
+            for (let i = 0; i < maxStairs; i++) {
+                const y = canvas.height - (i * stairHeight) - 45;
+                const x = startX + i * stairSpacing;
+                ctx.fillStyle = i < currentStair ? (i % 2 === 0 ? '#f39c12' : '#e74c3c') : '#34495e';
+                ctx.shadowBlur = i < currentStair ? 10 : 0;
+                ctx.shadowColor = ctx.fillStyle;
+                ctx.fillRect(x, y, stairWidth, 13);
+                ctx.strokeStyle = '#ecf0f1';
+                ctx.strokeRect(x, y, stairWidth, 13);
+                ctx.shadowBlur = 0;
+            }
+            
+            let stairNum = stairNumOverride !== null ? stairNumOverride : currentStair;
+            let playerX = startX + stairNum * stairSpacing + stairWidth / 2;
+            let playerY = canvas.height - stairNum * stairHeight - 63 - jumpOffsetY;
+            ctx.drawImage(playerImg, playerX - 11, playerY - 11, 22, 22);
+        }
+
+        function triggerJump() {
+            isJumping = true;
+            jumpStart = null;
+            jumpFrom = currentStair - 1;
+            jumpTo = currentStair;
+
+            function animateJump(ts) {
+                if (!jumpStart) jumpStart = ts;
+                let progress = (ts - jumpStart) / jumpDuration;
+                if (progress > 1) progress = 1;
+                
+                // Arc motion
+                let arcY = Math.sin(Math.PI * progress) * 25; // MODIFIED jump height
+                let stairProgress = jumpFrom + (jumpTo - jumpFrom) * progress;
+                drawStairs(arcY, stairProgress);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animateJump);
+                } else {
+                    isJumping = false;
+                    drawStairs();
+                }
+            }
+            requestAnimationFrame(animateJump);
+        }
+
+        function updateLivesDisplay() {
+            starCount.innerHTML = '';
+            for (let i = 0; i < lives; i++) {
+                starCount.innerHTML += '<span class="star-icon animate-pulse">🌟</span>';
+            }
+            for (let i = lives; i < 3; i++) {
+                starCount.innerHTML += '<span style="color: #7f8c8d; opacity: 0.3;">☆</span>';
+            }
+        }
+
+        function getRandomQuestion() {
+            if (questions.length === 0) refillQuestions();
+            const randomIndex = Math.floor(Math.random() * questions.length);
+            const selected = questions[randomIndex];
+            questions.splice(randomIndex, 1);
+            return selected;
+        }
+
+        // MODIFIED: Refill questions are also on the topic of Reproduction
+        function refillQuestions() {
+            questions.push(
+                { q: "A feature of reproduction common to Amoeba, Spirogyra, and Yeast is that:", options: ["They are all multicellular", "They all reproduce only sexually", "They all reproduce asexually", "They are all plants"], a: 2 },
+                { q: "The part of the seed which grows and develops into the root system is called the:", options: ["Plumule", "Cotyledon", "Radicle", "Endosperm"], a: 2 }
+            );
+        }
+
+        function askQuestion() {
+            currentQuestion = getRandomQuestion();
+            questionDisplay.textContent = currentQuestion.q;
+            optionsContainer.innerHTML = '';
+            selectedOption = null;
+            messageDisplay.textContent = '';
+            messageDisplay.className = 'message-area text-center';
+            nextBtn.classList.add('hidden');
+            restartBtn.classList.add('hidden');
+            submitBtn.disabled = false;
+            questionStartTime = Date.now();
+            currentQuestion.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.innerHTML = `<span class="font-bold mr-2">${String.fromCharCode(65 + index)})</span>${option}`;
+                btn.className = 'option-btn';
+                btn.addEventListener('click', () => selectOption(index, btn));
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectOption(index, button) {
+            document.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('selected'));
+            button.classList.add('selected');
+            selectedOption = index;
+        }
+
+        function checkAnswer() {
+            if (selectedOption === null) {
+                messageDisplay.textContent = "Select an option before submitting!";
+                messageDisplay.classList.add('error-msg');
+                return;
+            }
+            totalQuestionsAnswered++;
+            const isCorrect = selectedOption === currentQuestion.a;
+            if (isCorrect) {
+                currentStair++;
+                correctAnswers++;
+                messageDisplay.textContent = "Correct! You've climbed one step closer. Keep going!";
+                messageDisplay.classList.add('success-msg');
+                if (currentStair >= maxStairs) {
+                    messageDisplay.textContent = "Congratulations! You've successfully reached the top!";
+                    endGame(true);
+                    return;
+                }
+                // Jump animation on correct answer
+                if (!isJumping) triggerJump();
+            } else {
+                lives--;
+                const correctAnswerText = currentQuestion.options[currentQuestion.a];
+                messageDisplay.textContent = `Incorrect! The right answer was '${correctAnswerText}'. One life lost.`;
+                messageDisplay.classList.add('error-msg');
+                if (lives <= 0) {
+                    messageDisplay.textContent = "Game Over! You have run out of lives.";
+                    endGame(false);
+                    return;
+                }
+                drawStairs();
+            }
+            updateLivesDisplay();
+            submitBtn.disabled = true;
+            nextBtn.classList.remove('hidden');
+        }
+
+        function endGame(win) {
+            const totalTime = Math.floor((Date.now() - gameStartTime) / 1000); // seconds
+            const minutes = Math.floor(totalTime / 60);
+            const seconds = totalTime % 60;
+            timeTaken.textContent = `${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+            stairsCount.textContent = currentStair;
+            const acc = totalQuestionsAnswered > 0 ? Math.round((correctAnswers / totalQuestionsAnswered) * 100) : 0;
+            accuracy.textContent = `${acc}%`;
+            statsDisplay.classList.remove('hidden');
+            submitBtn.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+            setTimeout(() => {
+                restartBtn.classList.remove('hidden');
+            }, 2000);
+        }
+
+        function resetGame() {
+            lives = 3;
+            currentStair = 0;
+            totalQuestionsAnswered = 0;
+            correctAnswers = 0;
+            gameStartTime = Date.now();
+            updateLivesDisplay();
+            drawStairs();
+            // This ensures the original question set is restored for a new game
+            questions = [
+                { q: "The fusion of male and female gametes is called:", options: ["Pollination", "Fertilization", "Implantation", "Gestation"], a: 1 },
+                { q: "Which of the following is a part of the male reproductive system in humans?", options: ["Ovary", "Uterus", "Vas deferens", "Fallopian tube"], a: 2 },
+                { q: "Budding is a common mode of asexual reproduction in:", options: ["Amoeba", "Yeast and Hydra", "Planaria", "Spirogyra"], a: 1 },
+                { q: "The transfer of pollen from the anther to the stigma is known as:", options: ["Germination", "Pollination", "Fertilization", "Adhesion"], a: 1 },
+                { q: "In human females, where does fertilization typically occur?", options: ["Uterus", "Cervix", "Ovary", "Fallopian tube (Oviduct)"], a: 3 },
+                { q: "Which of the following is a sexually transmitted disease (STD) caused by a virus?", options: ["Syphilis", "Gonorrhoea", "AIDS", "Cholera"], a: 2 },
+                { q: "The part of the flower that develops into a fruit after fertilization is the:", options: ["Ovary", "Petal", "Sepal", "Stigma"], a: 0 },
+                { q: "A unisexual flower contains:", options: ["Both stamen and pistil", "Only stamen or only pistil", "Only stamen and petals", "Only pistil and sepals"], a: 1 },
+                { q: "The process of shedding the uterine lining, blood, and unfertilized egg is called:", options: ["Ovulation", "Menstruation", "Gestation", "Fertilization"], a: 1 },
+                { q: "Vegetative propagation refers to the formation of new plants from:", options: ["Seeds", "Spores", "Stem, roots, and leaves", "Gametes"], a: 2 },
+                { q: "The anther of a stamen contains:", options: ["Ovules", "Pollen grains", "Sepals", "Nectar"], a: 1 },
+                { q: "Which method of contraception provides protection from acquiring STDs?", options: ["Copper-T", "Oral pills", "Condoms", "Surgical methods"], a: 2 },
+                { q: "The embryo in humans gets nutrition from the mother's blood via the:", options: ["Placenta", "Fallopian tube", "Cervix", "Uterus wall"], a: 0 },
+                { q: "Planaria reproduces asexually through a process called:", options: ["Budding", "Spore formation", "Fission", "Regeneration"], a: 3 },
+                { q: "The site of implantation for the zygote in the human female is the:", options: ["Ovary", "Vagina", "Uterus", "Fallopian tube"], a: 2 }
+            ];
+            statsDisplay.classList.add('hidden');
+            submitBtn.classList.remove('hidden');
+            askQuestion();
+            submitBtn.disabled = false;
+            messageDisplay.textContent = "Your new adventure begins! Good luck.";
+        }
+
+        submitBtn.addEventListener('click', checkAnswer);
+        nextBtn.addEventListener('click', askQuestion);
+        restartBtn.addEventListener('click', resetGame);
+
+        updateLivesDisplay();
+        askQuestion();
+    </script>
+</body>
+</html>

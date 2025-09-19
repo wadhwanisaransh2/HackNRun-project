@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Virtual Chemistry Synthesis Lab</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,400;6..12,700&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<style>
+  :root {
+    --primary-gradient: linear-gradient(135deg, #1a0b3d 0%, #4c1d95 50%, #6d28d9 100%);
+    --accent-gradient: linear-gradient(135deg, #ff6b9d 0%, #c084fc 50%, #a855f7 100%);
+    --secondary-gradient: linear-gradient(135deg, #06b6d4 0%, #0ea5e9 100%);
+    --card-bg: rgba(255, 255, 255, 0.1);
+    --card-border: rgba(255, 255, 255, 0.2);
+    --glass-bg: rgba(255, 255, 255, 0.08);
+    --text-primary: #ffffff;
+    --text-secondary: #e2e8f0;
+    --text-muted: #cbd5e1;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --header-height: 90px;
+    --font-sans: 'Nunito Sans', sans-serif;
+    --font-mono: 'Roboto Mono', monospace;
+  }
+  
+  *, *::before, *::after { box-sizing: border-box; }
+  
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    background: var(--primary-gradient);
+    color: var(--text-primary);
+    user-select: none;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+  
+  /* Animated background particles */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+      radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255, 107, 157, 0.2) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(196, 181, 253, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+  }
+  
+  header {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--card-border);
+    padding: 0 2rem;
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+  
+  header .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  
+  nav a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    margin-left: 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    position: relative;
+  }
+  
+  nav a:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  nav a[aria-current="page"] {
+    background: var(--accent-gradient);
+    color: var(--text-primary);
+  }
+  
+  main {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    padding: 2rem;
+    gap: 2rem;
+    align-items: start;
+    min-height: calc(100vh - var(--header-height));
+  }
+  
+  .panel {
+    background: var(--card-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .panel:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  }
+  
+  h2 {
+    margin-top: 0;
+    font-size: 1.3rem;
+    text-align: center;
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-family: var(--font-mono);
+    border-bottom: 2px solid var(--card-border);
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.25rem;
+    font-weight: 700;
+  }
+  
+  #left-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  #challenge-area h2 {
+    background: var(--secondary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  #challenge-text {
+    font-size: 1rem;
+    text-align: left;
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+  
+  #challenge-text strong {
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 1.2rem;
+    font-family: var(--font-mono);
+  }
+  
+  #element-pool-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .element {
+    width: 60px;
+    height: 60px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    font-weight: 700;
+    font-family: var(--font-sans);
+    font-size: 1.4rem;
+    position: relative;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+  
+  .element:hover {
+    transform: translateY(-4px) scale(1.1);
+    box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+  
+  .element .count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: var(--accent-gradient);
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    font-weight: 700;
+  }
+  
+  .element.dragging {
+    opacity: 0.5;
+    transform: scale(1.1);
+  }
+  
+  #beaker-area {
+    text-align: center;
+  }
+  
+  #beaker {
+    width: 280px;
+    height: 280px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-radius: 0 0 50px 50px;
+    border-top: none;
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    position: relative;
+    margin: 1.5rem auto;
+    overflow: hidden;
+    box-shadow: 
+      inset 0 0 30px rgba(255, 255, 255, 0.1),
+      0 8px 32px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+  }
+  
+  #beaker.drag-over {
+    border-color: #06b6d4;
+    box-shadow: 
+      inset 0 0 30px rgba(6, 182, 212, 0.3),
+      0 8px 32px rgba(6, 182, 212, 0.2);
+  }
+  
+  #beaker-contents {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding: 1rem;
+    gap: 10px;
+  }
+  
+  .button-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  
+  button {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+  }
+  
+  button:hover::before {
+    left: 100%;
+  }
+  
+  button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  }
+  
+  #mixBtn {
+    background: var(--accent-gradient);
+    color: white;
+  }
+  
+  #hintBtn {
+    background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+    color: white;
+  }
+  
+  #clearBtn {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    color: white;
+    margin-top: 1rem;
+  }
+  
+  #output {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    min-height: 60px;
+    text-align: center;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+  }
+  
+  .warning {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+  }
+  
+  .success {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.3);
+    color: #6ee7b7;
+  }
+  
+  .goal-complete {
+    background: var(--accent-gradient);
+    color: white;
+    font-weight: 600;
+  }
+  
+  #progress-container {
+    margin-top: 2rem;
+  }
+  
+  #progress-label {
+    text-align: center;
+    font-family: var(--font-mono);
+    margin-bottom: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+  
+  #progress {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+  }
+  
+  #progress-bar {
+    height: 100%;
+    background: var(--secondary-gradient);
+    width: 0%;
+    transition: width 0.8s ease-in-out;
+    border-radius: 4px;
+  }
+
+  /* Hydrogen subscript styling */
+  .hydrogen-formula {
+    font-family: var(--font-mono);
+  }
+  
+  .hydrogen-formula sub {
+    font-size: 0.8em;
+    vertical-align: sub;
+  }
+</style>
+</head>
+<body>
+<!-- <header>
+    <div class="logo">
+        <i class="fas fa-flask"></i>
+        <span>Synthesis Lab</span>
+    </div>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="mathematics.html">Math</a>
+        <a href="physics.html">Physics</a>
+        <a href="chemistry.html" aria-current="page">Chemistry</a>
+    </nav>
+</header> -->
+<main>
+  <div id="left-column">
+    <section id="challenge-area" class="panel">
+        <h2>🔬 Research Task</h2>
+        <div id="challenge-text">Loading...</div>
+    </section>
+  </div>
+  <section id="lab-bench" class="panel">
+      <h2>🧪 Lab Bench</h2>
+      <div id="element-pool-container"></div>
+      <div id="beaker-area">
+        <div id="beaker">
+            <div id="beaker-contents"></div>
+        </div>
+      </div>
+      <div id="output">Drag elements to the beaker to begin.</div>
+      <div class="button-group">
+        <button id="mixBtn">Combine!</button>
+        <button id="hintBtn">💡 Get Hint</button>
+      </div>
+      <button id="clearBtn">Clear Beaker</button>
+      <div id="progress-container">
+        <div id="progress-label">Task Progress</div>
+        <div id="progress"><div id="progress-bar"></div></div>
+      </div>
+  </section>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<script>
+/* ==================== 1. DATA & STATE ==================== */
+const ELEMENTS = {
+  "H":  { name:"Hydrogen",  color:"#64b5f6" }, "O":  { name:"Oxygen",    color:"#e57373" },
+  "N":  { name:"Nitrogen",  color:"#7986cb" }, "S":  { name:"Sulfur",    color:"#fff176" },
+  "C":  { name:"Carbon",    color:"#9e9e9e" }, "Na": { name:"Sodium",    color:"#ce93d8" },
+  "Cl": { name:"Chlorine",  color:"#81c784" }, "Mg": { name:"Magnesium", color:"#f0f4c3" },
+  "Li": { name:"Lithium",   color:"#f48fb1" }, "F":  { name:"Fluorine",  color:"#a5d6a7" },
+  "Ca": { name:"Calcium",   color:"#e0e0e0" }, "Si": { name:"Silicon",   color:"#b0bec5" },
+};
+
+const REACTIONS = [
+  { reactants: {"H": 2, "O": 1},  products: {"H2O": 1},   desc: '<span class="hydrogen-formula">H<sub>2</sub>O (Water)</span>',   type:"exothermic", isSafe:true, color: [200, 220, 255] },
+  { reactants: {"Na": 1,"Cl": 1}, products: {"NaCl": 1},  desc: "NaCl (Salt)",  type:"neutral",    isSafe:true, color: [255, 255, 255] },
+  { reactants: {"C": 1, "O": 2},  products: {"CO2": 1},   desc: "CO₂ (Carbon Dioxide)", type:"exothermic", isSafe:true, color: [220, 220, 220] },
+  { reactants: {"S": 1, "O": 2},  products: {"SO2": 1},   desc: "SO₂ (Sulfur Dioxide)", type:"exothermic", isSafe:true, color: [255, 255, 200] },
+  { reactants: {"Mg": 1,"O": 2},  products: {"MgO": 1},   desc: "MgO (Magnesium Oxide)", type:"light", isSafe:true, color: [255, 255, 255] },
+  { reactants: {"Ca": 1, "O": 1}, products: {"CaO": 1},   desc: "CaO (Calcium Oxide)", type:"exothermic", isSafe:true, color: [240, 240, 230]},
+  { reactants: {"Li": 1, "F": 1}, products: {"LiF": 1},   desc: "LiF (Lithium Fluoride)", type:"exothermic", isSafe:true, color: [250, 230, 240]},
+  { reactants: {"Si": 1, "O": 2}, products: {"SiO2": 1},  desc: "SiO₂ (Silicon Dioxide)", type:"neutral", isSafe:true, color: [230,230,230]},
+  { reactants: {"N": 2, "H": 6},  products: {"NH3": 2},   desc: "NH₃ (Ammonia)", type:"endothermic", isSafe:true, color: [220, 230, 255] },
+  { reactants: {"Na": 1,"H": 2, "O": 1}, products: {}, desc: "Uncontrolled reaction!", type:"explosive", isSafe:false, color: [255, 100, 0] },
+];
+
+const CHALLENGES = [
+    { target: "H2O", name: "Water", task: 'Our first task is foundational. We need to synthesize Dihydrogen Monoxide, more commonly known as Water (<span class="hydrogen-formula">H<sub>2</sub>O</span>). It is essential for almost all known forms of life. Combine the necessary elements to proceed.' },
+    { target: "NaCl", name: "Sodium Chloride", task: "Assignment: create a sample of the ionic compound Sodium Chloride. This common salt is used globally for seasoning and food preservation. You will need a highly reactive alkali metal and a halogen gas." },
+    { target: "SiO2", name: "Silicon Dioxide", task: "Your goal is to form Silicon Dioxide, the primary component of sand and quartz. This compound is crucial in the manufacturing of glass and electronics. Find the correct metalloid and combine it with oxygen." },
+    { target: "CaO", name: "Calcium Oxide", task: "Next, we require a sample of Calcium Oxide, also known as quicklime. This substance is widely used in industrial processes, such as the production of cement. Synthesize it from its base elements." },
+    { target: "LiF", name: "Lithium Fluoride", task: "This task involves synthesizing Lithium Fluoride, an inorganic compound used in the production of specialized optics and as a component in molten salt reactors. Handle the reactants with care." },
+];
+
+const state = { elementsInBeaker: new Map(), currentChallengeIndex: 0 };
+
+const engine = {
+    findReaction: (reactantMap) => {
+        if (reactantMap.size === 0) return null;
+        return REACTIONS.find(r => {
+            const reqKeys = Object.keys(r.reactants);
+            if (reqKeys.length !== reactantMap.size) return false;
+            return reqKeys.every(key => reactantMap.has(key) && reactantMap.get(key) === r.reactants[key]);
+        });
+    }
+};
+
+const UI = {
+  init() { this.cacheDOM(); this.populateElementPool(); this.displayChallenge(); this.updateProgress(); },
+  cacheDOM() {
+    this.pool = document.getElementById('element-pool-container');
+    this.beakerContents = document.getElementById('beaker-contents');
+    this.output = document.getElementById('output');
+    this.progressBar = document.getElementById('progress-bar');
+    this.challengeText = document.getElementById('challenge-text');
+    this.beaker = document.getElementById('beaker');
+  },
+  createElementIcon(id, count = 0) {
+    const e = ELEMENTS[id];
+    const div = document.createElement('div');
+    div.className = 'element'; 
+    div.dataset.id = id; 
+    div.textContent = id;
+    div.style.backgroundColor = e.color; 
+    div.draggable = true;
+    if (count > 1) {
+        const span = document.createElement('span');
+        span.className = 'count'; 
+        span.textContent = count; 
+        div.appendChild(span);
+    }
+    return div;
+  },
+  populateElementPool() {
+    for (const id in ELEMENTS) {
+      const icon = this.createElementIcon(id);
+      icon.addEventListener('dragstart', (ev) => { 
+        ev.dataTransfer.setData('text/plain', id); 
+        icon.classList.add('dragging'); 
+      });
+      icon.addEventListener('dragend', () => icon.classList.remove('dragging'));
+      this.pool.appendChild(icon);
+    }
+  },
+  renderBeaker() {
+    this.beakerContents.innerHTML = '';
+    for (const [id, count] of state.elementsInBeaker.entries()) {
+      const icon = this.createElementIcon(id, count);
+      icon.draggable = false;
+      icon.addEventListener('click', () => app.removeElementFromBeaker(id));
+      this.beakerContents.appendChild(icon);
+    }
+  },
+  displayChallenge() {
+      if (state.currentChallengeIndex >= CHALLENGES.length) {
+          this.challengeText.innerHTML = "<strong>Lab Master!</strong><br>Excellent work, chemist! You've successfully completed all synthesis challenges. Your skills in the lab are truly impressive. Well done!";
+          this.showMessage("🎉 Mission Accomplished! 🎉", "goal-complete");
+          return;
+      }
+      const c = CHALLENGES[state.currentChallengeIndex];
+      this.challengeText.innerHTML = `<strong>${c.name}</strong><br>${c.task}`;
+  },
+  showMessage(msg, type = 'info') { 
+    this.output.innerHTML = msg; 
+    this.output.className = type; 
+  },
+  updateProgress() {
+      const progress = (state.currentChallengeIndex / CHALLENGES.length) * 100;
+      this.progressBar.style.width = progress + '%';
+      const label = state.currentChallengeIndex >= CHALLENGES.length ? `All ${CHALLENGES.length} Tasks Complete!` : `Task ${state.currentChallengeIndex + 1} of ${CHALLENGES.length}`;
+      document.getElementById('progress-label').textContent = label;
+  }
+};
+
+const app = {
+  currentSketch: null,
+  init() { UI.init(); this.setupEventListeners(); },
+  addElementToBeaker(id) { 
+    const count = state.elementsInBeaker.get(id) || 0; 
+    state.elementsInBeaker.set(id, count + 1); 
+    UI.renderBeaker(); 
+  },
+  removeElementFromBeaker(id) { 
+    const count = state.elementsInBeaker.get(id); 
+    (count > 1) ? state.elementsInBeaker.set(id, count - 1) : state.elementsInBeaker.delete(id); 
+    UI.renderBeaker(); 
+  },
+  clearBeaker() {
+    state.elementsInBeaker.clear(); 
+    UI.renderBeaker();
+    UI.showMessage('Beaker cleared.', 'info');
+    if (this.currentSketch) { 
+      this.currentSketch.remove(); 
+      this.currentSketch = null; 
+    }
+  },
+  getHint() {
+      if (state.currentChallengeIndex >= CHALLENGES.length) return;
+      const goal = CHALLENGES[state.currentChallengeIndex];
+      const targetReaction = REACTIONS.find(r => Object.keys(r.products).includes(goal.target));
+      if (!targetReaction) return;
+      const required = Object.keys(targetReaction.reactants);
+      const current = Array.from(state.elementsInBeaker.keys());
+      const missing = required.filter(r => !current.includes(r));
+      if (missing.length > 0) { 
+        UI.showMessage(`Hint: This synthesis requires ${ELEMENTS[missing[0]].name} (${missing[0]}). Try adding it.`, "info"); 
+      } else { 
+        UI.showMessage("Hint: You have the correct elements. Now, verify the exact quantities needed for the reaction.", "info"); 
+      }
+  },
+  mix() {
+    const reaction = engine.findReaction(state.elementsInBeaker);
+    if (!reaction) { 
+      UI.showMessage('No reaction occurred with this combination.', 'warning'); 
+      return; 
+    }
+    UI.showMessage(reaction.isSafe ? `Success: Synthesized ${reaction.desc}` : 'DANGER! Unsafe reaction!', reaction.isSafe ? 'success' : 'warning');
+    this.startReactionAnimation(reaction);
+    const goal = CHALLENGES[state.currentChallengeIndex];
+    if (reaction.isSafe && Object.keys(reaction.products).includes(goal.target)) {
+        setTimeout(() => {
+            UI.showMessage(`Task Complete! You created ${goal.name}.`, 'goal-complete');
+            state.currentChallengeIndex++;
+            UI.updateProgress();
+            setTimeout(() => UI.displayChallenge(), 2000);
+        }, 1500);
+    }
+    setTimeout(() => this.clearBeaker(), 3000);
+  },
+  startReactionAnimation(reaction) {
+    if (this.currentSketch) this.currentSketch.remove();
+    this.currentSketch = new p5(p => {
+      let particles = [];
+      p.setup = () => { 
+        p.createCanvas(280, 280); 
+        p.noStroke(); 
+      };
+      p.draw = () => {
+        p.clear();
+        if (p.frameCount % 4 === 0) {
+          particles.push({ 
+            pos: p.createVector(p.random(80, 200), 260), 
+            vel: p.createVector(p.random(-1, 1), p.random(-3, -1)), 
+            r: p.random(10, 20), 
+            lifespan: 255 
+          });
+        }
+        for (let i = particles.length - 1; i >= 0; i--) {
+          let pcl = particles[i];
+          pcl.pos.add(pcl.vel); 
+          pcl.lifespan -= 4; 
+          pcl.r -= 0.1;
+          const [r,g,b] = reaction.color;
+          p.fill(r, g, b, pcl.lifespan);
+          p.ellipse(pcl.pos.x, pcl.pos.y, pcl.r);
+          if (pcl.lifespan <= 0 || pcl.r <= 0) particles.splice(i, 1);
+        }
+      };
+    }, UI.beakerContents);
+  },
+  setupEventListeners() {
+    UI.beaker.addEventListener('dragover', (ev) => { 
+      ev.preventDefault(); 
+      UI.beaker.classList.add('drag-over'); 
+    });
+    UI.beaker.addEventListener('dragleave', () => UI.beaker.classList.remove('drag-over'));
+    UI.beaker.addEventListener('drop', (ev) => {
+      ev.preventDefault(); 
+      UI.beaker.classList.remove('drag-over');
+      const id = ev.dataTransfer.getData('text/plain');
+      if (ELEMENTS[id]) this.addElementToBeaker(id);
+    });
+    document.getElementById('mixBtn').addEventListener('click', () => this.mix());
+    document.getElementById('clearBtn').addEventListener('click', () => this.clearBeaker());
+    document.getElementById('hintBtn').addEventListener('click', () => this.getHint());
+  }
+};
+
+app.init();
+</script>
+</body>
+</html>

@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Light Quest - A Physics Journey</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --glow-color: #00aaff;
+        --accent-color: #00c0ff;
+        --success-color: #28a745;
+        --danger-color: #dc3545;
+        --text-color: #eee;
+        --bg-dark: #101018;
+        --bg-light: #1a1a2a;
+    }
+    body {
+        margin: 0;
+        overflow: hidden;
+        background: var(--bg-dark);
+        color: var(--text-color);
+        font-family: 'Share Tech Mono', monospace;
+        text-align: center;
+        user-select: none;
+    }
+    #game-container {
+        position: relative;
+        width: 900px;
+        height: 600px;
+        margin: auto;
+        top: 50vh;
+        transform: translateY(-50%);
+    }
+    #gameCanvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: transparent;
+        border: 2px solid var(--glow-color);
+        border-radius: 10px;
+        box-shadow: 0 0 25px rgba(0, 170, 255, 0.6), inset 0 0 15px rgba(0, 170, 255, 0.3);
+        cursor: crosshair;
+    }
+    .game-ui {
+        position: absolute;
+        background: rgba(10, 20, 40, 0.75);
+        backdrop-filter: blur(8px);
+        padding: 12px 16px;
+        border-radius: 10px;
+        border: 1px solid var(--accent-color);
+        box-shadow: 0 0 15px rgba(0, 192, 255, 0.3);
+    }
+    #instruction {
+        top: 20px;
+        left: 20px;
+        font-size: 1.1em;
+        width: 350px;
+        text-align: left;
+        line-height: 1.5;
+    }
+    .modal {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        display: flex; justify-content: center; align-items: center;
+        background: rgba(0, 0, 0, 0.8);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.4s ease, visibility 0.4s;
+        z-index: 1000;
+    }
+    .modal.visible {
+        opacity: 1;
+        visibility: visible;
+    }
+    .modal-content {
+        background: rgba(10, 20, 40, 0.85);
+        backdrop-filter: blur(10px);
+        padding: 32px; border-radius: 12px;
+        border: 2px solid var(--accent-color);
+        box-shadow: 0 0 40px rgba(0, 192, 255, 0.7);
+        text-align: center;
+        max-width: 500px;
+        transform: scale(0.9);
+        transition: transform 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+    .modal.visible .modal-content {
+        transform: scale(1);
+    }
+    .modal-content h1 { color: #ffffa0; text-shadow: 0 0 8px #ffffa0; margin-top: 0;}
+    .modal-content h2 { color: #90ee90; text-shadow: 0 0 8px #90ee90; }
+    .modal-content p { line-height: 1.6; }
+    .modal-button {
+        padding: 14px 28px; border-radius: 10px; border: 1px solid var(--success-color);
+        cursor: pointer;
+        background: linear-gradient(145deg, #2cae4d, #28a745);
+        color: white; font-size: 1.1em;
+        margin-top: 20px;
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        box-shadow: 0 0 10px rgba(40, 167, 69, 0.5), inset 0 0 5px rgba(255, 255, 255, 0.2);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .modal-button:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 0 20px rgba(40, 167, 69, 0.8), inset 0 0 8px rgba(255, 255, 255, 0.3);
+    }
+    /* Quiz Styles */
+    #quiz-question { font-size: 1.2em; margin-bottom: 25px; color: var(--accent-color); text-shadow: 0 0 5px var(--accent-color);}
+    #quiz-options { display: flex; flex-direction: column; gap: 10px; }
+    .option-btn {
+        padding: 12px; border: 1px solid var(--accent-color); border-radius: 8px;
+        background: transparent; color: var(--text-color); cursor: pointer;
+        text-align: left; transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .option-btn:hover:not(:disabled) {
+        background-color: rgba(0, 170, 255, 0.3);
+        transform: translateX(5px);
+        box-shadow: 0 0 10px rgba(0, 170, 255, 0.5);
+    }
+    .option-btn:disabled { cursor: default; opacity: 0.7; }
+    .option-btn.correct { background-color: var(--success-color) !important; border-color: #1e7e34; color: white; }
+    .option-btn.incorrect { background-color: var(--danger-color) !important; border-color: #b22222; color: white;}
+    #quiz-feedback { margin-top: 20px; font-size: 1em; color: #ffffa0; min-height: 40px; }
+    #quiz-continue-btn { display: none; margin-top: 10px; background: #1e90ff; border-color: #1e90ff; }
+</style>
+</head>
+<body>
+<div id="game-container">
+    <canvas id="gameCanvas"></canvas>
+</div>
+<!-- UI Modals -->
+<div class="modal visible" id="start-modal">
+    <div class="modal-content">
+        <h1>Light Quest</h1>
+        <h3>An Interactive Optics Journey</h3>
+        <p>Explore reflection and diffraction of light through interactive challenges.</p>
+        <p><strong>Click on mirrors/slits to select them, then use A/D keys to rotate or W/S to adjust slit width.</strong></p>
+        <button id="start-btn" class="modal-button">Begin Mission 🚀</button>
+    </div>
+</div>
+<div class="modal" id="level-complete-modal">
+    <div class="modal-content">
+        <h2 id="level-complete-title">Level Complete!</h2>
+        <p id="level-complete-message"></p>
+        <button id="next-level-btn" class="modal-button">Next Level ➡️</button>
+    </div>
+</div>
+<div class="modal" id="quiz-modal">
+    <div class="modal-content">
+        <h2>Knowledge Check!</h2>
+        <p id="quiz-question"></p>
+        <div id="quiz-options"></div>
+        <p id="quiz-feedback"></p>
+        <button id="quiz-continue-btn" class="modal-button">Continue</button>
+    </div>
+</div>
+<div id="instruction" class="game-ui"></div>
+<script>
+// ========== SETUP ==========
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = 900;
+canvas.height = 600;
+
+// UI Elements
+const startModal = document.getElementById('start-modal');
+const levelCompleteModal = document.getElementById('level-complete-modal');
+const quizModal = document.getElementById('quiz-modal');
+const startBtn = document.getElementById('start-btn');
+const nextLevelBtn = document.getElementById('next-level-btn');
+const instructionDiv = document.getElementById('instruction');
+const levelCompleteTitle = document.getElementById('level-complete-title');
+const levelCompleteMessage = document.getElementById('level-complete-message');
+
+// Quiz UI
+const quizQuestion = document.getElementById('quiz-question');
+const quizOptions = document.getElementById('quiz-options');
+const quizFeedback = document.getElementById('quiz-feedback');
+const quizContinueBtn = document.getElementById('quiz-continue-btn');
+
+// Game State
+let currentLevel = 0;
+let gameRunning = false;
+let interactiveObjects = [];
+let staticObjects = [];
+let laser, target;
+let particles = [];
+let stars = [];
+
+// ========== UI/MODAL HELPERS ==========
+function showModal(modal) {
+    modal.classList.add('visible');
+}
+function hideModal(modal) {
+    modal.classList.remove('visible');
+}
+
+// ========== ENHANCED QUIZ DATA ==========
+const quizzes = [
+    {
+        question: "What is the law of reflection?",
+        options: [
+            "The angle of incidence equals the angle of reflection",
+            "Light always bounces straight back",
+            "The angle changes based on mirror size",
+            "Light gets absorbed by mirrors"
+        ],
+        correct: 0,
+        explanation: "Correct! The law of reflection states that the angle of incidence equals the angle of reflection, both measured from the normal to the surface."
+    },
+    {
+        question: "What happens when you change a mirror's angle?",
+        options: [
+            "The reflection direction changes accordingly",
+            "The light speed changes",
+            "The light color changes", 
+            "Nothing happens"
+        ],
+        correct: 0,
+        explanation: "Correct! Changing the mirror's angle changes the direction of the reflected light beam according to the law of reflection."
+    },
+    {
+        question: "What is diffraction?",
+        options: [
+            "Light bouncing off surfaces",
+            "Light bending when passing through narrow openings",
+            "Light changing color",
+            "Light traveling in straight lines"
+        ],
+        correct: 1,
+        explanation: "Correct! Diffraction is the bending and spreading of light waves when they pass through narrow openings or around obstacles."
+    },
+    {
+        question: "What happens to the diffraction pattern when you make a slit narrower?",
+        options: [
+            "The pattern gets narrower",
+            "The pattern gets wider and more spread out",
+            "The pattern disappears",
+            "The pattern stays the same"
+        ],
+        correct: 1,
+        explanation: "Correct! When a slit gets narrower, the diffraction pattern spreads out more. This demonstrates the inverse relationship between slit width and diffraction spread."
+    },
+    {
+        question: "Where is the brightest part of a single-slit diffraction pattern?",
+        options: [
+            "At the edges",
+            "Randomly distributed",
+            "At the center (central maximum)",
+            "There is no bright part"
+        ],
+        correct: 2,
+        explanation: "Correct! The central maximum is the brightest and widest part of a single-slit diffraction pattern, with dimmer secondary maxima on either side."
+    }
+];
+
+// ========== ENHANCED LEVELS WITH DIFFRACTION ==========
+const levels = [
+    {
+        setup: () => {
+            laser = { x: 80, y: 450, angle: 315, type: 'laser' }; // 45° up-right
+            target = { x: 750, y: 120, r: 25, type: 'target' };
+            interactiveObjects = [
+                { x: 380, y: 180, angle: 75, length: 120, type: 'mirror', interactive: true, fixed: true },
+                { x: 560, y: 220, angle: 135, length: 120, type: 'mirror', interactive: true, fixed: true }
+            ];
+            staticObjects = [target];
+            instructionDiv.innerHTML = "<strong>Level 1: Single Reflection</strong><br><strong>Click mirrors to select, then use A/D keys to rotate.</strong> Try rotating the first mirror to around 60-90°.";
+        }
+    },
+    {
+        setup: () => {
+            laser = { x: 100, y: 300, angle: 0, type: 'laser' };
+            target = { x: 700, y: 180, r: 25, type: 'target' };
+            interactiveObjects = [
+                { x: 350, y: 280, angle: 60, length: 100, type: 'mirror', interactive: true, fixed: true },
+                { x: 550, y: 480, angle: 120, length: 100, type: 'mirror', interactive: true, fixed: true }
+            ];
+            staticObjects = [target];
+            instructionDiv.innerHTML = "<strong>Level 2: Double Reflection</strong><br><strong>Select mirrors with clicks, rotate with A/D keys.</strong> Try angles around 45° and 135° respectively.";
+        }
+    },
+    {
+        setup: () => {
+            laser = { x: 80, y: 520, angle: 330, type: 'laser' };
+            target = { x: 820, y: 80, r: 25, type: 'target' };
+            interactiveObjects = [
+                { x: 200, y: 450, angle: 80, length: 80, type: 'mirror', interactive: true, fixed: true },
+                { x: 120, y: 180, angle: 50, length: 80, type: 'mirror', interactive: true, fixed: true },
+                { x: 650, y: 490, angle: 130, length: 80, type: 'mirror', interactive: true, fixed: true }
+            ];
+            staticObjects = [target];
+            instructionDiv.innerHTML = "<strong>Level 3: Triple Reflection</strong><br><strong>Click to select mirrors, A/D to rotate.</strong> Work systematically: adjust first mirror ~75°, second ~45°, third ~135°.";
+        }
+    }
+];
+
+function startLevel(levelIndex) {
+    if (levelIndex >= levels.length) {
+        levelCompleteTitle.innerText = "🎉 Optics Master! 🎉";
+        levelCompleteMessage.innerHTML = "You have mastered both reflection and diffraction! You understand how light behaves as a wave!";
+        nextLevelBtn.innerText = "Play Again 🚀";
+        nextLevelBtn.onclick = () => window.location.reload();
+        showModal(levelCompleteModal);
+        return;
+    }
+    currentLevel = levelIndex;
+    levels[currentLevel].setup();
+    gameRunning = true;
+}
+
+// ========== ENHANCED VECTOR HELPERS ==========
+const V = {
+    normalize: (v) => {
+        const len = Math.hypot(v.x, v.y) || 1;
+        return { x: v.x / len, y: v.y / len };
+    },
+    reflect: (incident, normal) => {
+        const dot = incident.x * normal.x + incident.y * normal.y;
+        return {
+            x: incident.x - 2 * dot * normal.x,
+            y: incident.y - 2 * dot * normal.y
+        };
+    },
+    degToRad: (deg) => deg * Math.PI / 180,
+    radToDeg: (rad) => rad * 180 / Math.PI,
+    dot: (v1, v2) => v1.x * v2.x + v1.y * v2.y,
+    subtract: (v1, v2) => ({ x: v1.x - v2.x, y: v1.y - v2.y }),
+    add: (v1, v2) => ({ x: v1.x + v2.x, y: v1.y + v2.y }),
+    scale: (v, s) => ({ x: v.x * s, y: v.y * s })
+};
+
+// ========== DIFFRACTION PHYSICS ==========
+function calculateDiffractionIntensity(angle, slitWidth) {
+    // Single-slit diffraction intensity using sinc function
+    // I(θ) = I₀ * (sin(β)/β)² where β = (π * a * sin(θ)) / λ
+    const wavelength = 650e-9; // Red light wavelength in meters
+    const slitWidthMeters = slitWidth * 1e-6; // Convert to meters
+    
+    if (Math.abs(angle) < 0.01) return 1.0; // Central maximum
+    
+    const beta = (Math.PI * slitWidthMeters * Math.sin(V.degToRad(angle))) / wavelength;
+    const intensity = Math.pow(Math.sin(beta) / beta, 2);
+    
+    return Math.max(0, intensity);
+}
+
+// ========== MAIN GAME LOOP ==========
+function gameLoop(timestamp) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    drawStars();
+    updateStars();
+    
+    if (!laser) {
+        requestAnimationFrame(gameLoop);
+        return;
+    }
+
+    // Draw objects
+    interactiveObjects.forEach(obj => drawObject(obj, timestamp));
+    staticObjects.forEach(obj => drawObject(obj, timestamp));
+    if (laser) drawObject(laser, timestamp);
+    
+    if (gameRunning) {
+        let hasHit = traceLaser(laser, 8);
+        
+        if (hasHit) {
+            gameRunning = false;
+            createParticleExplosion(target.x, target.y, 'yellow');
+            setTimeout(() => {
+                showQuiz(currentLevel);
+            }, 1000);
+        }
+    }
+
+    updateAndDrawParticles();
+    requestAnimationFrame(gameLoop);
+}
+
+// ========== ENHANCED LASER TRACING WITH DIFFRACTION ==========
+function traceLaser(source, maxBounces) {
+    let currentPos = { x: source.x, y: source.y };
+    let currentDir = V.normalize({
+        x: Math.cos(V.degToRad(source.angle)),
+        y: Math.sin(V.degToRad(source.angle))
+    });
+    
+    const color = source.color || 'red';
+    const glowColor = 'rgba(255,50,50,0.6)';
+    
+    for (let bounce = 0; bounce < maxBounces; bounce++) {
+        const intersection = findClosestIntersection(currentPos, currentDir);
+        const endPoint = intersection ? intersection.point : 
+            { x: currentPos.x + currentDir.x * 2000, y: currentPos.y + currentDir.y * 2000 };
+        
+        const clampedEnd = clampToCanvas(currentPos, endPoint);
+        
+        // Handle diffraction slit
+        if (intersection && intersection.object.type === 'diffraction_slit') {
+            // Draw beam to slit
+            drawLaserBeam(currentPos, intersection.point, color, glowColor);
+            
+            // Create diffraction pattern
+            const hasHitTarget = drawDiffractionPattern(intersection.point, currentDir, intersection.object);
+            if (hasHitTarget) return true;
+            
+            break; // Stop tracing after diffraction
+        } else {
+            // Regular beam drawing
+            drawLaserBeam(currentPos, clampedEnd, color, glowColor);
+        }
+        
+        // Check target hit
+        if (checkTargetHit(clampedEnd, target)) {
+            return true;
+        }
+        
+        // Handle mirror reflection
+        if (intersection && intersection.object.type === 'mirror') {
+            const reflectedDir = V.reflect(currentDir, intersection.normal);
+            currentPos = intersection.point;
+            currentDir = reflectedDir;
+            
+            // Offset to avoid self-intersection
+            currentPos.x += intersection.normal.x * 0.1;
+            currentPos.y += intersection.normal.y * 0.1;
+        } else {
+            break;
+        }
+    }
+    
+    return false;
+}
+
+function drawDiffractionPattern(slitCenter, incidentDir, slit) {
+    const maxAngle = 30; // Maximum diffraction angle
+    const numRays = 21; // Number of diffracted rays
+    let hasHitTarget = false;
+    
+    // Calculate perpendicular to slit for diffraction directions
+    const slitAngle = V.degToRad(slit.angle);
+    const slitNormal = { x: -Math.sin(slitAngle), y: Math.cos(slitAngle) };
+    
+    // Create multiple diffracted rays
+    for (let i = 0; i < numRays; i++) {
+        const angleOffset = (i - (numRays - 1) / 2) * (maxAngle * 2 / (numRays - 1));
+        const diffractionAngle = V.degToRad(angleOffset);
+        
+        // Calculate intensity based on diffraction formula
+        const intensity = calculateDiffractionIntensity(angleOffset, slit.width);
+        
+        if (intensity < 0.01) continue; // Skip very dim rays
+        
+        // Calculate diffracted ray direction
+        const baseDir = { x: slitNormal.x, y: slitNormal.y };
+        const rotatedDir = {
+            x: baseDir.x * Math.cos(diffractionAngle) - baseDir.y * Math.sin(diffractionAngle),
+            y: baseDir.x * Math.sin(diffractionAngle) + baseDir.y * Math.cos(diffractionAngle)
+        };
+        
+        // Determine ray endpoint
+        const rayLength = 500;
+        const endPoint = {
+            x: slitCenter.x + rotatedDir.x * rayLength,
+            y: slitCenter.y + rotatedDir.y * rayLength
+        };
+        
+        const clampedEnd = clampToCanvas(slitCenter, endPoint);
+        
+        // Draw diffracted ray with intensity-based alpha
+        ctx.save();
+        const alpha = Math.sqrt(intensity) * 0.8; // Square root for better visibility
+        ctx.globalAlpha = alpha;
+        
+        // Glow effect
+        ctx.strokeStyle = `rgba(255, 50, 50, ${alpha * 0.5})`;
+        ctx.lineWidth = 6;
+        ctx.shadowColor = 'red';
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.moveTo(slitCenter.x, slitCenter.y);
+        ctx.lineTo(clampedEnd.x, clampedEnd.y);
+        ctx.stroke();
+        
+        // Core beam
+        ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
+        ctx.lineWidth = 2;
+        ctx.shadowBlur = 0;
+        ctx.beginPath();
+        ctx.moveTo(slitCenter.x, slitCenter.y);
+        ctx.lineTo(clampedEnd.x, clampedEnd.y);
+        ctx.stroke();
+        
+        ctx.restore();
+        
+        // Check if this ray hits the target
+        if (checkTargetHit(clampedEnd, target)) {
+            hasHitTarget = true;
+        }
+    }
+    
+    return hasHitTarget;
+}
+
+function clampToCanvas(start, end) {
+    let clampedEnd = { ...end };
+    
+    if (end.x < 0 || end.x > canvas.width || end.y < 0 || end.y > canvas.height) {
+        const dx = end.x - start.x;
+        const dy = end.y - start.y;
+        
+        let t = 1;
+        if (dx !== 0) {
+            const t1 = (0 - start.x) / dx;
+            const t2 = (canvas.width - start.x) / dx;
+            if (t1 > 0 && t1 < t) t = t1;
+            if (t2 > 0 && t2 < t) t = t2;
+        }
+        if (dy !== 0) {
+            const t1 = (0 - start.y) / dy;
+            const t2 = (canvas.height - start.y) / dy;
+            if (t1 > 0 && t1 < t) t = t1;
+            if (t2 > 0 && t2 < t) t = t2;
+        }
+        
+        clampedEnd.x = start.x + dx * t;
+        clampedEnd.y = start.y + dy * t;
+    }
+    
+    return clampedEnd;
+}
+
+function drawLaserBeam(start, end, color, glowColor) {
+    ctx.save();
+    
+    // Glow effect
+    ctx.globalCompositeOperation = 'screen';
+    ctx.strokeStyle = glowColor;
+    ctx.lineWidth = 8;
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 15;
+    ctx.beginPath();
+    ctx.moveTo(start.x, start.y);
+    ctx.lineTo(end.x, end.y);
+    ctx.stroke();
+    
+    // Core beam
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.shadowBlur = 0;
+    ctx.beginPath();
+    ctx.moveTo(start.x, start.y);
+    ctx.lineTo(end.x, end.y);
+    ctx.stroke();
+    
+    ctx.restore();
+}
+
+// ========== ENHANCED INTERSECTION DETECTION ==========
+function findClosestIntersection(pos, dir) {
+    let closestDist = Infinity;
+    let closestIntersection = null;
+    
+    [...interactiveObjects, ...staticObjects].forEach(obj => {
+        const intersection = getIntersection(pos, dir, obj);
+        if (intersection && intersection.dist > 0.1 && intersection.dist < closestDist) {
+            closestDist = intersection.dist;
+            closestIntersection = {
+                point: intersection.point,
+                normal: intersection.normal,
+                object: obj
+            };
+        }
+    });
+    
+    return closestIntersection;
+}
+
+function getIntersection(rayStart, rayDir, obj) {
+    if (obj.type === 'mirror') {
+        return getMirrorIntersection(rayStart, rayDir, obj);
+    } else if (obj.type === 'diffraction_slit') {
+        return getSlitIntersection(rayStart, rayDir, obj);
+    } else if (obj.type.includes('target')) {
+        return getCircleIntersection(rayStart, rayDir, obj);
+    }
+    return null;
+}
+
+function getSlitIntersection(rayStart, rayDir, slit) {
+    // Treat slit as a line segment for intersection
+    const angleRad = V.degToRad(slit.angle);
+    const halfHeight = slit.height / 2;
+    
+    const p1 = {
+        x: slit.x - Math.sin(angleRad) * halfHeight,
+        y: slit.y + Math.cos(angleRad) * halfHeight
+    };
+    const p2 = {
+        x: slit.x + Math.sin(angleRad) * halfHeight,
+        y: slit.y - Math.cos(angleRad) * halfHeight
+    };
+    
+    const intersection = getLineIntersection(rayStart, rayDir, p1, p2);
+    
+    if (intersection) {
+        // Normal for slit (perpendicular to slit direction)
+        const slitVec = V.subtract(p2, p1);
+        let normal = V.normalize({ x: slitVec.y, y: -slitVec.x });
+        
+        if (V.dot(normal, rayDir) > 0) {
+            normal.x *= -1;
+            normal.y *= -1;
+        }
+        
+        return {
+            ...intersection,
+            normal: normal
+        };
+    }
+    
+    return null;
+}
+
+function getMirrorIntersection(rayStart, rayDir, mirror) {
+    const angleRad = V.degToRad(mirror.angle);
+    const halfLength = mirror.length / 2;
+    
+    const p1 = {
+        x: mirror.x - Math.cos(angleRad) * halfLength,
+        y: mirror.y - Math.sin(angleRad) * halfLength
+    };
+    const p2 = {
+        x: mirror.x + Math.cos(angleRad) * halfLength,
+        y: mirror.y + Math.sin(angleRad) * halfLength
+    };
+    
+    const intersection = getLineIntersection(rayStart, rayDir, p1, p2);
+    
+    if (intersection) {
+        const mirrorVec = V.subtract(p2, p1);
+        let normal = V.normalize({ x: -mirrorVec.y, y: mirrorVec.x });
+        
+        if (V.dot(normal, rayDir) > 0) {
+            normal.x *= -1;
+            normal.y *= -1;
+        }
+        
+        return {
+            ...intersection,
+            normal: normal
+        };
+    }
+    
+    return null;
+}
+
+function getLineIntersection(rayStart, rayDir, lineStart, lineEnd) {
+    const rayDx = rayDir.x;
+    const rayDy = rayDir.y;
+    const lineDx = lineEnd.x - lineStart.x;
+    const lineDy = lineEnd.y - lineStart.y;
+    
+    const denominator = rayDx * lineDy - rayDy * lineDx;
+    if (Math.abs(denominator) < 1e-10) return null;
+    
+    const t = ((lineStart.x - rayStart.x) * lineDy - (lineStart.y - rayStart.y) * lineDx) / denominator;
+    const u = ((lineStart.x - rayStart.x) * rayDy - (lineStart.y - rayStart.y) * rayDx) / denominator;
+    
+    if (t > 0 && u >= 0 && u <= 1) {
+        return {
+            dist: t,
+            point: {
+                x: rayStart.x + t * rayDx,
+                y: rayStart.y + t * rayDy
+            }
+        };
+    }
+    
+    return null;
+}
+
+function getCircleIntersection(rayStart, rayDir, circle) {
+    const dx = circle.x - rayStart.x;
+    const dy = circle.y - rayStart.y;
+    const a = rayDir.x * rayDir.x + rayDir.y * rayDir.y;
+    const b = -2 * (dx * rayDir.x + dy * rayDir.y);
+    const c = dx * dx + dy * dy - circle.r * circle.r;
+    
+    const discriminant = b * b - 4 * a * c;
+    if (discriminant < 0) return null;
+    
+    const t1 = (-b - Math.sqrt(discriminant)) / (2 * a);
+    const t2 = (-b + Math.sqrt(discriminant)) / (2 * a);
+    
+    const t = t1 > 0.1 ? t1 : (t2 > 0.1 ? t2 : null);
+    if (t === null) return null;
+    
+    const point = {
+        x: rayStart.x + t * rayDir.x,
+        y: rayStart.y + t * rayDir.y
+    };
+    
+    return {
+        dist: t,
+        point: point,
+        normal: V.normalize(V.subtract(point, circle))
+    };
+}
+
+function checkTargetHit(point, targetObj) {
+    if (targetObj && targetObj.type.includes('target')) {
+        const dist = Math.hypot(point.x - targetObj.x, point.y - targetObj.y);
+        return dist <= targetObj.r;
+    }
+    return false;
+}
+
+// ========== ENHANCED OBJECT DRAWING ==========
+function drawObject(obj, timestamp) {
+    if (!obj) return;
+    
+    ctx.save();
+    ctx.translate(obj.x, obj.y);
+    ctx.rotate(V.degToRad(obj.angle || 0));
+    
+    switch (obj.type) {
+        case 'mirror':
+            // Mirror surface
+            ctx.strokeStyle = '#f0f0f0';
+            ctx.lineWidth = 6;
+            ctx.shadowColor = '#fff';
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.moveTo(-obj.length / 2, 0);
+            ctx.lineTo(obj.length / 2, 0);
+            ctx.stroke();
+            
+            // Mirror backing
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 8;
+            ctx.shadowBlur = 0;
+            ctx.beginPath();
+            ctx.moveTo(-obj.length / 2, 3);
+            ctx.lineTo(obj.length / 2, 3);
+            ctx.stroke();
+            
+            // Selection indicator
+            if (selectedObject === obj) {
+                drawRotationIndicator(obj);
+            }
+            break;
+            
+        case 'diffraction_slit':
+            // Slit opening
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = obj.width;
+            ctx.beginPath();
+            ctx.moveTo(0, -obj.height / 2);
+            ctx.lineTo(0, obj.height / 2);
+            ctx.stroke();
+            
+            // Slit barriers
+            ctx.strokeStyle = '#888';
+            ctx.lineWidth = 8;
+            ctx.shadowColor = '#666';
+            ctx.shadowBlur = 5;
+            
+            // Top barrier
+            ctx.beginPath();
+            ctx.moveTo(-15, -obj.height / 2 - 10);
+            ctx.lineTo(15, -obj.height / 2 - 10);
+            ctx.stroke();
+            
+            // Bottom barrier
+            ctx.beginPath();
+            ctx.moveTo(-15, obj.height / 2 + 10);
+            ctx.lineTo(15, obj.height / 2 + 10);
+            ctx.stroke();
+            
+            // Width indicator
+            if (selectedObject === obj) {
+                drawWidthIndicator(obj);
+            }
+            break;
+            
+        case 'laser':
+            const laserColor = obj.color || '#ff3333';
+            ctx.fillStyle = '#222';
+            ctx.shadowColor = '#000';
+            ctx.shadowBlur = 5;
+            ctx.fillRect(-30, -12, 60, 24);
+            
+            ctx.fillStyle = '#444';
+            ctx.shadowBlur = 0;
+            ctx.fillRect(-25, -8, 50, 16);
+            
+            ctx.fillStyle = laserColor;
+            ctx.shadowColor = laserColor;
+            ctx.shadowBlur = 15;
+            ctx.beginPath();
+            ctx.arc(25, 0, 5, 0, Math.PI * 2);
+            ctx.fill();
+            break;
+            
+        case 'target':
+            const pulse = Math.sin(timestamp / 300) * 4;
+            ctx.shadowColor = '#ffff00';
+            ctx.shadowBlur = 15 + pulse;
+            ctx.fillStyle = '#ffff00';
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(0, 0, obj.r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            
+            // Target rings
+            ctx.strokeStyle = '#ff6600';
+            ctx.lineWidth = 2;
+            ctx.shadowBlur = 5;
+            ctx.beginPath();
+            ctx.arc(0, 0, obj.r * 0.7, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(0, 0, obj.r * 0.4, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            ctx.fillStyle = '#ff0000';
+            ctx.shadowBlur = 0;
+            ctx.beginPath();
+            ctx.arc(0, 0, obj.r * 0.15, 0, Math.PI * 2);
+            ctx.fill();
+            break;
+    }
+    
+    ctx.restore();
+}
+
+function drawRotationIndicator(obj) {
+    ctx.restore();
+    ctx.save();
+    ctx.translate(obj.x, obj.y);
+    
+    ctx.strokeStyle = '#00ffff';
+    ctx.lineWidth = 3;
+    ctx.shadowColor = '#00ffff';
+    ctx.shadowBlur = 8;
+    
+    // Rotation arc
+    ctx.beginPath();
+    ctx.arc(0, 0, obj.length/2 + 18, 0, Math.PI * 1.5);
+    ctx.stroke();
+    
+    // Arrow
+    const arrowX = obj.length/2 + 18;
+    ctx.fillStyle = '#00ffff';
+    ctx.beginPath();
+    ctx.moveTo(arrowX - 5, -8);
+    ctx.lineTo(arrowX + 3, -3);
+    ctx.lineTo(arrowX - 5, 2);
+    ctx.fill();
+    
+    ctx.restore();
+    ctx.save();
+    ctx.translate(obj.x, obj.y);
+    ctx.rotate(V.degToRad(obj.angle || 0));
+}
+
+function drawWidthIndicator(obj) {
+    ctx.restore();
+    ctx.save();
+    ctx.translate(obj.x, obj.y);
+    
+    ctx.strokeStyle = '#ff00ff';
+    ctx.lineWidth = 2;
+    ctx.shadowColor = '#ff00ff';
+    ctx.shadowBlur = 6;
+    
+    // Width adjustment lines
+    ctx.beginPath();
+    ctx.moveTo(-25, 0);
+    ctx.lineTo(-obj.width/2 - 5, 0);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(25, 0);
+    ctx.lineTo(obj.width/2 + 5, 0);
+    ctx.stroke();
+    
+    // Arrows
+    ctx.fillStyle = '#ff00ff';
+    ctx.beginPath();
+    ctx.moveTo(-obj.width/2 - 8, -3);
+    ctx.lineTo(-obj.width/2 - 3, 0);
+    ctx.lineTo(-obj.width/2 - 8, 3);
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.moveTo(obj.width/2 + 8, -3);
+    ctx.lineTo(obj.width/2 + 3, 0);
+    ctx.lineTo(obj.width/2 + 8, 3);
+    ctx.fill();
+    
+    ctx.restore();
+    ctx.save();
+    ctx.translate(obj.x, obj.y);
+    ctx.rotate(V.degToRad(obj.angle || 0));
+}
+
+// ========== PARTICLE SYSTEM ==========
+function createParticleExplosion(x, y, color) {
+    for (let i = 0; i < 40; i++) {
+        particles.push({
+            x: x,
+            y: y,
+            vx: (Math.random() - 0.5) * 8,
+            vy: (Math.random() - 0.5) * 8,
+            life: 80 + Math.random() * 40,
+            color: color,
+            size: 2 + Math.random() * 4
+        });
+    }
+}
+
+function updateAndDrawParticles() {
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.1;
+        p.life--;
+        p.vx *= 0.98;
+        p.vy *= 0.98;
+        
+        if (p.life <= 0) {
+            particles.splice(i, 1);
+        } else {
+            ctx.save();
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = p.life / 80;
+            ctx.shadowColor = p.color;
+            ctx.shadowBlur = 5;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+    }
+}
+
+// ========== BACKGROUND STARS ==========
+function createStars() {
+    for (let i = 0; i < 120; i++) {
+        stars.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            radius: Math.random() * 1.5,
+            alpha: 0.4 + Math.random() * 0.6,
+            speed: 0.1 + Math.random() * 0.3
+        });
+    }
+}
+
+function drawStars() {
+    stars.forEach(star => {
+        ctx.save();
+        ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha * 0.8})`;
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    });
+}
+
+function updateStars() {
+    stars.forEach(star => {
+        star.y += star.speed;
+        if (star.y > canvas.height + 10) {
+            star.y = -10;
+            star.x = Math.random() * canvas.width;
+        }
+    });
+}
+
+// ========== QUIZ SYSTEM ==========
+function showQuiz(levelIndex) {
+    if (levelIndex >= quizzes.length) {
+        levelCompleteTitle.innerText = `Level ${currentLevel + 1} Complete!`;
+        levelCompleteMessage.innerText = "Excellent understanding of optics!";
+        nextLevelBtn.innerText = "Next Level ➡️";
+        showModal(levelCompleteModal);
+        return;
+    }
+
+    const quizData = quizzes[levelIndex];
+    quizQuestion.innerText = quizData.question;
+    quizOptions.innerHTML = '';
+    quizFeedback.innerHTML = '';
+    quizContinueBtn.style.display = 'none';
+
+    quizData.options.forEach((option, index) => {
+        const button = document.createElement('button');
+        button.className = 'option-btn';
+        button.innerText = option;
+        button.onclick = () => handleAnswer(index, quizData);
+        quizOptions.appendChild(button);
+    });
+
+    showModal(quizModal);
+}
+
+function handleAnswer(selectedIndex, quizData) {
+    const buttons = quizOptions.querySelectorAll('.option-btn');
+    buttons.forEach(button => button.disabled = true);
+
+    if (selectedIndex === quizData.correct) {
+        buttons[selectedIndex].classList.add('correct');
+    } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[quizData.correct].classList.add('correct');
+    }
+    
+    quizFeedback.innerText = quizData.explanation;
+    quizContinueBtn.style.display = 'block';
+}
+
+quizContinueBtn.onclick = () => {
+    hideModal(quizModal);
+    levelCompleteTitle.innerText = `Level ${currentLevel + 1} Complete!`;
+    levelCompleteMessage.innerText = "Great mastery of optical phenomena!";
+    nextLevelBtn.innerText = "Next Level ➡️";
+    showModal(levelCompleteModal);
+};
+
+nextLevelBtn.onclick = () => {
+    hideModal(levelCompleteModal);
+    startLevel(currentLevel + 1);
+};
+
+// ========== ENHANCED INPUT CONTROLS ==========
+let selectedObject = null;
+
+canvas.addEventListener('mousedown', e => {
+    const mouse = getMousePos(e);
+    if (e.button === 0) {
+        const clickedObject = interactiveObjects.slice().reverse()
+            .find(obj => isMouseOver(mouse, obj) && obj.interactive);
+        
+        selectedObject = clickedObject || null;
+    }
+});
+
+window.addEventListener('keydown', e => {
+    if (!selectedObject) return;
+    
+    switch (e.key.toLowerCase()) {
+        case 'a':
+            if (selectedObject.type === 'mirror') {
+                selectedObject.angle = (selectedObject.angle - 5 + 360) % 360;
+            }
+            break;
+        case 'd':
+            if (selectedObject.type === 'mirror') {
+                selectedObject.angle = (selectedObject.angle + 5) % 360;
+            }
+            break;
+        case 'w':
+            if (selectedObject.type === 'diffraction_slit') {
+                selectedObject.width = Math.max(5, selectedObject.width - 2);
+            } else if (selectedObject.type === 'mirror') {
+                selectedObject.angle = (selectedObject.angle - 1 + 360) % 360;
+            }
+            break;
+        case 's':
+            if (selectedObject.type === 'diffraction_slit') {
+                selectedObject.width = Math.min(50, selectedObject.width + 2);
+            } else if (selectedObject.type === 'mirror') {
+                selectedObject.angle = (selectedObject.angle + 1) % 360;
+            }
+            break;
+    }
+});
+
+function getMousePos(e) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+    };
+}
+
+function isMouseOver(mouse, obj) {
+    const size = Math.max(obj.length || 0, obj.height || 0, obj.r || 0, 30) + 25;
+    return Math.hypot(mouse.x - obj.x, mouse.y - obj.y) < size;
+}
+
+// ========== INITIALIZATION ==========
+startBtn.addEventListener('click', () => {
+    hideModal(startModal);
+    startLevel(0);
+});
+
+createStars();
+requestAnimationFrame(gameLoop);
+</script>
+</body>
+</html>

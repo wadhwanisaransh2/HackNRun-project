@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STEM Universe - Class 9 | HackNRun</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Original+Surfer&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        /*
+        ================================================================================
+        |                                                                              |
+        |                       HackNRun - STEM Universe Stylesheet                      |
+        |                       Version: 6.4 - "Galaxy Glow" Edition                     |
+        |                       Author: Gemini AI                                      |
+        |                                                                              |
+        ================================================================================
+        */
+
+        /*
+        ========================================
+        * 1. ROOT VARIABLES & GLOBAL SETUP
+        ========================================
+        */
+        :root {
+            /* Core Color Palette */
+            --primary: #4e32d5;
+            --primary-light: #7259f9;
+            --primary-lighter: #a993ff;
+            --accent: #ff478c;
+            --accent-light: #ff689c;
+            --secondary: #00bcd4;
+            --tertiary: #1b006a;
+            --deep-space: #0b001f; /* A darker space color for more contrast */
+            --navbar-bg: #1a0038; /* Changed to a distinct purple color */
+            
+            /* Neutral & Text Colors */
+            --white: #ffffff;
+            --dark: #1f014b;
+            --text-light: rgba(255, 255, 255, 0.9);
+            --text-muted: rgba(255, 255, 255, 0.7);
+
+            /* Subject-specific Colors & Glows for high visibility */
+            --science-color: #7259f9; /* General Science color */
+            --physics-color: #7259f9; /* Same as science */
+            --chemistry-color: #00bcd4; /* Engineering color for distinction */
+            --biology-color: #fbbf24;   /* Math color for distinction */
+
+            --tech-color: #ff478c;
+            
+            --physics-glow: 0 0 25px rgba(114, 89, 249, 0.7);
+            --chemistry-glow: 0 0 25px rgba(0, 188, 212, 0.7);
+            --biology-glow: 0 0 25px rgba(251, 191, 36, 0.7);
+            --tech-glow: 0 0 25px rgba(255, 71, 140, 0.7);
+            
+
+            /* UI Sizing & Spacing */
+            --header-height: 150px;
+            --border-radius: 24px;
+            --card-width: 380px;
+            --card-height: 520px;
+            --btn-padding: 1.4rem 2.5rem;
+            --btn-font-size: 1.3rem;
+
+            /* Transitions & Effects */
+            --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --shadow-card: 0 10px 20px rgba(0, 0, 0, 0.2);
+            --shadow-card-hover: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* Universal Box Sizing */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /*
+        ========================================
+        * 2. BODY & BACKGROUND STYLES
+        ========================================
+        */
+        body {
+            background: linear-gradient(135deg, var(--deep-space) 0%, var(--tertiary) 100%);
+            color: var(--text-light);
+            overflow: hidden;
+            line-height: 1.6;
+            font-family: "Nunito", sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: "Original Surfer", sans-serif;
+            color: var(--white);
+            font-weight: 400;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /*
+        ========================================
+        * 3. HEADER & NAVIGATION BAR
+        ========================================
+        */
+        header {
+            background: var(--navbar-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            transition: var(--transition-smooth);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 100vw;
+            margin: 0 auto;
+            padding: 0 2.5rem;
+        }
+        
+        .logo a { text-decoration: none; display: flex; align-items: center; }
+        .logo h1 { font-size: 2.2rem; color: var(--white); }
+        .logo span { color: var(--accent-light); }
+        .logo-icon { font-size: 2.5rem; margin-right: 15px; color: var(--white); }
+        
+        nav ul { display: flex; list-style: none; gap: 1.5rem; }
+        nav ul li a { 
+            color: var(--white); 
+            text-decoration: none; 
+            font-weight: 600; 
+            font-size: 1.6rem;
+            transition: var(--transition-smooth); 
+            padding: 0.8rem 1.6rem;
+            border-radius: 30px;
+            position: relative;
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--secondary));
+            border-radius: 3px;
+            transition: width 0.4s ease;
+        }
+        
+        nav ul li a:hover { color: var(--primary-lighter); }
+        nav ul li a:hover::after { width: 80%; }
+        
+        .nav-cta { 
+            background: linear-gradient(to right, var(--accent), var(--secondary)); 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .nav-cta:hover { 
+            transform: translateY(-2px) scale(1.05); 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            color: var(--white) !important;
+        }
+        .nav-cta:hover::after { width: 0; }
+
+        .mobile-menu-btn { display: none; }
+
+        /*
+        ========================================
+        * 4. MAIN CONTENT & PAGE LAYOUT
+        ========================================
+        */
+        .subject-main {
+            padding-top: var(--header-height);
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 95vw;
+            margin: 0 auto;
+            padding: 1.5rem 2rem 2rem 2rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            overflow: hidden;
+            perspective: 2000px;
+        }
+
+        .page-title {
+            text-align: center;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--accent-light), var(--primary-lighter), var(--white));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            animation: shimmer 5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { text-shadow: 0 0 10px var(--accent-light); }
+            50% { text-shadow: 0 0 25px var(--primary-lighter); }
+            100% { text-shadow: 0 0 10px var(--accent-light); }
+        }
+        
+        .page-subtitle {
+            text-align: center;
+            font-size: clamp(1rem, 2.5vw, 1.1rem);
+            color: var(--primary-lighter);
+            margin-bottom: 2rem;
+            font-family: "Nunito", sans-serif;
+            font-weight: 400;
+        }
+        
+        /*
+        =======================================
+        * 5. SUBJECT NAVIGATION TABS
+        =======================================
+        */
+        .subject-nav {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .subject-nav-btn {
+            padding: var(--btn-padding);
+            border-radius: 50px;
+            font-size: var(--btn-font-size);
+            font-family: "Original Surfer", sans-serif;
+            font-weight: 400;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            border: 2px solid rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--white);
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(5px);
+        }
+        
+        .subject-nav-btn.active {
+            transform: translateY(-3px) scale(1.05);
+            color: var(--white);
+            border-color: var(--accent-light);
+        }
+
+        .subject-nav-btn.phy-btn.active { background: var(--physics-color); box-shadow: var(--physics-glow); }
+        .subject-nav-btn.chem-btn.active { background: var(--chemistry-color); box-shadow: var(--chemistry-glow); }
+        .subject-nav-btn.bio-btn.active { background: var(--biology-color); box-shadow: var(--biology-glow); }
+        .subject-nav-btn.tech-btn.active { background: var(--tech-color); box-shadow: var(--tech-glow); }
+        
+        /*
+        ========================================
+        * 6. HORIZONTAL SCROLLING SECTIONS
+        ========================================
+        */
+        .subject-section {
+            display: none;
+            flex-grow: 1;
+            overflow: hidden;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+        
+        .subject-section.active { display: flex; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .topics-grid-container {
+            flex-grow: 1;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding-bottom: 20px;
+        }
+        
+        .topics-grid-container::-webkit-scrollbar { height: 12px; }
+        .topics-grid-container::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.3); border-radius: 10px; }
+        .topics-grid-container::-webkit-scrollbar-thumb { background-image: linear-gradient(to right, var(--accent), var(--secondary)); border-radius: 10px; }
+
+        .topics-grid {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 2.5rem;
+            padding: 1.5rem;
+            min-height: 100%;
+            align-items: center;
+        }
+
+        /*
+        ========================================
+        * 7. REVAMPED TOPIC CARD DESIGN
+        ========================================
+        */
+        .topic-card {
+            flex: 0 0 var(--card-width);
+            height: var(--card-height);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.2s ease-out;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .topic-card:hover {
+            transform: translateY(-10px) rotateX(5deg) rotateY(-5deg) scale(1.03);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .topic-card::before {
+            content: '';
+            position: absolute;
+            top: var(--mouse-y, 50%);
+            left: var(--mouse-x, 50%);
+            width: 500px;
+            height: 500px;
+            background-image: radial-gradient(circle, var(--glow-color, var(--primary-light)) 0%, transparent 60%);
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 0.4s ease, background-image 0.4s ease;
+            pointer-events: none;
+        }
+
+        .topic-card:hover::before {
+            opacity: 0.25;
+        }
+
+        .physics-card { --glow-color: var(--physics-color); }
+        .chemistry-card { --glow-color: var(--chemistry-color); }
+        .biology-card { --glow-color: var(--biology-color); }
+        .tech-card { --glow-color: var(--tech-color); }
+
+        .topic-icon {
+            height: 70px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .topic-icon i, .topic-icon svg {
+            font-size: 60px;
+            transition: var(--transition-smooth);
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+            color: currentColor;
+            fill: currentColor;
+        }
+
+        .topic-card:hover .topic-icon i,
+        .topic-card:hover .topic-icon svg {
+            transform: scale(1.2) rotate(-10deg);
+            filter: drop-shadow(0 8px 15px rgba(0,0,0,0.5));
+        }
+
+        .topic-card-content {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .topic-card h3 {
+            color: var(--white);
+            font-size: 1.8rem;
+            line-height: 1.3;
+            margin-bottom: 1rem;
+            flex-shrink: 0;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 0.5rem;
+        }
+
+        .topic-card h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0%;
+            height: 3px;
+            background: var(--glow-color, var(--primary-light));
+            border-radius: 3px;
+            transition: all 0.4s ease-in-out;
+            transform: translateX(-50%);
+        }
+
+        .topic-card:hover h3::after {
+            width: 80%;
+        }
+        
+        .topic-card p {
+            color: var(--primary-lighter);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            flex-grow: 1;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 400;
+        }
+        
+        .button-group { display: flex; justify-content: center; gap: 1.5rem; flex-shrink: 0; }
+        
+        .btn {
+            padding: var(--btn-padding);
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: var(--btn-font-size);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            color: var(--white);
+            text-decoration: none;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .btn i { font-size: 1.2rem; }
+        .btn:hover { transform: scale(1.05); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); }
+        
+        .btn-theory { background: linear-gradient(45deg, #00c6ff, #0072ff); }
+        .btn-game { background: linear-gradient(45deg, #ff0073, #ff66a3); }
+
+        /*
+        ========================================
+        * 8. RESPONSIVE DESIGN
+        ========================================
+        */
+        @media (max-width: 968px) {
+            body { 
+                overflow-y: auto;
+                height: auto;
+            }
+            .subject-main {
+                padding-top: var(--header-height);
+                overflow: visible;
+            }
+            .topics-grid-container { 
+                overflow-x: visible;
+            }
+            .topics-grid { 
+                flex-wrap: wrap;
+                justify-content: center;
+                padding-bottom: 0;
+                gap: 2rem;
+            }
+            .topic-card { 
+                flex: 1 1 90%;
+                max-width: var(--card-width);
+                margin: 1rem 0;
+                transform: none !important;
+                perspective: none;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+            .topic-card:hover {
+                transform: translateY(-5px) scale(1.02);
+            }
+            nav ul {
+                display: none;
+            }
+            .mobile-menu-btn { 
+                display: block; 
+                background: transparent; 
+                border: none; 
+                font-size: 1.8rem; 
+                color: var(--white); 
+                cursor: pointer; 
+                z-index: 1001; 
+            }
+            .page-title { font-size: 2.5rem; }
+            .container { max-width: 100%; padding: 1rem; }
+            
+            .btn, .subject-nav-btn {
+                padding: 1.2rem 2rem;
+                font-size: 1.2rem;
+            }
+        }
+        #full-logo{
+            display: flex;
+            align-items: center;
+        }
+             #full-logo .logo-icon{
+            list-style-type: none;
+            text-decoration: none;
+            font-size:2.5rem;
+            margin-right: 15px;
+            color: var(--secondary);
+            filter: drop-shadow(0 0 10px var(--secondary));
+            animation: float 5s infinite ease-in-out;
+        
+}      
+   @keyframes float {
+  0% { transform: translateY(0px) translateX(0px) rotate(0deg) scale(1); }
+     33% { transform: translateY(-40px) translateX(60px) rotate(120deg) scale(1.1); }
+     66% { transform: translateY(30px) translateX(60px) rotate(240deg) scale(1.2); }
+     100% { transform: translateY(-7px) translateX(12px) rotate(360deg) scale(1.3); }
+        }
+         .profile-dropdown {
+            position: relative;
+        }
+           .profile-trigger .fa-user-circle {
+            font-size: 3.8rem; /* Larger icon */
+            color: yellowgreen;
+            transition: color 0.3s ease, transform 0.3s ease;
+            padding-top: 0;
+            padding-bottom: 12px;
+            margin-right: 20px;
+            padding-left: 20px;
+        }
+
+        .profile-trigger {
+            /* background: linear-gradient(135deg, #fd746c 0%, #ff9068 100%); */
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+        
+        .profile-trigger:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .profile-trigger i {
+            /* color: rgb(212, 52, 52); */
+            font-size: 24px;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 105px;
+            right: 45px;
+            background: transparent;
+            width: 240px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            opacity: 1;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .profile-dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .dropdown-menu ul {
+            display: flex;
+            flex-direction: column;
+            padding: 10px 0;
+            background: rgba(0, 0, 0, 4);
+            width: 300px;
+            border-radius: 25px;
+        }
+        
+        .dropdown-menu ul li {
+            margin: 0;
+        }
+        
+        .dropdown-menu ul li a {
+            color: white;
+            padding: 12px 20px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+        }
+        
+        .dropdown-menu ul li a:hover {
+            background: #f0f5ff;
+            color: #4b6cb7;
+        }
+        
+        .dropdown-menu ul li a i {
+            color: #6c757d;
+            width: 24px;
+            font-size:30px;
+            padding-right: 40px;
+        }
+        
+        .dropdown-divider {
+            height: 1px;
+            background: #e9ecef;
+            margin: 8px 0;
+        }
+        
+        .content {
+            padding: 30px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+        
+        p {
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            nav ul {
+                justify-content: center;
+            }
+            
+            .dropdown-menu {
+                right: 50%;
+                transform: translateX(50%) translateY(-10px);
+            }
+            
+            .profile-dropdown:hover .dropdown-menu {
+                transform: translateX(50%) translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <div id="particles-js"></div>
+
+    <header>
+        <div class="header-container">
+            <a style="text-decoration: none;" href="index.html" class="logo">
+                <div id="full-logo">
+                    <i class="fas fa-graduation-cap logo-icon"></i>
+                    <h1>Hack<span>NRun</span></h1>
+                </div>
+            </a>
+            <nav id="main-nav">
+                 <ul>
+                    <li><a href="./home.html#home"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="./home.html#classes"><i class="fas fa-school"></i> Classes</a></li>
+                    <li><a href="./home.html#features"><i class="fas fa-star"></i> Features</a></li>
+                    <li><a href="./home.html#subjects"><i class="fas fa-book"></i> Subjects</a></li>
+                    <li><a href="./home.html#demo"><i class="fas fa-play-circle"></i> Demo</a></li>
+                    <li><a href="./home.html#testimonials"><i class="fas fa-chart-pie"></i>Testimonials</a></li>
+                    <li><a href="./home.html#contact" class="nav-cta"><i class="fas fa-envelope"></i> Contact</a></li>
+
+                 <li class="profile-dropdown">
+                        <button class="profile-trigger" aria-haspopup="true" aria-expanded="false" aria-label="Open user menu">
+                            <i class="fas fa-user-circle"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                            <ul>
+                                <li><a href="profile.html"><i class="fas fa-user-alt"></i> Profile</a></li>
+                                <li><a href="leaderboard.html"><i class="fas fa-trophy"></i> Leaderboard</a></li>
+                                <li><a href="./home.html#demo"><i class="fas fa-bookmark"></i>  Request Demo</a></li>
+                                <li><a href="./certifications.html"><i class="fas fa-users"></i> Certifications</a></li>
+                                <li class="dropdown-divider"></li>
+                                <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                                <li><a href="index.html"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    </ul>
+            </nav>
+            <button class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
+        </div>
+    </header>
+
+    <main class="subject-main">
+        <div class="container">
+            <h1 class="page-title" data-aos="fade-down">STEM Universe - Class 9</h1>
+            <h2 class="page-subtitle" data-aos="fade-down" data-aos-delay="100">Master the foundations of Science, Technology, Engineering, and Math!</h2>
+            
+            <div class="subject-nav" data-aos="fade-up">
+                <button class="subject-nav-btn phy-btn active" data-subject="physics"><i class="fas fa-atom"></i> Physics</button>
+                <button class="subject-nav-btn chem-btn" data-subject="chemistry"><i class="fas fa-flask"></i> Chemistry</button>
+                <button class="subject-nav-btn bio-btn" data-subject="biology"><i class="fas fa-dna"></i> Biology</button>
+                <button class="subject-nav-btn tech-btn" data-subject="technology"><i class="fas fa-laptop-code"></i> Technology & Math</button>
+            </div>
+            
+            <section id="physics-section" class="subject-section active">
+                <div class="topics-grid-container">
+                    <div class="topics-grid">
+                        <div class="topic-card physics-card"><div class="topic-icon" style="color:var(--physics-color)"><i class="fas fa-car-side"></i></div><div class="topic-card-content"><h3>Motion</h3><p>Describe motion using distance, displacement, speed, velocity, and acceleration. Master graphical representations.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card physics-card"><div class="topic-icon" style="color:var(--physics-color)"><i class="fas fa-balance-scale-left"></i></div><div class="topic-card-content"><h3>Force & Laws of Motion</h3><p>Uncover Newton's three laws of motion. Understand inertia, momentum, and the relationship F=ma.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card physics-card"><div class="topic-icon" style="color:var(--physics-color)"><i class="fas fa-apple-alt"></i></div><div class="topic-card-content"><h3>Gravitation</h3><p>Explore the universal law of gravitation, free fall, and the crucial difference between mass and weight.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card physics-card"><div class="topic-icon" style="color:var(--physics-color)"><i class="fas fa-water"></i></div><div class="topic-card-content"><h3>Thrust & Pressure</h3><p>Why do ships float? Delve into the principles of buoyancy, density, and Archimedes' Principle.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card physics-card"><div class="topic-icon" style="color:var(--physics-color)"><i class="fas fa-battery-full"></i></div><div class="topic-card-content"><h3>Work and Energy</h3><p>Define work, power, and energy. Understand kinetic and potential energy and the law of their conservation.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card physics-card"><div class="topic-icon" style="color:var(--physics-color)"><i class="fas fa-wave-square"></i></div><div class="topic-card-content"><h3>Sound</h3><p>Investigate how sound travels as a wave. Learn about its characteristics like pitch, loudness, and quality.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="chemistry-section" class="subject-section">
+                <div class="topics-grid-container">
+                    <div class="topics-grid">
+                        <div class="topic-card chemistry-card"><div class="topic-icon" style="color:var(--chemistry-color)"><i class="fas fa-cubes"></i></div><div class="topic-card-content"><h3>Matter in Our Surroundings</h3><p>Explore the three states of matter and the fascinating processes of melting, freezing, boiling, and sublimation.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card chemistry-card"><div class="topic-icon" style="color:var(--chemistry-color)"><i class="fas fa-vial"></i></div><div class="topic-card-content"><h3>Is Matter Around Us Pure?</h3><p>Differentiate between mixtures and pure substances. Learn about solutions, suspensions, and colloids.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card chemistry-card"><div class="topic-icon" style="color:var(--chemistry-color)"><i class="fas fa-atom"></i></div><div class="topic-card-content"><h3>Atoms and Molecules</h3><p>Discover the building blocks of matter. Learn about Dalton's atomic theory, molecules, ions, and the mole concept.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card chemistry-card"><div class="topic-icon" style="color:var(--chemistry-color)"><i class="fas fa-project-diagram"></i></div><div class="topic-card-content"><h3>Structure of the Atom</h3><p>Journey inside the atom. Explore the models of Thomson, Rutherford, and Bohr to understand subatomic particles.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="biology-section" class="subject-section">
+                <div class="topics-grid-container">
+                    <div class="topics-grid">
+                        <div class="topic-card biology-card"><div class="topic-icon" style="color:var(--biology-color)"><i class="fas fa-dna"></i></div><div class="topic-card-content"><h3>The Fundamental Unit of Life</h3><p>Enter the microscopic world of the cell. Discover its organelles and the difference between plant and animal cells.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card biology-card"><div class="topic-icon" style="color:var(--biology-color)"><i class="fas fa-layer-group"></i></div><div class="topic-card-content"><h3>Tissues</h3><p>Learn how cells team up to form tissues. Explore the different types of plant and animal tissues and their functions.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card biology-card"><div class="topic-icon" style="color:var(--biology-color)"><i class="fas fa-briefcase-medical"></i></div><div class="topic-card-content"><h3>Why Do We Fall Ill?</h3><p>Understand the difference between being healthy and disease-free. Learn about infectious and non-infectious diseases.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card biology-card"><div class="topic-icon" style="color:var(--biology-color)"><i class="fas fa-leaf"></i></div><div class="topic-card-content"><h3>Natural Resources</h3><p>Explore Earth's precious resources like air, water, and soil, and understand vital biogeochemical cycles.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="technology-section" class="subject-section">
+                <div class="topics-grid-container">
+                    <div class="topics-grid">
+                        <div class="topic-card tech-card"><div class="topic-icon" style="color:var(--tech-color)"><i class="fas fa-chart-line"></i></div><div class="topic-card-content"><h3>Coordinate Geometry</h3><p>Visualize math by plotting points and lines on the Cartesian plane. Understand the power of coordinates.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="./Games/line eq/page.html" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card tech-card"><div class="topic-icon" style="color:var(--tech-color)"><i class="fab fa-python"></i></div><div class="topic-card-content"><h3>Advanced Python</h3><p>Level up your coding by learning to control program flow with loops (for, while) and conditional logic (if-else).</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="./Games/Python/page.html" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card tech-card"><div class="topic-icon" style="color:var(--tech-color)"><i class="fas fa-superscript"></i></div><div class="topic-card-content"><h3>Polynomials</h3><p>Master algebraic expressions. Learn to use the Remainder and Factor theorems and apply algebraic identities.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card tech-card"><div class="topic-icon" style="color:var(--tech-color)"><i class="fas fa-vector-square"></i></div><div class="topic-card-content"><h3>Quadrilaterals</h3><p>Go beyond triangles to understand the properties of parallelograms and the applications of the midpoint theorem.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card tech-card"><div class="topic-icon" style="color:var(--tech-color)"><i class="far fa-circle"></i></div><div class="topic-card-content"><h3>Circles</h3><p>Explore the geometry of circles, including chords, arcs, and the angles they subtend at the center and circumference.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card tech-card"><div class="topic-icon" style="color:var(--tech-color)"><i class="fas fa-cube"></i></div><div class="topic-card-content"><h3>Surface Areas & Volumes</h3><p>Calculate the space occupied by 3D shapes like cubes, cylinders, cones, and spheres and find their surface areas.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card tech-card"><div class="topic-icon" style="color:var(--tech-color)"><i class="fas fa-chart-bar"></i></div><div class="topic-card-content"><h3>Statistics & Probability</h3><p>Learn to represent data with histograms and frequency polygons, and calculate experimental probability.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card tech-card"><div class="topic-icon" style="color:var(--tech-color)"><i class="fab fa-js-square"></i></div><div class="topic-card-content"><h3>Intro to JavaScript</h3><p>Bring your websites to life! Learn the basics of JavaScript to make your web pages interactive and dynamic.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                        <div class="topic-card tech-card"><div class="topic-icon" style="color:var(--tech-color)"><i class="fas fa-user-lock"></i></div><div class="topic-card-content"><h3>Cybersecurity</h3><p>Become a digital defender. Learn about the fundamentals of cryptography and how to protect against cyberattacks.</p><div class="button-group"><a href="#" class="btn btn-theory"><i class="fas fa-book-open"></i>Theory</a><a href="#" class="btn btn-game"><i class="fas fa-gamepad"></i>Play</a></div></div></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            AOS.init({ duration: 600, once: true, offset: 50 });
+
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            const mainNav = document.getElementById('main-nav');
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', () => mainNav.classList.toggle('active'));
+            }
+
+            const subjectButtons = document.querySelectorAll('.subject-nav-btn');
+            const subjectSections = document.querySelectorAll('.subject-section');
+            
+            function switchTab(subject) {
+                subjectButtons.forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-subject') === subject));
+                subjectSections.forEach(section => section.classList.toggle('active', section.id === `${subject}-section`));
+            }
+
+            subjectButtons.forEach(button => {
+                button.addEventListener('click', () => switchTab(button.getAttribute('data-subject')));
+            });
+
+            const cards = document.querySelectorAll('.topic-card');
+            cards.forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    card.style.setProperty('--mouse-x', `${x}px`);
+                    card.style.setProperty('--mouse-y', `${y}px`);
+                });
+            });
+
+            particlesJS('particles-js', {
+                particles: {
+                    number: { value: 80, density: { enable: true, value_area: 800 } },
+                    color: { value: "#ffffff" },
+                    shape: { type: "circle" },
+                    opacity: { value: 0.5, random: true, anim: { enable: true, speed: 1, opacity_min: 0.1, sync: false } },
+                    size: { value: 2, random: true, anim: { enable: false } },
+                    line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.15, width: 1 },
+                    move: { enable: true, speed: 1, direction: "none", random: true, straight: false, out_mode: "out", bounce: false }
+                },
+                interactivity: {
+                    detect_on: "canvas",
+                    events: { onhover: { enable: true, mode: "bubble" }, onclick: { enable: true, mode: "push" }, resize: true },
+                    modes: {
+                        bubble: { distance: 200, size: 4, duration: 2, opacity: 0.8 },
+                        push: { particles_nb: 4 }
+                    }
+                },
+                retina_detect: true
+            });
+        });
+    </script>
+</body>
+</html>

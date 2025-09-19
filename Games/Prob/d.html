@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataProbStats Quest 2.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+        }
+        .btn-nav.active {
+            background-color: #4f46e5;
+            box-shadow: 0 0 15px rgba(79, 70, 229, 0.6);
+            transform: scale(1.05);
+        }
+        .game-section {
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .challenge-box {
+            background: rgba(251, 191, 36, 0.1);
+            border-left: 5px solid #f59e0b;
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, #4f46e5, #818cf8);
+            transition: width 0.5s ease-in-out;
+        }
+        .glow-button {
+            box-shadow: 0 0 10px rgba(79, 70, 229, 0.5), 0 0 20px rgba(165, 180, 252, 0.3);
+        }
+        #hanoiCanvas .peg-highlight {
+            animation: pulse-glow 1.5s infinite;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px 5px rgba(46, 204, 113, 0.6); }
+            50% { box-shadow: 0 0 30px 10px rgba(46, 204, 113, 0.3); }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 min-h-screen bg-gradient-to-br from-[#111827] to-[#1e1b4b]">
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <header class="text-center mb-8">
+            <!-- <h1 class="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 mb-2">DataProbStats Quest 2.0</h1> -->
+            <p class="text-lg text-gray-400">An Epic Journey into Data, Probability, and Logic</p>
+            <div class="glass-card mt-4 p-2 inline-flex items-center space-x-6">
+                <div class="text-lg font-bold text-white">Points: <span id="totalPoints" class="text-cyan-400">0</span></div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-brain text-2xl text-purple-400"></i>
+                    <div class="w-48 bg-gray-700 h-4 rounded-full overflow-hidden">
+                        <div id="overallProgress" class="progress-bar w-0 h-full"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div id="achievementBanner" class="hidden fixed top-20 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg z-50 shadow-lg">
+            <i class="fas fa-trophy mr-2"></i><span>Achievement Unlocked!</span>
+        </div>
+
+        <nav class="mb-8">
+            <ul class="flex justify-center flex-wrap gap-3">
+                <button class="btn-nav bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-indigo-600 transform" onclick="showSection('intro')"><i class="fas fa-home mr-2"></i>Intro</button>
+                <button class="btn-nav bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-indigo-600 transform" onclick="showSection('level1')"><i class="fas fa-coins mr-2"></i>Coin Flips</button>
+                <button class="btn-nav bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-indigo-600 transform" onclick="showSection('level2')"><i class="fas fa-dice mr-2"></i>Dice Duel</button>
+                <button class="btn-nav bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-indigo-600 transform" onclick="showSection('level3')"><i class="fas fa-chess-tower mr-2"></i>Tower of Hanoi</button>
+            </ul>
+        </nav>
+
+        <div id="intro" class="game-section">
+             <div class="text-center">
+                 <h2 class="text-3xl font-semibold mb-4 text-white">Welcome, Voyager!</h2>
+                 <p class="mb-6 max-w-3xl mx-auto text-gray-400">Your quest is to navigate the cosmos of chance and logic. Each level is a new star system to explore. Complete challenges, earn points, and master the fundamental forces of data and probability.</p>
+             </div>
+             <div class="grid md:grid-cols-3 gap-6">
+                <div class="glass-card p-6 text-center">
+                    <i class="fas fa-coins text-4xl text-yellow-400 mb-3"></i>
+                    <h3 class="font-semibold text-xl mb-2">Coin Flips</h3>
+                    <p class="text-gray-400">Discover the laws of probability and witness the principle of large numbers in the simplest form of chance.</p>
+                </div>
+                <div class="glass-card p-6 text-center">
+                    <i class="fas fa-dice text-4xl text-green-400 mb-3"></i>
+                    <h3 class="font-semibold text-xl mb-2">Dice Duel</h3>
+                    <p class="text-gray-400">Roll two dice to reveal the secrets of statistical distributions and see how order emerges from randomness.</p>
+                </div>
+                <div class="glass-card p-6 text-center">
+                    <i class="fas fa-chess-tower text-4xl text-red-400 mb-3"></i>
+                    <h3 class="font-semibold text-xl mb-2">Tower of Hanoi</h3>
+                    <p class="text-gray-400">Test your strategic thinking by solving this classic recursive puzzle. Can you find the most efficient solution?</p>
+                </div>
+             </div>
+        </div>
+
+        <div id="level1" class="game-section hidden">
+            <h2 class="text-3xl font-semibold mb-4 text-center">Level 1: The Quantum Coin</h2>
+            <div class="grid md:grid-cols-2 gap-8 items-start">
+                <div class="space-y-8">
+                     <div class="glass-card p-6 flex justify-center items-center h-80">
+                         <canvas id="coinCanvas" width="250" height="250"></canvas>
+                     </div>
+                     <div class="flex flex-wrap justify-center gap-4">
+                        <button id="flipCoinBtn" class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-500 transform glow-button" onclick="flipCoin()"><i class="fas fa-play mr-2"></i>Flip Coin</button>
+                        <button id="flip100Btn" class="bg-cyan-600 text-white px-6 py-3 rounded-lg hover:bg-cyan-500 transform" onclick="flipCoinsMultiple(100)"><i class="fas fa-forward mr-2"></i>Flip 100</button>
+                        <button class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-500 transform" onclick="resetCoins()"><i class="fas fa-undo mr-2"></i>Reset</button>
+                    </div>
+                </div>
+                <div class="space-y-8">
+                    <div class="glass-card p-6">
+                        <h3 class="text-xl font-semibold mb-3 text-center">Results Log</h3>
+                        <div class="relative h-64">
+                          <canvas id="coinDistCanvas"></canvas>
+                        </div>
+                        <div class="bg-gray-800 p-4 rounded-lg mt-4 grid grid-cols-2 gap-2 text-center">
+                            <p><strong>Heads:</strong> <span id="headsCount" class="text-green-400 font-bold">0</span></p>
+                            <p><strong>Tails:</strong> <span id="tailsCount" class="text-red-400 font-bold">0</span></p>
+                            <p><strong>Total Flips:</strong> <span id="totalFlips" class="text-cyan-400 font-bold">0</span></p>
+                            <p><strong>Heads Prob:</strong> <span id="headsProb" class="text-purple-400 font-bold">0.00%</span></p>
+                        </div>
+                    </div>
+                    <div id="l1-challenge" class="challenge-box p-4 rounded-lg">
+                         <h4 class="font-bold text-lg mb-2 text-yellow-400"><i class="fas fa-lightbulb mr-2"></i>Thinking Question</h4>
+                         <p id="l1-question" class="text-gray-300 mb-3"></p>
+                         <div id="l1-answer-area" class="flex flex-wrap items-center gap-2"></div>
+                         <p id="l1-feedback" class="mt-2 font-semibold h-6"></p>
+                     </div>
+                </div>
+            </div>
+            <div class="w-full bg-gray-700 h-2 rounded-full mt-8 overflow-hidden"><div class="progress-bar h-full" id="level1Bar"></div></div>
+        </div>
+        
+        <div id="level2" class="game-section hidden">
+            <h2 class="text-3xl font-semibold mb-4 text-center">Level 2: The Galactic Dice Duel</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 items-start">
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="glass-card p-4 shadow-lg flex justify-center items-center h-48">
+                        <div class="flex justify-around w-full">
+                           <canvas id="dieCanvas1" width="150" height="150"></canvas>
+                           <canvas id="dieCanvas2" width="150" height="150"></canvas>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <button id="rollDieBtn" class="bg-indigo-600 text-white px-5 py-3 rounded-lg hover:bg-indigo-500 transform glow-button" onclick="rollDice()"><i class="fas fa-play mr-2"></i>Roll Dice</button>
+                        <button id="roll100Btn" class="bg-cyan-600 text-white px-5 py-3 rounded-lg hover:bg-cyan-500 transform" onclick="rollDiceMultiple(100)"><i class="fas fa-forward mr-2"></i>Roll 100x</button>
+                        <button class="bg-gray-600 text-white px-5 py-3 rounded-lg hover:bg-gray-500 transform" onclick="resetDice()"><i class="fas fa-undo mr-2"></i>Reset</button>
+                    </div>
+                     <div class="glass-card p-4 shadow-lg h-full">
+                        <h3 class="text-lg font-semibold mb-2 text-center">Stats Dashboard</h3>
+                        <div class="grid grid-cols-2 gap-3 text-center">
+                            <p>Total Rolls: <span id="dieTotalRolls" class="font-bold text-cyan-400 block text-xl">0</span></p>
+                            <p>Mean Sum: <span id="dieMean" class="font-bold text-green-400 block text-xl">0.00</span></p>
+                            <p>Mode(s): <span id="dieMode" class="font-bold text-purple-400 block text-xl">N/A</span></p>
+                            <p>Std Dev: <span id="dieStdDev" class="font-bold text-orange-400 block text-xl">0.00</span></p>
+                        </div>
+                    </div>
+                </div>
+                 <div class="lg:col-span-3 space-y-6">
+                    <div class="glass-card p-4 shadow-lg">
+                        <h3 class="text-lg font-semibold mb-2 text-center">Distribution of Sums</h3>
+                        <div class="relative h-80"> <canvas id="dieDistCanvas"></canvas> </div>
+                    </div>
+                    <div id="l2-challenge" class="challenge-box p-4 rounded-lg">
+                        <h4 class="font-bold text-lg mb-2 text-yellow-400"><i class="fas fa-lightbulb mr-2"></i>Thinking Question</h4>
+                        <p id="l2-question" class="text-gray-300 mb-3"></p>
+                        <div id="l2-answer-area" class="flex flex-wrap items-center gap-2"></div>
+                        <p id="l2-feedback" class="mt-2 font-semibold h-6"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="w-full bg-gray-700 h-2 rounded-full mt-8 overflow-hidden"><div class="progress-bar h-full" id="level2Bar"></div></div>
+        </div>
+        
+        <div id="level3" class="game-section hidden">
+             <h2 class="text-3xl font-semibold mb-4 text-center">Level 3: The Celestial Tower</h2>
+             <div class="glass-card p-6">
+                 <div class="grid grid-cols-1 md:grid-cols-3 justify-items-center items-center gap-4 mb-4">
+                     <div class="flex items-center gap-3">
+                         <label for="disk-slider" class="font-semibold">Disks:</label>
+                         <input id="disk-slider" type="range" min="3" max="8" value="5" class="w-32" oninput="updateDiskCount(this.value)" onchange="setupHanoi()">
+                         <span id="disk-count" class="font-bold text-lg w-4 text-cyan-400">5</span>
+                     </div>
+                     <div class="text-center font-semibold order-first md:order-none">
+                         <p class="text-lg">Moves: <span id="moveCount" class="font-bold text-cyan-400">0</span></p>
+                         <p class="text-sm text-gray-400">Minimum: <span id="minMoves">31</span></p>
+                     </div>
+                     <div class="flex gap-2">
+                        <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-500 transform" onclick="getHanoiHint()"><i class="fas fa-question-circle mr-2"></i>Hint</button>
+                        <button class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transform" onclick="setupHanoi()"><i class="fas fa-undo mr-2"></i>Reset</button>
+                     </div>
+                 </div>
+                 <div class="flex justify-center bg-gray-800 rounded-lg p-2">
+                      <canvas id="hanoiCanvas" width="600" height="350"></canvas>
+                  </div>
+                  <div class="h-6 mt-2 text-center text-xl font-bold">
+                      <p id="hanoiFeedback" class="text-green-400"></p>
+                  </div>
+             </div>
+             <div class="w-full bg-gray-700 h-2 rounded-full mt-8 overflow-hidden"><div class="progress-bar h-full" id="level3Bar"></div></div>
+        </div>
+
+    </div>
+
+    <script>
+    // --- Game State Management ---
+    const state = {
+        totalPoints: 0,
+        level1: { heads: 0, tails: 0, totalFlips: 0, currentQuestion: 0, achievement: false },
+        level2: { rolls: Array(13).fill(0), allRollSums: [], totalRolls: 0, currentQuestion: 0, achievement: false },
+        level3: { 
+            disks: 5, pegs: [], selectedPeg: -1, heldDisk: null, moves: 0, minMoves: 0, 
+            won: false, isAnimating: false, achievement: false, hint: null 
+        },
+        charts: {}
+    };
+
+    // --- Thinking Questions ---
+    const l1Questions = [
+        { q: "What is the theoretical probability of a fair coin landing on Heads?", type: 'buttons', options: ['1/4', '1/2', '1/3', '1'], validate: (val) => val === '1/2', feedback: "Correct! A fair coin has 2 equally likely outcomes." },
+        { q: "After 5 Heads in a row, what's the probability the *next* flip is Heads?", type: 'buttons', options: ['Lower', '1/2', 'Higher'], validate: (val) => val === '1/2', feedback: "Exactly! Each flip is an independent event." },
+        { q: "The 'Law of Large Numbers' suggests that with more flips, the experimental probability will...", type: 'buttons', options: ['Get closer to 50%', 'Get further from 50%', 'Stay random'], validate: (val) => val === 'Get closer to 50%', feedback: "You got it! Randomness averages out over time." }
+    ];
+    const l2Questions = [
+        { q: "When rolling two standard dice, what is the most probable sum?", type: 'input', placeholder: 'Enter a number', validate: (val) => val == 7, feedback: "Correct! A sum of 7 has the most combinations (1+6, 2+5, 3+4, etc)." },
+        { q: "What is the theoretical mean (average) of the sum of two dice?", type: 'input', placeholder: 'Enter a number', validate: (val) => val == 7, feedback: "Perfect! It's 3.5 (mean of one die) + 3.5 = 7." },
+        { q: "After many rolls, the shape of the bar chart distribution will look like...", type: 'buttons', options: ['A flat line', 'A Bell Curve', 'A U-shape'], validate: (val) => val === 'A Bell Curve', feedback: "That's right! It forms a triangular or bell-like shape, a key concept in statistics." },
+        { q: "What is the least likely sum you can roll with two dice?", type: 'buttons', options: ['1', '2 and 12', '6 and 8'], validate: (val) => val === '2 and 12', feedback: "Exactly! Both 2 (1+1) and 12 (6+6) have only one possible combination."}
+    ];
+
+    // --- Initialization and Core Logic ---
+    window.onload = () => {
+        initCoinChart();
+        initDieChart();
+        setupHanoi();
+        loadQuestion(1);
+        loadQuestion(2);
+        document.getElementById('hanoiCanvas').addEventListener('click', handleHanoiClick);
+        showSection('intro');
+    };
+
+    function showSection(sectionId) {
+        document.querySelectorAll('.game-section').forEach(s => s.classList.add('hidden'));
+        document.getElementById(sectionId).classList.remove('hidden');
+        document.querySelectorAll('.btn-nav').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.getAttribute('onclick').includes(sectionId)) {
+                btn.classList.add('active');
+            }
+        });
+    }
+    
+    function triggerAchievement(message) {
+        const banner = document.getElementById('achievementBanner');
+        banner.querySelector('span').textContent = message;
+        banner.classList.remove("hidden");
+        setTimeout(() => banner.classList.add("hidden"), 3000);
+        state.totalPoints += 50;
+        updatePoints();
+    }
+    
+    function updatePoints() {
+        document.getElementById("totalPoints").textContent = state.totalPoints;
+        const maxPoints = 500;
+        const progress = Math.min(state.totalPoints / maxPoints * 100, 100);
+        document.getElementById("overallProgress").style.width = `${progress}%`;
+    }
+
+    function updateLevelProgress(level, current, max, achievementMessage, isAchievementUnlocked) {
+        const progress = Math.min(current / max, 1);
+        document.getElementById(`level${level}Bar`).style.width = `${100 * progress}%`;
+        if (progress === 1 && !isAchievementUnlocked) {
+            triggerAchievement(achievementMessage);
+            state[`level${level}`].achievement = true;
+        }
+    }
+
+    // --- Question Logic ---
+    function loadQuestion(level) {
+        const questions = level === 1 ? l1Questions : l2Questions;
+        const qState = level === 1 ? state.level1 : state.level2;
+        const q = questions[qState.currentQuestion % questions.length];
+        
+        document.getElementById(`l${level}-question`).textContent = q.q;
+        const answerArea = document.getElementById(`l${level}-answer-area`);
+        answerArea.innerHTML = '';
+        
+        if (q.type === 'input') {
+            answerArea.innerHTML = `<input type="text" id="l${level}-input" placeholder="${q.placeholder}" class="border rounded p-2 flex-grow bg-gray-700 text-white border-gray-600">
+                                    <button class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600" onclick="checkAnswer(${level})">Submit</button>`;
+        } else { // 'buttons'
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.textContent = opt;
+                btn.className = 'bg-yellow-600 text-white px-3 py-1 rounded hover:bg-yellow-500';
+                btn.onclick = () => checkAnswer(level, opt);
+                answerArea.appendChild(btn);
+            });
+        }
+        document.getElementById(`l${level}-feedback`).textContent = '';
+    }
+
+    function checkAnswer(level, value) {
+        const questions = level === 1 ? l1Questions : l2Questions;
+        const qState = level === 1 ? state.level1 : state.level2;
+        const q = questions[qState.currentQuestion % questions.length];
+        
+        const answer = value !== undefined ? value : document.getElementById(`l${level}-input`).value;
+        const feedbackEl = document.getElementById(`l${level}-feedback`);
+        
+        if (q.validate(answer)) {
+            feedbackEl.textContent = q.feedback;
+            feedbackEl.className = 'mt-2 font-semibold text-green-400 h-6';
+            state.totalPoints += 25;
+            updatePoints();
+            qState.currentQuestion++;
+            setTimeout(() => loadQuestion(level), 3000);
+        } else {
+            feedbackEl.textContent = "Not quite, try again!";
+            feedbackEl.className = 'mt-2 font-semibold text-red-400 h-6';
+        }
+    }
+    
+    function disableButtons(ids, disabled = true) {
+        ids.forEach(id => { if(document.getElementById(id)) document.getElementById(id).disabled = disabled; });
+    }
+
+    // --- Level 1: Coin Flips ---
+    function initCoinChart() {
+        const ctx = document.getElementById('coinDistCanvas').getContext('2d');
+        state.charts.coin = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Heads', 'Tails'],
+                datasets: [{
+                    label: 'Frequency', data: [0, 0], 
+                    backgroundColor: ['rgba(74, 222, 128, 0.5)', 'rgba(248, 113, 113, 0.5)'],
+                    borderColor: ['#22c55e', '#ef4444'], borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: { 
+                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#9ca3af' } }, 
+                    x: { grid: { display: false }, ticks: { color: '#9ca3af', font: { size: 14 } } } 
+                },
+                plugins: { legend: { display: false } },
+            }
+        });
+    }
+
+    function flipCoin() {
+        disableButtons(['flipCoinBtn', 'flip100Btn']);
+        const result = Math.random() < 0.5; // true for heads
+        animateCoin(result, () => {
+            if (result) state.level1.heads++; else state.level1.tails++;
+            state.level1.totalFlips++;
+            updateCoinStats();
+            state.totalPoints += 1;
+            updatePoints();
+            updateLevelProgress(1, state.level1.totalFlips, 100, "Coin Flip Champion!", state.level1.achievement);
+            disableButtons(['flipCoinBtn', 'flip100Btn'], false);
+        });
+    }
+
+    function flipCoinsMultiple(count) {
+        let headsBatch = 0;
+        for (let i = 0; i < count; i++) { if (Math.random() < 0.5) headsBatch++; }
+        state.level1.heads += headsBatch;
+        state.level1.tails += (count - headsBatch);
+        state.level1.totalFlips += count;
+        state.totalPoints += count;
+        updateCoinStats();
+        updatePoints();
+        updateLevelProgress(1, state.level1.totalFlips, count, "Coin Flip Champion!", state.level1.achievement);
+    }
+
+    function animateCoin(isHeads, onComplete) {
+        const canvas = document.getElementById('coinCanvas');
+        const ctx = canvas.getContext('2d');
+        const duration = 500, startTime = performance.now();
+        
+        function draw(scale, showResult = false) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.scale(1, scale);
+            ctx.beginPath();
+            ctx.arc(0, 0, 80, 0, 2 * Math.PI);
+            ctx.fillStyle = "#facc15";
+            ctx.fill();
+            ctx.strokeStyle = "#ca8a04";
+            ctx.lineWidth = 5;
+            ctx.stroke();
+            if (showResult || scale < 0) {
+                ctx.scale(1, showResult ? 1 : -1);
+                ctx.fillStyle = "#4b5563";
+                ctx.font = "bold 80px Poppins";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(isHeads ? "H" : "T", 0, 0);
+            }
+            ctx.restore();
+        }
+
+        requestAnimationFrame(function step(currentTime) {
+            const elapsedTime = currentTime - startTime;
+            if (elapsedTime < duration) {
+                draw(Math.cos((elapsedTime / duration) * Math.PI * 3));
+                requestAnimationFrame(step);
+            } else {
+                draw(1, true);
+                onComplete();
+            }
+        });
+    }
+
+    function updateCoinStats() {
+        document.getElementById('headsCount').textContent = state.level1.heads;
+        document.getElementById('tailsCount').textContent = state.level1.tails;
+        document.getElementById('totalFlips').textContent = state.level1.totalFlips;
+        const prob = state.level1.totalFlips > 0 ? (state.level1.heads / state.level1.totalFlips * 100) : 0;
+        document.getElementById('headsProb').textContent = prob.toFixed(2) + "%";
+        state.charts.coin.data.datasets[0].data = [state.level1.heads, state.level1.tails];
+        state.charts.coin.update();
+    }
+    
+    function resetCoins() {
+        Object.assign(state.level1, { heads: 0, tails: 0, totalFlips: 0, achievement: false, currentQuestion: 0 });
+        updateCoinStats();
+        updateLevelProgress(1, 0, 100, "", true);
+        loadQuestion(1);
+        document.getElementById('coinCanvas').getContext('2d').clearRect(0, 0, 300, 300);
+    }
+
+    // --- Level 2: Dice Rolls ---
+    function initDieChart() {
+        const ctx = document.getElementById('dieDistCanvas').getContext('2d');
+        state.charts.die = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+                datasets: [{
+                    label: 'Sum Count', data: state.level2.rolls.slice(2),
+                    backgroundColor: 'rgba(79, 70, 229, 0.6)', borderColor: '#4f46e5', borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: { 
+                    y: { beginAtZero: true, ticks: { stepSize: 1, color: '#9ca3af' }, grid: { color: 'rgba(255,255,255,0.1)' } }, 
+                    x: { grid: { display: false }, ticks: { color: '#9ca3af' } } 
+                },
+                plugins: { legend: { display: false } },
+            }
+        });
+    }
+
+    function rollDice() {
+        disableButtons(['rollDieBtn', 'roll100Btn']);
+        const result1 = Math.floor(Math.random() * 6) + 1;
+        const result2 = Math.floor(Math.random() * 6) + 1;
+        animateTwoDice(result1, result2, () => {
+            const sum = result1 + result2;
+            state.level2.rolls[sum]++;
+            state.level2.allRollSums.push(sum);
+            state.level2.totalRolls++;
+            updateDieStats();
+            state.totalPoints += 2;
+            updatePoints();
+            updateLevelProgress(2, state.level2.totalRolls, 100, "Dice Master!", state.level2.achievement);
+            disableButtons(['rollDieBtn', 'roll100Btn'], false);
+        });
+    }
+
+    function rollDiceMultiple(count) {
+        for (let i = 0; i < count; i++) {
+            const result1 = Math.floor(Math.random() * 6) + 1;
+            const result2 = Math.floor(Math.random() * 6) + 1;
+            const sum = result1 + result2;
+            state.level2.rolls[sum]++;
+            state.level2.allRollSums.push(sum);
+        }
+        state.level2.totalRolls += count;
+        state.totalPoints += count * 2;
+        updateDieStats();
+        updatePoints();
+        updateLevelProgress(2, state.level2.totalRolls, count, "Dice Master!", state.level2.achievement);
+    }
+    
+    function animateTwoDice(final1, final2, onComplete) {
+        const canvas1 = document.getElementById('dieCanvas1');
+        const canvas2 = document.getElementById('dieCanvas2');
+        const ctx1 = canvas1.getContext('2d');
+        const ctx2 = canvas2.getContext('2d');
+        const duration = 800, startTime = performance.now();
+
+        requestAnimationFrame(function step(currentTime) {
+            const elapsedTime = currentTime - startTime;
+            if (elapsedTime < duration) {
+                ctx1.clearRect(0,0,150,150);
+                ctx2.clearRect(0,0,150,150);
+                drawDieFace(ctx1, Math.floor(Math.random() * 6) + 1, true, elapsedTime/duration);
+                drawDieFace(ctx2, Math.floor(Math.random() * 6) + 1, true, elapsedTime/duration);
+                requestAnimationFrame(step);
+            } else {
+                ctx1.clearRect(0,0,150,150);
+                ctx2.clearRect(0,0,150,150);
+                drawDieFace(ctx1, final1);
+                drawDieFace(ctx2, final2);
+                onComplete();
+            }
+        });
+    }
+    
+    function drawDieFace(ctx, result, isAnimating = false, progress = 1) {
+        const w = ctx.canvas.width, h = ctx.canvas.height;
+        const dotRadius = 8, padding = 15;
+        
+        ctx.save();
+        if (isAnimating) {
+            const angle = 1080 * Math.pow(progress, 2) * (Math.PI / 180);
+            const scale = 1 - 0.5 * Math.sin(progress * Math.PI);
+            ctx.translate(w/2, h/2);
+            ctx.rotate(angle);
+            ctx.scale(scale, scale);
+            ctx.translate(-w/2, -h/2);
+        }
+
+        const x = 5, y = 5, width = w - 10, height = h - 10, radius = 15;
+        ctx.fillStyle = "#e5e7eb";
+        ctx.strokeStyle = "#9ca3af";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.arcTo(x + width, y, x + width, y + height, radius);
+        ctx.arcTo(x + width, y + height, x, y + height, radius);
+        ctx.arcTo(x, y + height, x, y, radius);
+        ctx.arcTo(x, y, x + width, y, radius);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        const positions = {
+            1: [[w/2, h/2]],
+            2: [[padding, padding], [w-padding, h-padding]],
+            3: [[padding, padding], [w/2, h/2], [w-padding, h-padding]],
+            4: [[padding, padding], [w-padding, padding], [padding, h-padding], [w-padding, h-padding]],
+            5: [[padding, padding], [w-padding, padding], [w/2, h/2], [padding, h-padding], [w-padding, h-padding]],
+            6: [[padding, h/2], [padding, padding], [padding, h-padding], [w-padding, h/2], [w-padding, padding], [w-padding, h-padding]]
+        };
+        ctx.fillStyle = '#1f2937';
+        if (positions[result]) {
+            positions[result].forEach(([px, py]) => {
+                ctx.beginPath();
+                ctx.arc(px, py, dotRadius, 0, 2 * Math.PI);
+                ctx.fill();
+            });
+        }
+        ctx.restore();
+    }
+
+    function updateDieStats() {
+        const { allRollSums, totalRolls } = state.level2;
+        document.getElementById('dieTotalRolls').textContent = totalRolls;
+        
+        if (totalRolls > 0) {
+            const sum = allRollSums.reduce((a, b) => a + b, 0);
+            const mean = sum / totalRolls;
+            document.getElementById('dieMean').textContent = mean.toFixed(2);
+            
+            const variance = allRollSums.reduce((a, b) => a + (b - mean) ** 2, 0) / totalRolls;
+            document.getElementById('dieStdDev').textContent = Math.sqrt(variance).toFixed(2);
+            
+            const counts = state.level2.rolls;
+            const maxCount = Math.max(...counts);
+            const mode = counts.map((c, i) => c === maxCount ? i : null).filter(val => val !== null);
+            document.getElementById('dieMode').textContent = mode.join(", ");
+        }
+        
+        state.charts.die.data.datasets[0].data = state.level2.rolls.slice(2);
+        state.charts.die.update();
+    }
+
+    function resetDice() {
+        Object.assign(state.level2, { rolls: Array(13).fill(0), allRollSums: [], totalRolls: 0, achievement: false, currentQuestion: 0 });
+        updateDieStats();
+        updateLevelProgress(2, 0, 100, "", true);
+        loadQuestion(2);
+        document.getElementById('dieCanvas1').getContext('2d').clearRect(0, 0, 150, 150);
+        document.getElementById('dieCanvas2').getContext('2d').clearRect(0, 0, 150, 150);
+    }
+    
+    // --- Level 3: Tower of Hanoi ---
+    function updateDiskCount(value) {
+        document.getElementById('disk-count').textContent = value;
+    }
+
+    function setupHanoi() {
+        const hanoiState = state.level3;
+        hanoiState.disks = parseInt(document.getElementById('disk-slider').value);
+        updateDiskCount(hanoiState.disks);
+        
+        Object.assign(hanoiState, { won: false, moves: 0, selectedPeg: -1, heldDisk: null, isAnimating: false, minMoves: 2 ** hanoiState.disks - 1, achievement: false, hint: null });
+        
+        hanoiState.pegs = [[], [], []];
+        for (let i = hanoiState.disks; i > 0; i--) hanoiState.pegs[0].push({ size: i });
+        
+        document.getElementById('moveCount').textContent = 0;
+        document.getElementById('minMoves').textContent = hanoiState.minMoves;
+        document.getElementById('hanoiFeedback').textContent = '';
+        updateLevelProgress(3, 0, 1, "", true);
+        
+        drawHanoi();
+    }
+
+    function drawHanoi() {
+        const canvas = document.getElementById('hanoiCanvas');
+        const ctx = canvas.getContext('2d');
+        const { width, height } = canvas;
+        const { pegs, disks, heldDisk, hint } = state.level3;
+        
+        const pegWidth = 10, pegHeight = 250, diskHeight = 25, maxDiskWidth = 180;
+        const pegXPositions = [width / 4, width / 2, 3 * width / 4];
+        const baseY = height - 30;
+        const diskColors = ["#ef4444", "#f97316", "#facc15", "#4ade80", "#22d3ee", "#6366f1", "#a78bfa", "#ec4899"];
+
+        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = "#4b5563";
+        ctx.fillRect(0, baseY, width, 20); // Base
+
+        pegXPositions.forEach((x, i) => {
+            if (hint && (i === hint.source || i === hint.target)) {
+                 ctx.fillStyle = '#22c55e'; // Highlight color for hinted pegs
+            } else {
+                 ctx.fillStyle = "#4b5563";
+            }
+            ctx.fillRect(x - pegWidth / 2, baseY - pegHeight, pegWidth, pegHeight); // Pegs
+        });
+
+        pegs.forEach((peg, pegIndex) => {
+            peg.forEach((disk, diskIndex) => {
+                const diskWidth = 40 + (disk.size / disks) * (maxDiskWidth - 40);
+                const x = pegXPositions[pegIndex] - diskWidth / 2;
+                const y = baseY - (diskIndex + 1) * diskHeight;
+                ctx.fillStyle = diskColors[disk.size - 1];
+                ctx.fillRect(x, y, diskWidth, diskHeight-2);
+            });
+        });
+
+        if (heldDisk) {
+            const diskWidth = 40 + (heldDisk.size / disks) * (maxDiskWidth - 40);
+            ctx.fillStyle = diskColors[heldDisk.size - 1];
+            ctx.globalAlpha = 0.7;
+            ctx.fillRect(heldDisk.x - diskWidth / 2, heldDisk.y, diskWidth, diskHeight-2);
+            ctx.globalAlpha = 1.0;
+        }
+    }
+
+    function handleHanoiClick(event) {
+        const hanoiState = state.level3;
+        if (hanoiState.won || hanoiState.isAnimating) return;
+        hanoiState.hint = null; // Clear hint on click
+
+        const rect = event.target.getBoundingClientRect();
+        const clickedPegIndex = Math.floor((event.clientX - rect.left) / (event.target.width / 3));
+
+        document.getElementById('hanoiFeedback').textContent = '';
+
+        if (hanoiState.selectedPeg === -1) { // Pick up a disk
+            if (hanoiState.pegs[clickedPegIndex].length > 0) {
+                hanoiState.selectedPeg = clickedPegIndex;
+                hanoiState.heldDisk = hanoiState.pegs[clickedPegIndex].pop();
+                animateLift(hanoiState.selectedPeg);
+            }
+        } else { // Place a disk
+            const sourcePeg = hanoiState.selectedPeg;
+            const targetPeg = clickedPegIndex;
+            const targetPegArray = hanoiState.pegs[targetPeg];
+            const topDiskOnTarget = targetPegArray[targetPegArray.length - 1];
+
+            if (sourcePeg === targetPeg || !topDiskOnTarget || hanoiState.heldDisk.size < topDiskOnTarget.size) { // Valid move or returning to same peg
+                animateMove(sourcePeg, targetPeg, () => {
+                    targetPegArray.push(hanoiState.heldDisk);
+                    hanoiState.heldDisk = null;
+                    hanoiState.selectedPeg = -1;
+                    if (sourcePeg !== targetPeg) {
+                      hanoiState.moves++;
+                      document.getElementById('moveCount').textContent = hanoiState.moves;
+                      checkHanoiWin();
+                    }
+                    drawHanoi();
+                });
+            } else { // Invalid move
+                document.getElementById('hanoiFeedback').textContent = 'Invalid! Cannot place larger disk on smaller one.';
+                hanoiState.pegs[sourcePeg].push(hanoiState.heldDisk); // Return disk
+                hanoiState.heldDisk = null;
+                hanoiState.selectedPeg = -1;
+                drawHanoi();
+            }
+        }
+    }
+    
+    function getHanoiHint() {
+        const { disks, pegs, moves } = state.level3;
+        const totalMoves = 2 ** disks - 1;
+        const i = moves + 1; // The move number we are trying to find
+        
+        const source = (i & i - 1) % 3;
+        const target = ((i | i - 1) + 1) % 3;
+        
+        // Find the disk that should be moved
+        let diskToMove = null;
+        for (let j = 0; j < pegs[source].length; j++) {
+            const disk = pegs[source][j];
+            let canBeMoved = true;
+            // A disk can be moved if there isn't a smaller disk on top of it on another peg
+            for (let k = 0; k < 3; k++) {
+                if (k === source) continue;
+                if (pegs[k].length > 0 && pegs[k][pegs[k].length - 1].size < disk.size) {
+                    canBeMoved = false;
+                    break;
+                }
+            }
+            if (canBeMoved) {
+                diskToMove = disk;
+                break;
+            }
+        }
+
+        // Logic might be complex; let's use a simpler iterative method for hints
+        const smallDiskPeg = pegs.findIndex(p => p.some(d => d.size === 1));
+        let nextSource, nextTarget;
+        
+        // Find next move based on position of smallest disk
+        if (disks % 2 !== 0) { // Odd number of disks
+            if(smallDiskPeg === 0) { nextSource = 0; nextTarget = 2; }
+            else if (smallDiskPeg === 1) { nextSource = 1; nextTarget = 0; }
+            else { nextSource = 2; nextTarget = 1; }
+        } else { // Even
+            if(smallDiskPeg === 0) { nextSource = 0; nextTarget = 1; }
+            else if (smallDiskPeg === 1) { nextSource = 1; nextTarget = 2; }
+            else { nextSource = 2; nextTarget = 0; }
+        }
+        
+        // If moving the small disk is not the only valid move, find the other one
+        const topDisks = pegs.map(p => p.length > 0 ? p[p.length-1].size : Infinity);
+        topDisks[smallDiskPeg] = Infinity; // ignore small disk
+        const otherMovers = topDisks.filter(s => s !== Infinity).sort((a,b) => a-b);
+        
+        if (otherMovers.length > 1) {
+            const diskAIndex = pegs.findIndex(p => p.length > 0 && p[p.length-1].size === otherMovers[0]);
+            const diskBIndex = pegs.findIndex(p => p.length > 0 && p[p.length-1].size === otherMovers[1]);
+            // The only valid move is from the smaller of the two to the larger
+             state.level3.hint = { source: diskAIndex, target: diskBIndex };
+        } else {
+             state.level3.hint = { source: nextSource, target: nextTarget };
+        }
+        
+        drawHanoi();
+    }
+    
+    function animate(duration, update, onComplete) {
+        state.level3.isAnimating = true;
+        const startTime = performance.now();
+        requestAnimationFrame(function step(currentTime) {
+            const progress = Math.min((currentTime - startTime) / duration, 1);
+            update(progress);
+            drawHanoi();
+            if (progress < 1) requestAnimationFrame(step);
+            else {
+                state.level3.isAnimating = false;
+                if (onComplete) onComplete();
+            }
+        });
+    }
+
+    function animateLift(sourcePegIndex, onComplete) {
+        const { width, height } = document.getElementById('hanoiCanvas');
+        const pegXPositions = [width / 4, width / 2, 3 * width / 4];
+        const startY = (height - 30) - (state.level3.pegs[sourcePegIndex].length + 1) * 25;
+        state.level3.heldDisk.x = pegXPositions[sourcePegIndex];
+        state.level3.heldDisk.y = startY;
+        animate(200, p => state.level3.heldDisk.y = startY * (1-p) + 50 * p, onComplete);
+    }
+    
+    function animateMove(sourcePegIndex, targetPegIndex, onComplete) {
+        const { width, height } = document.getElementById('hanoiCanvas');
+        const pegXPositions = [width / 4, width / 2, 3 * width / 4];
+        const startX = pegXPositions[sourcePegIndex], endX = pegXPositions[targetPegIndex];
+        animate(200, p => state.level3.heldDisk.x = startX * (1-p) + endX * p, () => {
+            const endY = (height-30) - (state.level3.pegs[targetPegIndex].length + 1) * 25;
+            animate(200, p => state.level3.heldDisk.y = 50 * (1-p) + endY * p, onComplete);
+        });
+    }
+
+    function checkHanoiWin() {
+        const { level3: hanoiState } = state;
+        const isWon = hanoiState.pegs[1].length === hanoiState.disks || hanoiState.pegs[2].length === hanoiState.disks;
+
+        if (isWon) {
+            hanoiState.won = true;
+            let message = `You won in ${hanoiState.moves} moves!`;
+            if (hanoiState.moves === hanoiState.minMoves) {
+                message += " Flawless Victory! 🏆";
+                state.totalPoints += 150;
+            } else { state.totalPoints += 75; }
+            document.getElementById('hanoiFeedback').textContent = message;
+            updateLevelProgress(3, 1, 1, "Puzzle Master!", hanoiState.achievement);
+            updatePoints();
+        }
+    }
+    </script>
+</body>
+</html>

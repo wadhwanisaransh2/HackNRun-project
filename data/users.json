@@ -1,0 +1,25 @@
+[
+  {
+    "id": "1758291613479",
+    "name": "Aditya Sisodiya",
+    "email": "adi@gmail.com",
+    "role": "student",
+    "passwordHash": "$2b$10$npKEYGs9L4javI1xA5SKOO6n4y4iiI.ocf1f4BQxeOlMbQsbfAIha"
+  },
+  {
+    "id": "1758299499051",
+    "name": "sumer singh rao",
+    "email": "sumer@gmail.com",
+    "role": "student",
+    "passwordHash": "$2b$10$UE7e4/hcJcGbl/hft1Cjnu3TTI83SMEOJJWKy1WkBBWSUtpwOFuR6",
+    "score": 10
+  },
+  {
+    "id": "1758304045913",
+    "name": "Deepak Saini",
+    "email": "deepaksaini@gmail.com",
+    "role": "student",
+    "passwordHash": "$2b$10$GVuwpKBnfa5W0Fi3d9WsueoDflwRFD/N34yOHFnvFrKCZuDNxEzD6",
+    "score": 45
+  }
+]
